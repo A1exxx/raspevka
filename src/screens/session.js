@@ -3,14 +3,14 @@
 // интонация → беглость → охлаждение. Между упражнениями — короткая заставка.
 import { renderGame } from './game.js';
 import { sustain, siren, fiveNoteScale, agilityRun } from '../theory/exercises.js';
+import { getVoiceType } from '../theory/voice-types.js';
 import * as progress from '../state/progress.js';
 
 export function renderSession(app, mic, tracker, { onExit }) {
-  // Корневой тон из диапазона юзера (комфортный низ +3 полутона), иначе C4.
-  const range = progress.getRange();
-  let root = range ? range.low + 3 : 60;
-  // Беглость уходит на +9 — следим, чтобы не вылезти за верх диапазона.
-  if (range && root + 9 > range.high) root = Math.max(range.low, range.high - 9);
+  // Корневой тон из центра типа голоса (иначе C4).
+  const v = progress.getVoice();
+  const t = v && getVoiceType(v.key);
+  const root = t ? t.center : 60;
 
   const seq = [
     { title: 'Разогрев — мычание', tip: 'Тяни ровно, мягко, на «м-м-м».', ex: sustain(root, 6) },
@@ -19,6 +19,9 @@ export function renderSession(app, mic, tracker, { onExit }) {
     { title: 'Беглость «Ма»', tip: 'Лёгко и быстро, не зажимайся.', ex: agilityRun(root) },
     { title: 'Охлаждение — долгая нота', tip: 'Спокойно отпусти голос на «А».', ex: sustain(root, 8) },
   ];
+  // Масштаб темпа под выбранную сложность.
+  const f = progress.difficultyFactor();
+  seq.forEach((s) => { s.ex.tempo = Math.max(40, Math.round(s.ex.tempo * f)); });
 
   let i = 0;
   const results = [];

@@ -1,9 +1,13 @@
 // game.js — экран упражнения: слушаем эталон → отсчёт → проход по хайвею → итог.
 import { Scorer } from '../game/scoring.js';
 import { NoteHighway } from '../game/note-highway.js';
-import { playSequence, playClick } from '../audio/reference-tone.js';
+import { playSequence, playClick, playTone } from '../audio/reference-tone.js';
 import { referenceFreqs } from '../theory/exercises.js';
 import { hzToNoteInfo } from '../theory/note-map.js';
+import { getGuide } from '../state/progress.js';
+
+// Компенсация задержки: голос детектится позже, чем нота прошла линию.
+const LATENCY_S = 0.09;
 
 export function renderGame(app, mic, tracker, exercise, opts = {}) {
   const { onExit, onAgain, onComplete, explain } = opts;
@@ -84,10 +88,17 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
 
   // 3) Проход
   function startRun() {
-    msg.textContent = 'Пой!';
+    msg.textContent = getGuide() ? 'Пой за подсказкой!' : 'Пой!';
     tracker.reset();
     startPerf = performance.now();
     lastPerf = startPerf;
+    // Звук-поводырь: тихо проигрываем тон каждой ноты ровно когда она у линии,
+    // чтобы попадать ухом, а не только глазом. Аудио-часы стартуют вместе с игрой.
+    if (getGuide()) {
+      highway.timed.forEach((seg) => {
+        playTone(mic.ctx, seg.hz, Math.max(0.2, seg.dur * 0.92), seg.start, 0.1);
+      });
+    }
     loop();
   }
 
@@ -105,7 +116,8 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
       sungHz = r.smoothedHz;
     }
 
-    const ev = highway.evaluate(now, voiced ? sungHz : null, voiced);
+    // Скоринг — с учётом задержки голоса; отрисовка — по «настоящему» времени.
+    const ev = highway.evaluate(now - LATENCY_S, voiced ? sungHz : null, voiced);
     if (ev.index >= 0) scorer.record(ev.index, ev.zone, dt, ev.voiced);
     highway.draw(now, voiced ? sungHz : null, voiced);
 

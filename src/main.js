@@ -1,11 +1,12 @@
 // main.js — точка входа. MVP: приветствие → меню → (тюнер | упражнение) → итог.
 import { MicEngine } from './audio/mic.js';
 import { PitchTracker } from './audio/pitch-detector.js';
-import { hzToNoteInfo, hzToY, centsZone } from './theory/note-map.js';
+import { hzToNoteInfo, hzToY, centsZone, midiToHz } from './theory/note-map.js';
 import { renderGame } from './screens/game.js';
 import { fiveNoteScale, agilityRun, sustain, octaveJump } from './theory/exercises.js';
 import { renderSession } from './screens/session.js';
-import { renderOnboarding } from './screens/onboarding-range.js';
+import { renderVoice } from './screens/voice.js';
+import { getVoiceType } from './theory/voice-types.js';
 import { renderBreathing, BREATHING } from './screens/breathing.js';
 import * as progress from './state/progress.js';
 
@@ -14,15 +15,31 @@ const mic = new MicEngine({ fftSize: 2048 });
 let tracker = null;
 let rafId = null;
 
-// Корневой тон по умолчанию (C4). На Фазе 3 берётся из диапазона пользователя.
+// Корневой тон по умолчанию (C4) — если тип голоса не задан.
 const DEFAULT_ROOT = 60;
 
 const EXERCISES = [
-  { label: 'Удержание ноты', sub: 'держать ровный звук', make: () => sustain(DEFAULT_ROOT, 8) },
-  { label: 'Гамма «Ма-Мэ»', sub: 'попадать в ноты гаммы', make: () => fiveNoteScale(DEFAULT_ROOT) },
-  { label: 'Беглость «Ма»', sub: 'быстрые ноты — как в рекламе', make: () => agilityRun(DEFAULT_ROOT) },
-  { label: 'Октавный скачок', sub: 'прыжок на октаву и назад', make: () => octaveJump(DEFAULT_ROOT) },
+  { label: 'Удержание ноты', sub: 'держать ровный звук', make: (r) => sustain(r, 8) },
+  { label: 'Гамма «Ма-Мэ»', sub: 'попадать в ноты гаммы', make: (r) => fiveNoteScale(r) },
+  { label: 'Беглость «Ма»', sub: 'быстрые ноты — как в рекламе', make: (r) => agilityRun(r) },
+  { label: 'Октавный скачок', sub: 'прыжок на октаву и назад', make: (r) => octaveJump(r) },
 ];
+
+// Корень упражнений из центра типа голоса (иначе C4).
+function voiceRoot() {
+  const v = progress.getVoice();
+  const t = v && getVoiceType(v.key);
+  return t ? t.center : DEFAULT_ROOT;
+}
+
+// Сузить диапазон детекции под голос — режет октавные ошибки и шум.
+function applyTrackerRange() {
+  if (!tracker) return;
+  const v = progress.getVoice();
+  const t = v && getVoiceType(v.key);
+  if (t) tracker.setRange(midiToHz(t.low - 5), midiToHz(t.high + 5));
+  else tracker.setRange(60, 1200);
+}
 
 // ---------- Экран 1: приветствие + запрос микрофона ----------
 function renderWelcome() {
@@ -48,7 +65,17 @@ function renderWelcome() {
     try {
       const { sampleRate } = await mic.start();
       tracker = new PitchTracker(sampleRate, { fftSize: 2048, minClarity: 0.9 });
-      renderMenu();
+      // Первый запуск без типа голоса — предложим определить (можно пропустить).
+      if (progress.getVoice()) {
+        applyTrackerRange();
+        renderMenu();
+      } else {
+        renderVoice(app, mic, tracker, {
+          onDone: () => { applyTrackerRange(); renderMenu(); },
+          onExit: renderMenu,
+          canSkip: true,
+        });
+      }
     } catch (e) {
       err.textContent = 'Не удалось получить доступ к микрофону: ' + (e?.message || e) +
         '. Проверь разрешения браузера. На телефоне нужен HTTPS.';
@@ -72,54 +99,71 @@ function renderMenu() {
     </button>
   `).join('');
   const streak = progress.getStreak();
-  const range = progress.getRange();
+  const voice = progress.getVoice();
+  const vType = voice && getVoiceType(voice.key);
+  const diff = progress.getDifficulty();
+  const guideOn = progress.getGuide();
+  const diffBtn = (key, label) => `<button data-diff="${key}" class="${diff === key ? 'on' : ''}">${label}</button>`;
   app.innerHTML = `
     <div class="screen">
       <div class="brand"><h1>Распевка</h1>
-        ${streak > 0 ? `<p class="streak-line">🔥 Стрик: ${streak} ${streak === 1 ? 'день' : 'дн.'}</p>` : ''}
+        ${streak > 0 ? `<p class="streak-line">Стрик: ${streak} ${streak === 1 ? 'день' : 'дн.'} подряд</p>` : ''}
       </div>
-      <button class="btn btn-primary" id="session" style="width:100%">▶ Полная распевка (5 упражнений)</button>
+      <button class="btn btn-primary" id="session" style="width:100%">Полная распевка · 5 упражнений</button>
+      <div class="settings">
+        <div class="seg-label">Темп упражнений</div>
+        <div class="seg">${diffBtn('easy', 'Медленно')}${diffBtn('medium', 'Средне')}${diffBtn('fast', 'Быстро')}</div>
+        <button class="toggle ${guideOn ? 'on' : ''}" id="guide">Подсказка тоном: ${guideOn ? 'вкл' : 'выкл'}</button>
+      </div>
       <div class="card list">
-        <button class="list-item" data-onboard="1">
-          <span class="li-main">🎚 Настроить диапазон</span>
-          <span class="li-sub">${range ? 'диапазон записан · перенастроить' : 'найди свои низ и верх — упражнения подстроятся'}</span>
+        <button class="list-item" data-voice="1">
+          <span class="li-main">Мой голос: ${vType ? vType.name : 'не задан'}</span>
+          <span class="li-sub">${vType ? 'сменить или определить заново' : 'выбери тип или определи свой голос'}</span>
         </button>
         <button class="list-item" data-tuner="1">
-          <span class="li-main">🎯 Живой тюнер</span>
+          <span class="li-main">Живой тюнер</span>
           <span class="li-sub">проверь, как тебя слышит микрофон</span>
         </button>
         <div class="list-sep">Дыхание</div>
         ${breathItems}
-        <div class="list-sep">Отдельные упражнения</div>
+        <div class="list-sep">Распевочные упражнения</div>
         ${items}
       </div>
-      <p class="hint">Совет: начни с дыхания и диапазона, потом — полная распевка. Она разогреет голос по правильному порядку.</p>
+      <p class="hint">«Подсказка тоном» подыгрывает нужную ноту — попадать легче. Темп ставь «Медленно», пока не привыкнешь.</p>
     </div>
   `;
   document.getElementById('session').addEventListener('click', () => {
-    const p = progress.load();
-    if (p.safetyAccepted) {
-      renderSession(app, mic, tracker, { onExit: renderMenu });
-    } else {
-      renderSafety(() => renderSession(app, mic, tracker, { onExit: renderMenu }));
-    }
+    applyTrackerRange();
+    const go = () => renderSession(app, mic, tracker, { onExit: renderMenu });
+    if (progress.load().safetyAccepted) go();
+    else renderSafety(go);
   });
-  app.querySelector('[data-onboard]').addEventListener('click', () => {
-    renderOnboarding(app, mic, tracker, { onDone: renderMenu, onExit: renderMenu });
+  app.querySelector('[data-voice]').addEventListener('click', () => {
+    renderVoice(app, mic, tracker, {
+      onDone: () => { applyTrackerRange(); renderMenu(); },
+      onExit: renderMenu,
+    });
   });
   app.querySelector('[data-tuner]').addEventListener('click', renderTuner);
   app.querySelectorAll('[data-ex]').forEach((btn) => {
     btn.addEventListener('click', () => startExercise(Number(btn.dataset.ex)));
   });
   app.querySelectorAll('[data-breath]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      renderBreathing(app, mic, btn.dataset.breath, { onExit: renderMenu });
-    });
+    btn.addEventListener('click', () => renderBreathing(app, mic, btn.dataset.breath, { onExit: renderMenu }));
+  });
+  app.querySelectorAll('[data-diff]').forEach((btn) => {
+    btn.addEventListener('click', () => { progress.setDifficulty(btn.dataset.diff); renderMenu(); });
+  });
+  document.getElementById('guide').addEventListener('click', () => {
+    progress.setGuide(!progress.getGuide());
+    renderMenu();
   });
 }
 
 function startExercise(i, explain = true) {
-  const exercise = EXERCISES[i].make();
+  applyTrackerRange();
+  const exercise = EXERCISES[i].make(voiceRoot());
+  exercise.tempo = Math.max(40, Math.round(exercise.tempo * progress.difficultyFactor()));
   renderGame(app, mic, tracker, exercise, {
     explain,
     onExit: renderMenu,
@@ -158,6 +202,7 @@ function renderSafety(onAccept) {
 // ---------- Экран 3: живой тюнер ----------
 function renderTuner() {
   stopRaf();
+  applyTrackerRange();
   app.innerHTML = `
     <div class="screen tuner">
       <div class="game-top"><button class="icon-btn" id="back">‹ Меню</button></div>

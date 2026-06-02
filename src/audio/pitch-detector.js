@@ -54,4 +54,10 @@ export class PitchTracker {
   reset() {
     this.smoothed = null;
   }
+
+  /** Сузить рабочий диапазон (Hz) — кламп по голосу режет октавные ошибки и шум. */
+  setRange(minHz, maxHz) {
+    this.minHz = minHz;
+    this.maxHz = maxHz;
+  }
 }

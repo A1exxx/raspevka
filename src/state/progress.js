@@ -49,6 +49,46 @@ export function getStreak() {
   return load().streak || 0;
 }
 
+/** Тип голоса {key, low, high} или null. */
+export function getVoice() {
+  const p = load();
+  return p.voice && p.voice.key ? p.voice : null;
+}
+export function setVoice(key, low = null, high = null) {
+  const p = load();
+  const prev = p.voice || {};
+  p.voice = { key, low: low ?? prev.low ?? null, high: high ?? prev.high ?? null };
+  if (low != null && high != null) p.range = { low: Math.round(low), high: Math.round(high) };
+  save(p);
+  return p.voice;
+}
+
+/** Сложность: 'easy' | 'medium' | 'fast'. Влияет на темп упражнений. */
+const DIFF_FACTOR = { easy: 0.6, medium: 0.8, fast: 1.0 };
+export function getDifficulty() {
+  return load().difficulty || 'easy';
+}
+export function setDifficulty(d) {
+  const p = load();
+  p.difficulty = d;
+  save(p);
+  return d;
+}
+export function difficultyFactor() {
+  return DIFF_FACTOR[getDifficulty()] || 0.6;
+}
+
+/** Звук-поводырь (тон активной ноты во время пения). По умолчанию включён. */
+export function getGuide() {
+  return load().guide !== false;
+}
+export function setGuide(on) {
+  const p = load();
+  p.guide = !!on;
+  save(p);
+  return p.guide;
+}
+
 /** Рекорд ровного выдоха «с-с-с» (сек). */
 export function getBreathBest() {
   return load().breathBest || 0;
