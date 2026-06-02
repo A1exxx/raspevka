@@ -84,7 +84,7 @@ export class NoteHighway {
     }
 
     // линия попадания
-    ctx.strokeStyle = 'rgba(255,138,107,.55)';
+    ctx.strokeStyle = 'rgba(70,179,168,.5)';
     ctx.lineWidth = 2;
     ctx.setLineDash([5, 6]);
     ctx.beginPath(); ctx.moveTo(hitX, 0); ctx.lineTo(hitX, h); ctx.stroke();
@@ -103,12 +103,12 @@ export class NoteHighway {
       const isActive = i === activeIdx;
       const r = 8;
       ctx.fillStyle = isActive
-        ? 'rgba(255,107,94,.95)'
-        : 'rgba(243,201,105,.40)';
+        ? 'rgba(94,201,189,.95)'
+        : 'rgba(94,201,189,.30)';
       roundRect(ctx, x, y - noteH / 2, Math.max(wgt, 10), noteH, r);
       ctx.fill();
       if (isActive) {
-        ctx.shadowColor = 'rgba(255,107,94,.7)';
+        ctx.shadowColor = 'rgba(94,201,189,.75)';
         ctx.shadowBlur = 18;
         ctx.fill();
         ctx.shadowBlur = 0;
@@ -122,7 +122,7 @@ export class NoteHighway {
       if (active) {
         const cents = Math.abs(centsOff(sungHz, active.seg.hz));
         const z = centsZone(cents);
-        color = z === 'green' ? '#4cd6a0' : z === 'yellow' ? '#f3c969' : '#ff6b5e';
+        color = z === 'green' ? '#34dd98' : z === 'yellow' ? '#f3c45c' : '#ff6f61';
       }
       ctx.fillStyle = color;
       ctx.shadowColor = color;

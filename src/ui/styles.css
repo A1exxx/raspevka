@@ -1,20 +1,27 @@
 /* ============ Дизайн-токены (тёплая палитра, не AI-slop) ============ */
 :root {
-  --bg:        #14101a;
-  --bg-soft:   #1d1726;
-  --surface:   #261d31;
-  --line:      #3a2f47;
-  --text:      #f3ecf5;
-  --text-dim:  #b6a6c2;
-  --coral:     #ff6b5e;
-  --coral-2:   #ff8a6b;
-  --gold:      #f3c969;
-  --green:     #4cd6a0;
-  --yellow:    #f3c969;
-  --red:       #ff6b6b;
-  --shadow:    0 18px 50px -20px rgba(0,0,0,.7);
+  /* Нейтральная спокойная база (cool charcoal/slate, без чистого чёрного) */
+  --bg:        #14161a;
+  --bg-soft:   #1a1d23;
+  --surface:   #20242b;
+  --surface-2: #272c34;
+  --line:      #313842;
+  --text:      #e9ecf1;
+  --text-dim:  #949daa;
+  /* Единственный спокойный акцент (десатурированный teal) — кнопки/активные */
+  --accent:    #46b3a8;
+  --accent-2:  #5ec9bd;
+  /* ЯРКИЕ цвета — только для живой обратной связи/анимаций */
+  --green:     #34dd98;   /* попал */
+  --amber:     #f3c45c;   /* почти */
+  --coral:     #ff6f61;   /* мимо / danger (только тут) */
+  --gold:      #f0c065;   /* стрик, второстепенные тёплые акценты */
+  /* алиасы для обратной совместимости со старыми классами зон */
+  --yellow:    var(--amber);
+  --red:       var(--coral);
+  --shadow:    0 16px 44px -22px rgba(0,0,0,.66);
   --r:         18px;
-  --font:      'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font:      system-ui, -apple-system, 'Segoe UI', Roboto, 'Inter', sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,7 +30,7 @@ body {
   font-family: var(--font);
   color: var(--text);
   background:
-    radial-gradient(120% 80% at 50% -10%, #2a1d33 0%, var(--bg) 55%) fixed;
+    radial-gradient(120% 80% at 50% -12%, #1c2128 0%, var(--bg) 58%) fixed;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
   touch-action: manipulation;
@@ -54,17 +61,15 @@ body {
   letter-spacing: .02em;
 }
 .brand h1 {
-  font-size: clamp(28px, 8vw, 40px);
+  font-size: clamp(26px, 7vw, 36px);
   font-weight: 800;
-  background: linear-gradient(100deg, var(--text) 30%, var(--coral-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--text);
+  letter-spacing: -.01em;
 }
 .brand p { color: var(--text-dim); margin-top: 8px; font-size: 15px; line-height: 1.5; }
 
 .card {
-  background: linear-gradient(180deg, var(--surface), var(--bg-soft));
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r);
   padding: 24px;
@@ -85,11 +90,12 @@ body {
 }
 .btn:active { transform: scale(.97); }
 .btn-primary {
-  background: linear-gradient(100deg, var(--coral), var(--coral-2));
-  color: #2a0f0c;
-  box-shadow: 0 10px 30px -10px var(--coral);
+  background: var(--accent);
+  color: #08201d;
+  box-shadow: 0 8px 22px -14px var(--accent);
 }
-.btn-primary:hover { filter: brightness(1.05); }
+.btn-primary:hover { background: var(--accent-2); }
+.btn-primary:active { transform: scale(.98) translateY(1px); }
 .btn-ghost {
   background: transparent;
   color: var(--text-dim);
@@ -149,7 +155,7 @@ body {
   height: 6px; width: 100%; background: var(--bg);
   border-radius: 999px; overflow: hidden; border: 1px solid var(--line);
 }
-.bar > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold), var(--coral)); transition: width .1s linear; }
+.bar > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--green)); transition: width .1s linear; }
 
 /* Канвас следа тона */
 .trace-wrap {
@@ -175,7 +181,7 @@ canvas.trace { display: block; width: 100%; height: 240px; }
   transition: transform .12s ease, border-color .2s ease, background .2s ease;
   color: var(--text); font: inherit;
 }
-.list-item:hover { border-color: var(--coral); background: #2c2236; }
+.list-item:hover { border-color: var(--accent); background: var(--surface-2); }
 .list-item:active { transform: scale(.985); }
 .li-main { font-weight: 700; font-size: 16px; }
 .li-sub { color: var(--text-dim); font-size: 13px; }
@@ -191,16 +197,16 @@ canvas.trace { display: block; width: 100%; height: 240px; }
   color: var(--text-dim); border-radius: 999px; padding: 8px 14px;
   font: inherit; font-size: 14px; cursor: pointer; transition: color .2s, border-color .2s;
 }
-.icon-btn:hover { color: var(--text); border-color: var(--coral); }
+.icon-btn:hover { color: var(--text); border-color: var(--accent); }
 .ex-name { font-weight: 700; font-size: 15px; }
-.ex-name .syl { color: var(--coral-2); }
+.ex-name .syl { color: var(--accent-2); }
 
 /* ============ Игровой HUD ============ */
 .game { gap: 14px; }
 .hud { display: flex; flex-direction: column; gap: 10px; }
 .hud-msg { text-align: center; font-weight: 700; font-size: 18px; min-height: 1.2em; color: var(--gold); }
 .hud-meter { height: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
-.hud-meter > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold), var(--coral)); transition: width .08s linear; }
+.hud-meter > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--green)); transition: width .08s linear; }
 .hud-notes { display: flex; justify-content: space-around; color: var(--text-dim); font-size: 14px; }
 .hud-notes b { color: var(--text); font-weight: 700; }
 canvas.trace { height: 300px; }
@@ -214,10 +220,10 @@ canvas.trace { height: 300px; }
 .summary .row { width: 100%; max-width: 360px; }
 .streak-badge {
   display: inline-block; padding: 10px 18px; border-radius: 999px;
-  background: rgba(255,107,94,.12); border: 1px solid var(--coral);
-  color: var(--coral-2); font-weight: 700; font-size: 15px;
+  background: rgba(240,192,101,.12); border: 1px solid var(--gold);
+  color: var(--gold); font-weight: 700; font-size: 15px;
 }
-.streak-line { color: var(--coral-2); font-weight: 700; margin-top: 6px !important; font-size: 14px; }
+.streak-line { color: var(--gold); font-weight: 700; margin-top: 6px !important; font-size: 14px; }
 
 /* ============ Заставка между упражнениями ============ */
 .interstitial { text-align: center; align-items: center; gap: 20px; }
@@ -225,11 +231,11 @@ canvas.trace { height: 300px; }
 .progress-dots { display: flex; gap: 10px; justify-content: center; }
 .progress-dots .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); transition: background .2s; }
 .progress-dots .dot.done { background: var(--green); }
-.progress-dots .dot.now { background: var(--coral); box-shadow: 0 0 10px var(--coral); }
+.progress-dots .dot.now { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
 
 /* ============ Онбординг диапазона ============ */
 .onboard { gap: 16px; }
-.onboard .brand p b { color: var(--coral-2); }
+.onboard .brand p b { color: var(--accent-2); }
 
 /* ============ Дисклеймер ============ */
 .safety-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
@@ -237,7 +243,7 @@ canvas.trace { height: 300px; }
   position: relative; padding-left: 24px; font-size: 14px; line-height: 1.5; color: var(--text-dim);
 }
 .safety-list li::before {
-  content: "•"; position: absolute; left: 6px; top: -1px; color: var(--coral); font-size: 18px;
+  content: "•"; position: absolute; left: 6px; top: -1px; color: var(--accent); font-size: 18px;
 }
 .safety-list li b { color: var(--text); }
 
@@ -249,12 +255,12 @@ canvas.trace { height: 300px; }
   width: min(260px, 64vw); aspect-ratio: 1; border-radius: 50%;
   border: 1px solid var(--line);
   display: flex; align-items: center; justify-content: center;
-  background: radial-gradient(circle, rgba(255,107,94,.05), transparent 70%);
+  background: radial-gradient(circle, rgba(70,179,168,.07), transparent 70%);
 }
 .breathe-core {
   width: 70%; aspect-ratio: 1; border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, var(--coral-2), var(--coral) 70%);
-  box-shadow: 0 0 50px -8px var(--coral);
+  background: radial-gradient(circle at 40% 35%, var(--accent-2), var(--accent) 72%);
+  box-shadow: 0 0 55px -6px var(--accent);
   transform: scale(0.5);
   transition: transform .12s linear;
 }
@@ -263,11 +269,16 @@ canvas.trace { height: 300px; }
 .breathe-cycles { display: flex; gap: 10px; }
 .breathe-cycles .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
 .breathe-cycles .dot.done { background: var(--green); }
-.breathe-cycles .dot.now { background: var(--coral); box-shadow: 0 0 10px var(--coral); }
+.breathe-cycles .dot.now { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
 .big-timer {
   font-size: clamp(64px, 22vw, 110px); font-weight: 800; line-height: 1;
   font-variant-numeric: tabular-nums;
-  background: linear-gradient(100deg, var(--gold), var(--coral-2));
+  background: linear-gradient(100deg, var(--gold), var(--accent-2));
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .summary .big-pct span { font-size: .35em; }
+
+/* ============ Текст объяснений ============ */
+.how { font-size: 14px; line-height: 1.6; color: var(--text-dim); margin-top: 12px; }
+.how b { color: var(--text); }
+.mech { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 14px; }

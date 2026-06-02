@@ -5,7 +5,16 @@ import { playSequence, playClick } from '../audio/reference-tone.js';
 import { referenceFreqs } from '../theory/exercises.js';
 import { hzToNoteInfo } from '../theory/note-map.js';
 
-export function renderGame(app, mic, tracker, exercise, { onExit, onAgain, onComplete } = {}) {
+export function renderGame(app, mic, tracker, exercise, opts = {}) {
+  const { onExit, onAgain, onComplete, explain } = opts;
+  // Первый вход в упражнение — короткое объяснение, потом сам интерактив.
+  if (explain) {
+    renderExplain(app, exercise, {
+      onExit,
+      onStart: () => renderGame(app, mic, tracker, exercise, { ...opts, explain: false }),
+    });
+    return;
+  }
   app.innerHTML = `
     <div class="screen game">
       <div class="game-top">
@@ -152,4 +161,23 @@ export function renderGame(app, mic, tracker, exercise, { onExit, onAgain, onCom
 function noteName(midi) {
   const info = hzToNoteInfo(440 * Math.pow(2, (midi - 69) / 12));
   return info ? info.name : '';
+}
+
+// Экран-объяснение перед упражнением: что тренирует + как делать + как работает игра.
+function renderExplain(app, exercise, { onExit, onStart }) {
+  app.innerHTML = `
+    <div class="screen breathe-intro">
+      <div class="game-top"><button class="icon-btn" id="back">‹ Меню</button></div>
+      <div class="brand"><h1>${exercise.name}</h1>
+        <p>Слог: <b>«${exercise.syllable}»</b></p></div>
+      <div class="card">
+        ${exercise.desc ? `<p class="blurb">${exercise.desc}</p>` : ''}
+        ${exercise.how ? `<p class="how"><b>Как делать.</b> ${exercise.how}</p>` : ''}
+        <p class="how mech"><b>Как устроена игра.</b> Ноты едут к вертикальной линии слева. Пой так, чтобы твой светящийся шарик совпал с нотой по высоте: <b style="color:var(--green)">зелёный</b> — точно, <b style="color:var(--amber)">жёлтый</b> — почти, <b style="color:var(--coral)">красный</b> — мимо. Сначала прозвучит образец.</p>
+      </div>
+      <button class="btn btn-primary" id="go" style="width:100%">Начать</button>
+    </div>
+  `;
+  document.getElementById('back').addEventListener('click', onExit);
+  document.getElementById('go').addEventListener('click', onStart);
 }

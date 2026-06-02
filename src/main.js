@@ -18,10 +18,10 @@ let rafId = null;
 const DEFAULT_ROOT = 60;
 
 const EXERCISES = [
-  { label: 'Удержание ноты', sub: 'разогрев · sustain', make: () => sustain(DEFAULT_ROOT, 8) },
-  { label: 'Гамма «Ма-Мэ»', sub: 'интонация · 5 нот', make: () => fiveNoteScale(DEFAULT_ROOT) },
-  { label: 'Беглость «Ма»', sub: 'agility · как Vocalista', make: () => agilityRun(DEFAULT_ROOT) },
-  { label: 'Октавный скачок', sub: 'координация регистров', make: () => octaveJump(DEFAULT_ROOT) },
+  { label: 'Удержание ноты', sub: 'держать ровный звук', make: () => sustain(DEFAULT_ROOT, 8) },
+  { label: 'Гамма «Ма-Мэ»', sub: 'попадать в ноты гаммы', make: () => fiveNoteScale(DEFAULT_ROOT) },
+  { label: 'Беглость «Ма»', sub: 'быстрые ноты — как в рекламе', make: () => agilityRun(DEFAULT_ROOT) },
+  { label: 'Октавный скачок', sub: 'прыжок на октаву и назад', make: () => octaveJump(DEFAULT_ROOT) },
 ];
 
 // ---------- Экран 1: приветствие + запрос микрофона ----------
@@ -118,11 +118,12 @@ function renderMenu() {
   });
 }
 
-function startExercise(i) {
+function startExercise(i, explain = true) {
   const exercise = EXERCISES[i].make();
   renderGame(app, mic, tracker, exercise, {
+    explain,
     onExit: renderMenu,
-    onAgain: () => startExercise(i),
+    onAgain: () => startExercise(i, false),
   });
 }
 
@@ -242,7 +243,7 @@ function drawTrace(ctx, canvas, history, noteLines) {
     ctx.fillStyle = 'rgba(255,255,255,.25)';
     ctx.fillText(ln.name, 6, y - 4);
   });
-  const zoneColor = { green: '#4cd6a0', yellow: '#f3c969', red: '#ff6b5e' };
+  const zoneColor = { green: '#34dd98', yellow: '#f3c45c', red: '#ff6f61' };
   for (let i = 0; i < history.length; i++) {
     const p = history[i];
     if (!p.voiced || p.y == null) continue;
