@@ -5,7 +5,7 @@ import { playSequence, playClick } from '../audio/reference-tone.js';
 import { referenceFreqs } from '../theory/exercises.js';
 import { hzToNoteInfo } from '../theory/note-map.js';
 
-export function renderGame(app, mic, tracker, exercise, { onExit, onAgain }) {
+export function renderGame(app, mic, tracker, exercise, { onExit, onAgain, onComplete } = {}) {
   app.innerHTML = `
     <div class="screen game">
       <div class="game-top">
@@ -126,6 +126,9 @@ export function renderGame(app, mic, tracker, exercise, { onExit, onAgain }) {
   // 4) Итог
   function finish() {
     const res = scorer.result();
+    window.removeEventListener('resize', resize);
+    // Режим сессии: итог не показываем, отдаём результат контроллеру.
+    if (onComplete) { onComplete(res); return; }
     const stars = '★'.repeat(res.stars) + '☆'.repeat(3 - res.stars);
     const pct = Math.round(res.pct * 100);
     const verdict = res.stars >= 3 ? 'Отлично!' : res.stars === 2 ? 'Хорошо!' : res.stars === 1 ? 'Неплохо' : 'Ещё разок';

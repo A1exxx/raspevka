@@ -4,6 +4,9 @@ import { PitchTracker } from './audio/pitch-detector.js';
 import { hzToNoteInfo, hzToY, centsZone } from './theory/note-map.js';
 import { renderGame } from './screens/game.js';
 import { fiveNoteScale, agilityRun, sustain, octaveJump } from './theory/exercises.js';
+import { renderSession } from './screens/session.js';
+import { renderOnboarding } from './screens/onboarding-range.js';
+import * as progress from './state/progress.js';
 
 const app = document.getElementById('app');
 const mic = new MicEngine({ fftSize: 2048 });
@@ -61,20 +64,35 @@ function renderMenu() {
       <span class="li-sub">${e.sub}</span>
     </button>
   `).join('');
+  const streak = progress.getStreak();
+  const range = progress.getRange();
   app.innerHTML = `
     <div class="screen">
-      <div class="brand"><h1>Распевка</h1></div>
+      <div class="brand"><h1>Распевка</h1>
+        ${streak > 0 ? `<p class="streak-line">🔥 Стрик: ${streak} ${streak === 1 ? 'день' : 'дн.'}</p>` : ''}
+      </div>
+      <button class="btn btn-primary" id="session" style="width:100%">▶ Полная распевка (5 упражнений)</button>
       <div class="card list">
+        <button class="list-item" data-onboard="1">
+          <span class="li-main">🎚 Настроить диапазон</span>
+          <span class="li-sub">${range ? 'диапазон записан · перенастроить' : 'найди свои низ и верх — упражнения подстроятся'}</span>
+        </button>
         <button class="list-item" data-tuner="1">
           <span class="li-main">🎯 Живой тюнер</span>
           <span class="li-sub">проверь, как тебя слышит микрофон</span>
         </button>
-        <div class="list-sep">Упражнения</div>
+        <div class="list-sep">Отдельные упражнения</div>
         ${items}
       </div>
-      <p class="hint">Совет: начни с тюнера, потом разогрейся удержанием ноты, а уже после — беглость.</p>
+      <p class="hint">Совет: сначала настрой диапазон, потом запускай полную распевку — она разогреет голос по правильному порядку.</p>
     </div>
   `;
+  document.getElementById('session').addEventListener('click', () => {
+    renderSession(app, mic, tracker, { onExit: renderMenu });
+  });
+  app.querySelector('[data-onboard]').addEventListener('click', () => {
+    renderOnboarding(app, mic, tracker, { onDone: renderMenu, onExit: renderMenu });
+  });
   app.querySelector('[data-tuner]').addEventListener('click', renderTuner);
   app.querySelectorAll('[data-ex]').forEach((btn) => {
     btn.addEventListener('click', () => startExercise(Number(btn.dataset.ex)));

@@ -212,3 +212,21 @@ canvas.trace { height: 300px; }
 .summary .big-pct { font-size: 72px; font-weight: 800; line-height: 1; color: var(--green); }
 .summary .big-pct span { font-size: .4em; color: var(--text-dim); font-weight: 600; }
 .summary .row { width: 100%; max-width: 360px; }
+.streak-badge {
+  display: inline-block; padding: 10px 18px; border-radius: 999px;
+  background: rgba(255,107,94,.12); border: 1px solid var(--coral);
+  color: var(--coral-2); font-weight: 700; font-size: 15px;
+}
+.streak-line { color: var(--coral-2); font-weight: 700; margin-top: 6px !important; font-size: 14px; }
+
+/* ============ Заставка между упражнениями ============ */
+.interstitial { text-align: center; align-items: center; gap: 20px; }
+.step-count { color: var(--text-dim); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
+.progress-dots { display: flex; gap: 10px; justify-content: center; }
+.progress-dots .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); transition: background .2s; }
+.progress-dots .dot.done { background: var(--green); }
+.progress-dots .dot.now { background: var(--coral); box-shadow: 0 0 10px var(--coral); }
+
+/* ============ Онбординг диапазона ============ */
+.onboard { gap: 16px; }
+.onboard .brand p b { color: var(--coral-2); }
