@@ -3,11 +3,13 @@
 //   paced  — ведомое дыхание с дышащим кругом (box breathing, дыхание животом)
 //   exhale — замер длительности ровного выдоха на «с-с-с» по громкости (RMS)
 import * as progress from '../state/progress.js';
+import { bellyDiagram } from '../ui/illustrations.js';
 
 export const BREATHING = {
   box: {
     title: 'Дыхание по квадрату',
     kind: 'paced',
+    belly: true,
     blurb: 'Успокаивает и выравнивает дыхание перед пением. Вдох, задержка, выдох и пауза — все по 4 секунды. Дыши животом, плечи расслаблены.',
     cycles: 4,
     phases: [
@@ -20,6 +22,7 @@ export const BREATHING = {
   belly: {
     title: 'Дыхание животом',
     kind: 'paced',
+    belly: true,
     blurb: 'База певческого дыхания: вдох на 4 счёта — живот расширяется, выдох длиннее, на 6 счётов — ровно и плавно. Грудь и плечи неподвижны.',
     cycles: 5,
     phases: [
@@ -45,7 +48,7 @@ export function renderBreathing(app, mic, key, { onExit }) {
       <div class="screen breathe-intro">
         <div class="game-top"><button class="icon-btn" id="back">‹ Меню</button></div>
         <div class="brand"><h1>${ex.title}</h1></div>
-        <div class="card"><p class="blurb">${ex.blurb}</p></div>
+        <div class="card"><p class="blurb">${ex.blurb}</p>${ex.belly ? bellyDiagram() : ''}</div>
         <button class="btn btn-primary" id="go" style="width:100%">Начать упражнение</button>
       </div>
     `;

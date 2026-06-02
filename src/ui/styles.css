@@ -309,3 +309,9 @@ canvas.trace { height: 300px; }
   font-size: clamp(34px, 11vw, 54px); font-weight: 800; color: var(--accent-2); line-height: 1.05;
 }
 .voice-card .li-main { font-weight: 700; }
+
+/* ============ Схема дыхания животом ============ */
+.breathe-diagram { margin-top: 16px; }
+.breathe-diagram svg { width: 100%; height: auto; display: block; }
+.diagram-note { margin-top: 10px; font-size: 13px; line-height: 1.55; color: var(--text-dim); }
+.diagram-note b { color: var(--text); }
