@@ -6,6 +6,7 @@ import { renderGame } from './screens/game.js';
 import { fiveNoteScale, agilityRun, sustain, octaveJump } from './theory/exercises.js';
 import { renderSession } from './screens/session.js';
 import { renderOnboarding } from './screens/onboarding-range.js';
+import { renderBreathing, BREATHING } from './screens/breathing.js';
 import * as progress from './state/progress.js';
 
 const app = document.getElementById('app');
@@ -64,6 +65,12 @@ function renderMenu() {
       <span class="li-sub">${e.sub}</span>
     </button>
   `).join('');
+  const breathItems = Object.entries(BREATHING).map(([k, b]) => `
+    <button class="list-item" data-breath="${k}">
+      <span class="li-main">🫁 ${b.title}</span>
+      <span class="li-sub">${b.kind === 'exhale' ? 'замер ровного выдоха' : 'ведомое дыхание'}</span>
+    </button>
+  `).join('');
   const streak = progress.getStreak();
   const range = progress.getRange();
   app.innerHTML = `
@@ -81,10 +88,12 @@ function renderMenu() {
           <span class="li-main">🎯 Живой тюнер</span>
           <span class="li-sub">проверь, как тебя слышит микрофон</span>
         </button>
+        <div class="list-sep">Дыхание</div>
+        ${breathItems}
         <div class="list-sep">Отдельные упражнения</div>
         ${items}
       </div>
-      <p class="hint">Совет: сначала настрой диапазон, потом запускай полную распевку — она разогреет голос по правильному порядку.</p>
+      <p class="hint">Совет: начни с дыхания и диапазона, потом — полная распевка. Она разогреет голос по правильному порядку.</p>
     </div>
   `;
   document.getElementById('session').addEventListener('click', () => {
@@ -101,6 +110,11 @@ function renderMenu() {
   app.querySelector('[data-tuner]').addEventListener('click', renderTuner);
   app.querySelectorAll('[data-ex]').forEach((btn) => {
     btn.addEventListener('click', () => startExercise(Number(btn.dataset.ex)));
+  });
+  app.querySelectorAll('[data-breath]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      renderBreathing(app, mic, btn.dataset.breath, { onExit: renderMenu });
+    });
   });
 }
 

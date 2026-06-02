@@ -240,3 +240,34 @@ canvas.trace { height: 300px; }
   content: "•"; position: absolute; left: 6px; top: -1px; color: var(--coral); font-size: 18px;
 }
 .safety-list li b { color: var(--text); }
+
+/* ============ Дыхание ============ */
+.breathe-intro .blurb { font-size: 15px; line-height: 1.6; color: var(--text-dim); }
+.breathe { gap: 18px; align-items: center; }
+.breathe-stage { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 10px 0; }
+.breathe-ring {
+  width: min(260px, 64vw); aspect-ratio: 1; border-radius: 50%;
+  border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle, rgba(255,107,94,.05), transparent 70%);
+}
+.breathe-core {
+  width: 70%; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, var(--coral-2), var(--coral) 70%);
+  box-shadow: 0 0 50px -8px var(--coral);
+  transform: scale(0.5);
+  transition: transform .12s linear;
+}
+.breathe-phase { font-size: 20px; font-weight: 700; color: var(--gold); min-height: 1.3em; text-align: center; }
+.breathe-count { font-size: 40px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--text); min-height: 1em; }
+.breathe-cycles { display: flex; gap: 10px; }
+.breathe-cycles .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.breathe-cycles .dot.done { background: var(--green); }
+.breathe-cycles .dot.now { background: var(--coral); box-shadow: 0 0 10px var(--coral); }
+.big-timer {
+  font-size: clamp(64px, 22vw, 110px); font-weight: 800; line-height: 1;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(100deg, var(--gold), var(--coral-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.summary .big-pct span { font-size: .35em; }

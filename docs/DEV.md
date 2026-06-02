@@ -38,3 +38,18 @@ mkcert 192.168.1.119 localhost
 - [ ] Зелёный при попадании (±20ц), красный при промахе
 - [ ] iOS Safari: микрофон стартует только после тапа, AudioContext не «suspended», нет треска
 - [ ] След тона рисуется и скроллится, линии-ориентиры C2..C6 видны
+
+## Деплой на GitHub Pages
+Live: **https://a1exxx.github.io/raspevka/** · репо: github.com/A1exxx/raspevka
+
+Pages раздаётся из ветки `gh-pages` (содержит собранный `dist/`). Передеплой после правок:
+```bash
+npm run build                       # base './' уже настроен для build
+cd dist
+: > .nojekyll                       # чтобы Pages не прятал /assets
+git init -q && git symbolic-ref HEAD refs/heads/gh-pages
+git add -A && git commit -q -m deploy
+git push -f https://github.com/A1exxx/raspevka.git gh-pages
+```
+Изменения на сайте появляются через ~1 минуту (Pages пересобирает ветку).
+Исходники (`main`/`master`) пушатся отдельно: `git push origin master`.

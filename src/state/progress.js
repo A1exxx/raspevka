@@ -48,3 +48,14 @@ export function recordSession(result) {
 export function getStreak() {
   return load().streak || 0;
 }
+
+/** Рекорд ровного выдоха «с-с-с» (сек). */
+export function getBreathBest() {
+  return load().breathBest || 0;
+}
+export function recordBreathBest(seconds) {
+  const p = load();
+  p.breathBest = Math.max(p.breathBest || 0, seconds);
+  save(p);
+  return p.breathBest;
+}
