@@ -230,3 +230,13 @@ canvas.trace { height: 300px; }
 /* ============ Онбординг диапазона ============ */
 .onboard { gap: 16px; }
 .onboard .brand p b { color: var(--coral-2); }
+
+/* ============ Дисклеймер ============ */
+.safety-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.safety-list li {
+  position: relative; padding-left: 24px; font-size: 14px; line-height: 1.5; color: var(--text-dim);
+}
+.safety-list li::before {
+  content: "•"; position: absolute; left: 6px; top: -1px; color: var(--coral); font-size: 18px;
+}
+.safety-list li b { color: var(--text); }

@@ -88,7 +88,12 @@ function renderMenu() {
     </div>
   `;
   document.getElementById('session').addEventListener('click', () => {
-    renderSession(app, mic, tracker, { onExit: renderMenu });
+    const p = progress.load();
+    if (p.safetyAccepted) {
+      renderSession(app, mic, tracker, { onExit: renderMenu });
+    } else {
+      renderSafety(() => renderSession(app, mic, tracker, { onExit: renderMenu }));
+    }
   });
   app.querySelector('[data-onboard]').addEventListener('click', () => {
     renderOnboarding(app, mic, tracker, { onDone: renderMenu, onExit: renderMenu });
@@ -104,6 +109,34 @@ function startExercise(i) {
   renderGame(app, mic, tracker, exercise, {
     onExit: renderMenu,
     onAgain: () => startExercise(i),
+  });
+}
+
+// ---------- Дисклеймер здоровья голоса (один раз) ----------
+function renderSafety(onAccept) {
+  stopRaf();
+  app.innerHTML = `
+    <div class="screen">
+      <div class="brand"><h1>Береги голос</h1></div>
+      <div class="card">
+        <ul class="safety-list">
+          <li><b>Больно — остановись.</b> Любой дискомфорт в горле = стоп и отдых.</li>
+          <li><b>Разогрев обязателен.</b> Не начинай с высоких или быстрых упражнений.</li>
+          <li><b>Не форсируй верх.</b> Расширение диапазона — это недели, не один день.</li>
+          <li><b>Не пой на больном горле.</b> Связки отекают — высок риск травмы.</li>
+          <li><b>Пей воду</b> и делай перерывы — не больше 20–30 минут подряд.</li>
+        </ul>
+        <p class="hint" style="margin-top:14px">
+          Приложение помогает тренироваться, но <b>не заменяет педагога или фониатра</b>.
+          При проблемах с голосом обратись к специалисту.
+        </p>
+        <button class="btn btn-primary" id="accept" style="width:100%;margin-top:18px">Понятно, начать</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('accept').addEventListener('click', () => {
+    progress.save({ ...progress.load(), safetyAccepted: true });
+    onAccept();
   });
 }
 
