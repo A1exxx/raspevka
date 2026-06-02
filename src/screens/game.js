@@ -3,8 +3,8 @@ import { Scorer } from '../game/scoring.js';
 import { NoteHighway } from '../game/note-highway.js';
 import { playSequence, playClick, playTone } from '../audio/reference-tone.js';
 import { referenceFreqs } from '../theory/exercises.js';
-import { hzToNoteInfo } from '../theory/note-map.js';
-import { getGuide } from '../state/progress.js';
+import { hzToNoteInfo, centsOff } from '../theory/note-map.js';
+import * as progress from '../state/progress.js';
 
 // Компенсация задержки: голос детектится позже, чем нота прошла линию.
 const LATENCY_S = 0.09;
@@ -33,6 +33,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
           <span>цель: <b id="target">—</b></span>
           <span>ты: <b id="yours">—</b></span>
         </div>
+        <div class="cue" id="cue"></div>
       </div>
     </div>
   `;
@@ -43,6 +44,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   const livebar = document.getElementById('livebar');
   const targetEl = document.getElementById('target');
   const yoursEl = document.getElementById('yours');
+  const cueEl = document.getElementById('cue');
 
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -53,7 +55,11 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   resize();
   window.addEventListener('resize', resize);
 
-  const highway = new NoteHighway(canvas, exercise);
+  // Темп применяется ДИНАМИЧНО при сборке (читаем текущую сложность) —
+  // меняешь темп на экране объяснения/итога, и следующий проход уже с ним.
+  const factor = progress.difficultyFactor();
+  const exRun = { ...exercise, tempo: Math.max(40, Math.round(exercise.tempo * factor)) };
+  const highway = new NoteHighway(canvas, exRun);
   const scorer = new Scorer(exercise.notes.length);
   let raf = null, startPerf = 0, lastPerf = 0, finished = false;
 
@@ -88,13 +94,13 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
 
   // 3) Проход
   function startRun() {
-    msg.textContent = getGuide() ? 'Пой за подсказкой!' : 'Пой!';
+    msg.textContent = progress.getGuide() ? 'Пой за подсказкой!' : 'Пой!';
     tracker.reset();
     startPerf = performance.now();
     lastPerf = startPerf;
     // Звук-поводырь: тихо проигрываем тон каждой ноты ровно когда она у линии,
     // чтобы попадать ухом, а не только глазом. Аудио-часы стартуют вместе с игрой.
-    if (getGuide()) {
+    if (progress.getGuide()) {
       highway.timed.forEach((seg) => {
         playTone(mic.ctx, seg.hz, Math.max(0.2, seg.dur * 0.92), seg.start, 0.1);
       });
@@ -118,7 +124,11 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
 
     // Скоринг — с учётом задержки голоса; отрисовка — по «настоящему» времени.
     const ev = highway.evaluate(now - LATENCY_S, voiced ? sungHz : null, voiced);
-    if (ev.index >= 0) scorer.record(ev.index, ev.zone, dt, ev.voiced);
+    if (ev.index >= 0) {
+      let cents = null;
+      if (ev.voiced && sungHz && highway.timed[ev.index]) cents = centsOff(sungHz, highway.timed[ev.index].hz);
+      scorer.record(ev.index, ev.zone, dt, ev.voiced, cents);
+    }
     highway.draw(now, voiced ? sungHz : null, voiced);
 
     // HUD
@@ -130,10 +140,18 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
       const color = ev.zone === 'green' ? 'var(--green)' : ev.zone === 'yellow' ? 'var(--yellow)' : 'var(--coral)';
       yoursEl.style.color = active ? color : 'var(--text)';
       livebar.style.width = Math.min(100, mic.rms() * 350) + '%';
+      // Живая подсказка «выше/ниже»
+      if (active) {
+        const c = centsOff(sungHz, active.seg.hz);
+        if (Math.abs(c) <= 20) { cueEl.textContent = 'в точку'; cueEl.style.color = 'var(--green)'; }
+        else if (c < 0) { cueEl.textContent = '↑ выше'; cueEl.style.color = 'var(--amber)'; }
+        else { cueEl.textContent = '↓ ниже'; cueEl.style.color = 'var(--amber)'; }
+      } else cueEl.textContent = '';
     } else {
       yoursEl.textContent = '—';
       yoursEl.style.color = 'var(--text-dim)';
       livebar.style.width = '0%';
+      cueEl.textContent = '';
     }
 
     if (now < highway.totalTime) {
@@ -153,18 +171,22 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     const stars = '★'.repeat(res.stars) + '☆'.repeat(3 - res.stars);
     const pct = Math.round(res.pct * 100);
     const verdict = res.stars >= 3 ? 'Отлично!' : res.stars === 2 ? 'Хорошо!' : res.stars === 1 ? 'Неплохо' : 'Ещё разок';
+    const tip = diagnose(res, exercise);
     app.innerHTML = `
       <div class="screen summary">
         <div class="stars">${stars}</div>
         <div class="verdict">${verdict}</div>
         <div class="big-pct">${pct}<span>%</span></div>
         <p class="hint">в зелёной зоне · попал ${res.notesHit} из ${res.notesTotal} нот</p>
+        <div class="card tip-card"><p class="how"><b>Разбор.</b> ${tip}</p></div>
+        ${controlsBlock()}
         <div class="row">
           <button class="btn btn-ghost" id="menu">Меню</button>
           <button class="btn btn-primary" id="again">Ещё раз</button>
         </div>
       </div>
     `;
+    wireControls(app, finish);
     document.getElementById('again').addEventListener('click', onAgain);
     document.getElementById('menu').addEventListener('click', onExit);
   }
@@ -187,9 +209,52 @@ function renderExplain(app, exercise, { onExit, onStart }) {
         ${exercise.how ? `<p class="how"><b>Как делать.</b> ${exercise.how}</p>` : ''}
         <p class="how mech"><b>Как устроена игра.</b> Ноты едут к вертикальной линии слева. Пой так, чтобы твой светящийся шарик совпал с нотой по высоте: <b style="color:var(--green)">зелёный</b> — точно, <b style="color:var(--amber)">жёлтый</b> — почти, <b style="color:var(--coral)">красный</b> — мимо. Сначала прозвучит образец.</p>
       </div>
+      ${controlsBlock()}
       <button class="btn btn-primary" id="go" style="width:100%">Начать</button>
     </div>
   `;
   document.getElementById('back').addEventListener('click', onExit);
   document.getElementById('go').addEventListener('click', onStart);
+  wireControls(app, () => renderExplain(app, exercise, { onExit, onStart }));
+}
+
+// Динамические настройки темпа и поводыря (на экранах объяснения и итога).
+function controlsBlock() {
+  const diff = progress.getDifficulty();
+  const guideOn = progress.getGuide();
+  const b = (k, l) => `<button data-diff="${k}" class="${diff === k ? 'on' : ''}">${l}</button>`;
+  return `
+    <div class="settings inline-settings">
+      <div class="seg-label">Темп</div>
+      <div class="seg">${b('easy', 'Медл.')}${b('medium', 'Средне')}${b('fast', 'Быстро')}</div>
+      <button class="toggle ${guideOn ? 'on' : ''}" data-guidetoggle="1">Подсказка тоном: ${guideOn ? 'вкл' : 'выкл'}</button>
+    </div>
+  `;
+}
+
+function wireControls(root, rerender) {
+  root.querySelectorAll('[data-diff]').forEach((btn) => {
+    btn.addEventListener('click', () => { progress.setDifficulty(btn.dataset.diff); rerender(); });
+  });
+  const g = root.querySelector('[data-guidetoggle]');
+  if (g) g.addEventListener('click', () => { progress.setGuide(!progress.getGuide()); rerender(); });
+}
+
+// «Почему» — короткий разбор по итогам: тенденция занижения/завышения + слабые ноты.
+function diagnose(res, exercise) {
+  if (res.stars >= 3) return 'Чисто и точно! Можно прибавить темп или взять упражнение посложнее.';
+  const tips = [];
+  const a = res.avgCents;
+  if (a <= -18) tips.push('Ты чаще занижал — тяни ноту чуть выше, поддержи дыханием (опора живота).');
+  else if (a >= 18) tips.push('Ты чаще завышал — не дави, расслабь гортань, целься чуть ниже.');
+  // Слабее ли даются верхние ноты (верхняя треть по высоте)?
+  const n = res.perNote.length;
+  if (n >= 3) {
+    const order = exercise.notes.map((nt, i) => ({ i, midi: nt.midi })).sort((x, y) => y.midi - x.midi);
+    const top = order.slice(0, Math.max(1, Math.round(n / 3)));
+    const topAvg = top.reduce((s, o) => s + (res.perNote[o.i] || 0), 0) / top.length;
+    if (topAvg < res.pct - 0.15) tips.push('Верхние ноты даются хуже — не тянись вверх горлом, добавь головной резонанс и воздух.');
+  }
+  if (!tips.length) tips.push('Целься в центр ноты и держи ровно. Включи «подсказку тоном» — попадать заметно легче.');
+  return tips.join(' ');
 }

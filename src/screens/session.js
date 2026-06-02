@@ -19,9 +19,7 @@ export function renderSession(app, mic, tracker, { onExit }) {
     { title: 'Беглость «Ма»', tip: 'Лёгко и быстро, не зажимайся.', ex: agilityRun(root) },
     { title: 'Охлаждение — долгая нота', tip: 'Спокойно отпусти голос на «А».', ex: sustain(root, 8) },
   ];
-  // Масштаб темпа под выбранную сложность.
-  const f = progress.difficultyFactor();
-  seq.forEach((s) => { s.ex.tempo = Math.max(40, Math.round(s.ex.tempo * f)); });
+  // Темп применяется внутри renderGame по текущей сложности (не дублируем тут).
 
   let i = 0;
   const results = [];

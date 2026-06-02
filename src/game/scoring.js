@@ -4,11 +4,11 @@
 
 export class Scorer {
   constructor(noteCount) {
-    this.notes = Array.from({ length: noteCount }, () => ({ greenMs: 0, scoredMs: 0, activeMs: 0 }));
+    this.notes = Array.from({ length: noteCount }, () => ({ greenMs: 0, scoredMs: 0, activeMs: 0, sumCents: 0, centsMs: 0 }));
   }
 
-  /** Записать кадр: noteIndex активной ноты, зона попадания, прошло dtMs, был ли голос. */
-  record(noteIndex, zone, dtMs, voiced) {
+  /** Записать кадр: индекс ноты, зона, dtMs, был ли голос, знаковое отклонение (центы). */
+  record(noteIndex, zone, dtMs, voiced, cents = null) {
     const s = this.notes[noteIndex];
     if (!s) return;
     s.activeMs += dtMs;
@@ -16,14 +16,20 @@ export class Scorer {
     s.scoredMs += dtMs;
     if (zone === 'green') s.greenMs += dtMs;
     else if (zone === 'yellow') s.greenMs += dtMs * 0.5;
+    if (cents != null && Number.isFinite(cents)) {
+      s.sumCents += cents * dtMs;
+      s.centsMs += dtMs;
+    }
   }
 
   result() {
-    let green = 0, active = 0;
+    let green = 0, active = 0, sumCents = 0, centsMs = 0;
     let notesHit = 0;
     for (const n of this.notes) {
       green += n.greenMs;
       active += n.activeMs;
+      sumCents += n.sumCents;
+      centsMs += n.centsMs;
       if (n.activeMs > 0 && n.greenMs / n.activeMs >= 0.5) notesHit += 1;
     }
     const pct = active > 0 ? green / active : 0;
@@ -33,6 +39,7 @@ export class Scorer {
       stars,
       notesHit,
       notesTotal: this.notes.length,
+      avgCents: centsMs > 0 ? sumCents / centsMs : 0,
       perNote: this.notes.map((n) => (n.activeMs > 0 ? n.greenMs / n.activeMs : 0)),
     };
   }

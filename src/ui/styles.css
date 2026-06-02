@@ -315,3 +315,9 @@ canvas.trace { height: 300px; }
 .breathe-diagram svg { width: 100%; height: auto; display: block; }
 .diagram-note { margin-top: 10px; font-size: 13px; line-height: 1.55; color: var(--text-dim); }
 .diagram-note b { color: var(--text); }
+
+/* ============ Живая подсказка + разбор + инлайн-настройки ============ */
+.cue { text-align: center; font-weight: 800; font-size: 17px; min-height: 1.3em; letter-spacing: .02em; transition: color .12s; }
+.inline-settings { width: 100%; }
+.tip-card { text-align: left; width: 100%; }
+.tip-card .how { margin-top: 0; }

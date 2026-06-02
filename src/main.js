@@ -163,7 +163,7 @@ function renderMenu() {
 function startExercise(i, explain = true) {
   applyTrackerRange();
   const exercise = EXERCISES[i].make(voiceRoot());
-  exercise.tempo = Math.max(40, Math.round(exercise.tempo * progress.difficultyFactor()));
+  // Темп применяется внутри renderGame по текущей сложности (динамично).
   renderGame(app, mic, tracker, exercise, {
     explain,
     onExit: renderMenu,
