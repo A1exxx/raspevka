@@ -273,8 +273,7 @@ canvas.trace { height: 300px; }
 .big-timer {
   font-size: clamp(64px, 22vw, 110px); font-weight: 800; line-height: 1;
   font-variant-numeric: tabular-nums;
-  background: linear-gradient(100deg, var(--gold), var(--accent-2));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
+  color: var(--accent-2);
 }
 .summary .big-pct span { font-size: .35em; }
 
