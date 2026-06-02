@@ -32,17 +32,18 @@ body {
   background:
     radial-gradient(120% 80% at 50% -12%, #1c2128 0%, var(--bg) 58%) fixed;
   -webkit-font-smoothing: antialiased;
-  overflow: hidden;
-  touch-action: manipulation;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 #app {
-  height: 100dvh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+  padding: max(20px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom));
 }
 
 /* ============ Карточки / экраны ============ */
