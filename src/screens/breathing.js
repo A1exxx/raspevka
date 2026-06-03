@@ -3,7 +3,7 @@
 //   paced  — ведомое дыхание с дышащим кругом (box breathing, дыхание животом)
 //   exhale — замер длительности ровного выдоха на «с-с-с» по громкости (RMS)
 import * as progress from '../state/progress.js';
-import { bellyDiagram } from '../ui/illustrations.js';
+import { bellyDiagram } from '../ui/belly-diagram.js';
 
 export const BREATHING = {
   box: {
