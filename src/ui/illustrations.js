@@ -51,39 +51,42 @@ export function miniKeyboard(lowMidi, highMidi) {
     </div>`;
 }
 
-// Одна фигура (фронтально): торс + «живот». inflated=true → надутый живот + стрелки.
+const BODY = '#2b323c';
+
+// Фигура человека (фронтально). inflated=true → живот выпирает + рука на животе.
 function figure(cx, inflated, capTop, capBot) {
+  // силуэт корпуса: на вдохе бока расходятся в районе живота
+  const body = inflated
+    ? `M${cx - 23} 58 C ${cx - 33} 92 ${cx - 36} 128 ${cx - 25} 152 C ${cx - 16} 166 ${cx} 168 ${cx} 168 C ${cx} 168 ${cx + 16} 166 ${cx + 25} 152 C ${cx + 36} 128 ${cx + 33} 92 ${cx + 23} 58 Z`
+    : `M${cx - 22} 58 C ${cx - 25} 90 ${cx - 23} 126 ${cx - 19} 150 C ${cx - 13} 164 ${cx} 166 ${cx} 166 C ${cx} 166 ${cx + 13} 164 ${cx + 19} 150 C ${cx + 23} 126 ${cx + 25} 90 ${cx + 22} 58 Z`;
   const belly = inflated
     ? `
-      <circle cx="${cx}" cy="126" r="28" fill="rgba(70,179,168,0.18)" stroke="${ACCENT}" stroke-width="2.5"/>
-      <text x="${cx}" y="130" text-anchor="middle" fill="${ACCENT}" font-size="11" font-weight="700">воздух</text>
-      <path d="M${cx} 82 L${cx} 102" stroke="${ACCENT}" stroke-width="3" stroke-linecap="round"/>
-      <path d="M${cx - 5} 98 L${cx} 107 L${cx + 5} 98 Z" fill="${ACCENT}"/>
-      <path d="M${cx - 31} 126 L${cx - 47} 126" stroke="${ACCENT}" stroke-width="3" stroke-linecap="round"/>
-      <path d="M${cx - 43} 121 L${cx - 51} 126 L${cx - 43} 131 Z" fill="${ACCENT}"/>
-      <path d="M${cx + 31} 126 L${cx + 47} 126" stroke="${ACCENT}" stroke-width="3" stroke-linecap="round"/>
-      <path d="M${cx + 43} 121 L${cx + 51} 126 L${cx + 43} 131 Z" fill="${ACCENT}"/>`
-    : `
-      <circle cx="${cx}" cy="122" r="10" fill="none" stroke="${LINE}" stroke-width="2" stroke-dasharray="3 3"/>`;
+      <ellipse cx="${cx}" cy="126" rx="25" ry="21" fill="rgba(70,179,168,0.22)"/>
+      <text x="${cx}" y="130" text-anchor="middle" fill="${ACCENT}" font-size="10" font-weight="700">воздух</text>
+      <path d="M${cx - 30} 126 L${cx - 45} 126" stroke="${ACCENT}" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M${cx - 41} 122 L${cx - 48} 126 L${cx - 41} 130 Z" fill="${ACCENT}"/>
+      <path d="M${cx + 30} 126 L${cx + 45} 126" stroke="${ACCENT}" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M${cx + 41} 122 L${cx + 48} 126 L${cx + 41} 130 Z" fill="${ACCENT}"/>
+      <path d="M${cx + 18} 96 C ${cx + 30} 104 ${cx + 30} 120 ${cx + 22} 132" fill="none" stroke="${TEXT}" stroke-width="5" stroke-linecap="round"/>`
+    : '';
   return `
-    <circle cx="${cx}" cy="30" r="12" fill="none" stroke="${LINE}" stroke-width="2.5"/>
-    <rect x="${cx - 34}" y="49" width="68" height="10" rx="5" fill="${LINE}" opacity="0.85"/>
-    <rect x="${cx - 26}" y="62" width="52" height="112" rx="22" fill="#20242b" stroke="${LINE}" stroke-width="2.5"/>
+    <circle cx="${cx}" cy="32" r="15" fill="${BODY}" stroke="${LINE}" stroke-width="2.5"/>
+    <path d="${body}" fill="${BODY}" stroke="${LINE}" stroke-width="2.5"/>
     ${belly}
-    <text x="${cx}" y="198" text-anchor="middle" fill="${TEXT}" font-size="12.5" font-weight="700">${capTop}</text>
-    <text x="${cx}" y="215" text-anchor="middle" fill="${DIM}" font-size="11">${capBot}</text>`;
+    <text x="${cx}" y="194" text-anchor="middle" fill="${TEXT}" font-size="12.5" font-weight="700">${capTop}</text>
+    <text x="${cx}" y="211" text-anchor="middle" fill="${DIM}" font-size="11">${capBot}</text>`;
 }
 
-/** Схема диафрагмального дыхания: покой vs вдох + контроль плеч. */
+/** Картинка-человек: дыхание животом (покой vs вдох) + контроль плеч. */
 export function bellyDiagram() {
   return `
     <div class="breathe-diagram">
-      <svg viewBox="0 0 340 228" role="img" aria-label="Дыхание животом: на вдохе живот наполняется, плечи не поднимаются">
-        <line x1="22" y1="51" x2="318" y2="51" stroke="${LINE}" stroke-dasharray="4 5" stroke-width="1.5"/>
-        <text x="170" y="43" text-anchor="middle" fill="${DIM}" font-size="11">плечи на одном уровне — не поднимай</text>
+      <svg viewBox="0 0 340 224" role="img" aria-label="Дыхание животом: на вдохе живот наполняется, плечи не поднимаются">
+        <line x1="24" y1="54" x2="316" y2="54" stroke="${LINE}" stroke-dasharray="4 5" stroke-width="1.5"/>
+        <text x="170" y="46" text-anchor="middle" fill="${DIM}" font-size="11">плечи на месте — не поднимай</text>
         ${figure(92, false, 'Выдох / покой', 'живот мягкий')}
         ${figure(248, true, 'Вдох', 'живот наполнен')}
       </svg>
-      <p class="diagram-note">Воздух идёт вниз, в живот — он округляется вперёд. <b>Плечи и грудь почти неподвижны</b>, не тянись вверх.</p>
+      <p class="diagram-note">Не стесняйся: на вдохе <b>живот округляется вперёд</b> (рукой почувствуешь), воздух идёт вниз. Плечи и грудь почти неподвижны — не тянись вверх.</p>
     </div>`;
 }

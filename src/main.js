@@ -7,6 +7,7 @@ import { fiveNoteScale, agilityRun, sustain, octaveJump, hum3, lipTrill, transpo
 import { renderSession } from './screens/session.js';
 import { renderVoice } from './screens/voice.js';
 import { renderDashboard } from './screens/progress-dash.js';
+import { renderFreesing } from './screens/freesing.js';
 import { getVoiceType } from './theory/voice-types.js';
 import { renderBreathing, BREATHING } from './screens/breathing.js';
 import { renderRhythm, RHYTHM } from './screens/rhythm.js';
@@ -102,6 +103,8 @@ function icon(name) {
     mic: '<path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
     chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
     tuner: '<circle cx="12" cy="12" r="8"/><path d="M12 12l4-3"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/>',
+    wave: '<path d="M2 12h2l2-6 3 14 3-12 2 8 2-4h6"/>',
+    note: '<circle cx="7" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="M10 18V5l11-2v13"/>',
   }[name] || '';
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 }
@@ -113,23 +116,20 @@ const dayWord = (n) => (n % 10 === 1 && n % 100 !== 11 ? 'день' : 'дн.');
 // ---------- Экран 2: меню (домашний) ----------
 function renderMenu() {
   stopRaf();
-  const items = EXERCISES.map((e, i) => `
-    <button class="list-item" data-ex="${i}">
-      <span class="li-main">${e.label}</span>
-      <span class="li-sub">${e.sub}</span>
+  // Распевки — крупные карточки (главное, «сок»).
+  const exCards = EXERCISES.map((e, i) => `
+    <button class="ex-card" data-ex="${i}">
+      ${icon('note')}
+      <span class="ex-card-body"><span class="ex-card-main">${e.label}</span><span class="ex-card-sub">${e.sub}</span></span>
+      <span class="ex-card-go">→</span>
     </button>
   `).join('');
-  const breathItems = Object.entries(BREATHING).map(([k, b]) => `
-    <button class="list-item" data-breath="${k}">
-      <span class="li-main">${b.title}</span>
-      <span class="li-sub">${b.kind === 'exhale' ? 'замер ровного выдоха' : 'ведомое дыхание'}</span>
-    </button>
+  // Дыхание/артикуляция — тонкие компактные строки.
+  const breathThin = Object.entries(BREATHING).map(([k, b]) => `
+    <button class="thin-item" data-breath="${k}"><span>${b.title}</span><span class="thin-sub">${b.kind === 'exhale' ? 'выдох' : 'дыхание'}</span></button>
   `).join('');
-  const rhythmItems = Object.entries(RHYTHM).map(([k, r]) => `
-    <button class="list-item" data-rhythm="${k}">
-      <span class="li-main">${r.name}</span>
-      <span class="li-sub">метроном + подложка</span>
-    </button>
+  const rhythmThin = Object.entries(RHYTHM).map(([k, r]) => `
+    <button class="thin-item" data-rhythm="${k}"><span>${r.name}</span><span class="thin-sub">метроном</span></button>
   `).join('');
   const streak = progress.getStreak();
   const voice = progress.getVoice();
@@ -148,19 +148,20 @@ function renderMenu() {
         <span class="hero-arrow">→</span>
       </button>
 
-      <div class="tiles">
+      <div class="tiles tiles-4">
+        <button class="tile tile-hl" data-freesing="1">${icon('wave')}<span class="tile-main">Распевайся</span><span class="tile-sub">видеть свой голос</span></button>
         <button class="tile" data-voice="1">${icon('mic')}<span class="tile-main">Мой голос</span><span class="tile-sub">${vType ? vType.name : 'определить'}</span></button>
         <button class="tile" data-dash="1">${icon('chart')}<span class="tile-main">Прогресс</span><span class="tile-sub">${streak > 0 ? streak + ' ' + dayWord(streak) + ' подряд' : 'статистика'}</span></button>
         <button class="tile" data-tuner="1">${icon('tuner')}<span class="tile-main">Тюнер</span><span class="tile-sub">проверка</span></button>
       </div>
 
       <section class="home-sec">
-        <div class="sec-title">Дыхание и артикуляция</div>
-        <div class="sec-list">${rhythmItems}${breathItems}</div>
+        <div class="sec-title">Распевки</div>
+        <div class="ex-cards">${exCards}</div>
       </section>
       <section class="home-sec">
-        <div class="sec-title">Распевки</div>
-        <div class="sec-list">${items}</div>
+        <div class="sec-title">Дыхание и артикуляция</div>
+        <div class="thin-list">${rhythmThin}${breathThin}</div>
       </section>
       <p class="hint">Темп и «подсказку тоном» настраивай прямо в упражнении — значок ⚙.</p>
     </div>
@@ -179,6 +180,13 @@ function renderMenu() {
   });
   app.querySelector('[data-dash]').addEventListener('click', () => renderDashboard(app, { onExit: renderMenu }));
   app.querySelector('[data-tuner]').addEventListener('click', renderTuner);
+  app.querySelector('[data-freesing]').addEventListener('click', () => {
+    const r = voiceRange();
+    renderFreesing(app, mic, tracker, {
+      onExit: () => { applyTrackerRange(); renderMenu(); },
+      lowMidi: r.low, highMidi: r.high,
+    });
+  });
   app.querySelectorAll('[data-ex]').forEach((btn) => {
     btn.addEventListener('click', () => startExercise(Number(btn.dataset.ex)));
   });
