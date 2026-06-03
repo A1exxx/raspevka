@@ -135,9 +135,17 @@ export function setTimbre(t) {
 
 /** Чувствительность микрофона: 'low'|'med'|'high' -> множитель усиления входа. */
 const SENS = { low: 1.5, med: 3, high: 5.5 };
+// Дефолт по устройству: у телефонов микрофон тише → начинаем с «высокой».
+function deviceDefaultSensitivity() {
+  try {
+    const ua = navigator.userAgent || '';
+    const mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua) || (navigator.maxTouchPoints || 0) > 1;
+    return mobile ? 'high' : 'med';
+  } catch (e) { return 'med'; }
+}
 export function getSensitivityKey() {
   const k = load().sensitivity;
-  return SENS[k] ? k : 'med';
+  return SENS[k] ? k : deviceDefaultSensitivity();
 }
 export function getSensitivity() {
   return SENS[getSensitivityKey()];
