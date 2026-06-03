@@ -3,7 +3,7 @@ import { MicEngine } from './audio/mic.js';
 import { PitchTracker } from './audio/pitch-detector.js';
 import { hzToNoteInfo, hzToY, centsZone, midiToHz } from './theory/note-map.js';
 import { renderGame } from './screens/game.js';
-import { fiveNoteScale, agilityRun, sustain, octaveJump, hum3, lipTrill } from './theory/exercises.js';
+import { fiveNoteScale, agilityRun, sustain, octaveJump, hum3, lipTrill, transposePlan } from './theory/exercises.js';
 import { renderSession } from './screens/session.js';
 import { renderVoice } from './screens/voice.js';
 import { renderDashboard } from './screens/progress-dash.js';
@@ -34,6 +34,15 @@ function voiceRoot() {
   const v = progress.getVoice();
   const t = v && getVoiceType(v.key);
   return t ? t.center : DEFAULT_ROOT;
+}
+
+// Рабочий диапазон голоса (для транспозиции повторов): из теста или из типа.
+function voiceRange() {
+  const v = progress.getVoice();
+  const t = v && getVoiceType(v.key);
+  if (v && v.low != null && v.high != null) return { low: v.low, high: v.high };
+  if (t) return { low: t.low, high: t.high };
+  return { low: 48, high: 72 };
 }
 
 // Сузить диапазон детекции под голос — режет октавные ошибки и шум.
@@ -68,7 +77,7 @@ function renderWelcome() {
     err.textContent = '';
     try {
       const { sampleRate } = await mic.start();
-      tracker = new PitchTracker(sampleRate, { fftSize: 2048, minClarity: 0.93 });
+      tracker = new PitchTracker(sampleRate, { fftSize: 2048, minClarity: 0.9 });
       // Первый запуск без типа голоса — предложим определить (можно пропустить).
       if (progress.getVoice()) {
         applyTrackerRange();
@@ -184,9 +193,12 @@ function renderMenu() {
 function startExercise(i, explain = true) {
   applyTrackerRange();
   const exercise = EXERCISES[i].make(voiceRoot());
+  const r = voiceRange();
+  const reps = transposePlan(exercise, r.low, r.high, 4); // вверх до верха и вниз
   // Темп применяется внутри renderGame по текущей сложности (динамично).
   renderGame(app, mic, tracker, exercise, {
     explain,
+    reps,
     onExit: renderMenu,
     onAgain: () => startExercise(i, false),
   });

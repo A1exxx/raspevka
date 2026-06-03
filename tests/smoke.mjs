@@ -1,5 +1,5 @@
 import { hzToNoteInfo, midiToHz, centsOff, centsZone, hzToY, noteToHz } from '../src/theory/note-map.js';
-import { fiveNoteScale, agilityRun, sustain, octaveJump, referenceFreqs, hum3, lipTrill } from '../src/theory/exercises.js';
+import { fiveNoteScale, agilityRun, sustain, octaveJump, referenceFreqs, hum3, lipTrill, transposePlan } from '../src/theory/exercises.js';
 import { Scorer } from '../src/game/scoring.js';
 import { classifyVoice, getVoiceType, VOICE_TYPES } from '../src/theory/voice-types.js';
 import { RHYTHM } from '../src/screens/rhythm.js';
@@ -84,6 +84,15 @@ const sc2 = new Scorer(1);
 sc2.record(0, 'yellow', 1000, true, -30);
 sc2.record(0, 'yellow', 1000, true, -30);
 eq('avgCents=-30 (занижение)', Math.round(sc2.result().avgCents), -30);
+
+// транспозиция повторов (вверх до верха диапазона и вниз)
+const plan = transposePlan(hum3(60), 48, 72, 4);
+eq('transposePlan up-down len', plan.length, 13);
+eq('transposePlan starts 0', plan[0], 0);
+eq('transposePlan peak +4', Math.max(...plan), 4);
+eq('transposePlan ends -4', plan[plan.length - 1], -4);
+eq('transposePlan narrow=[0]', transposePlan(hum3(60), 60, 64, 4).length, 1);
+eq('transposePlan no range=[0]', transposePlan(hum3(60), NaN, NaN).length, 1);
 
 let pass = 0;
 for (const [ok, name, info] of checks) {

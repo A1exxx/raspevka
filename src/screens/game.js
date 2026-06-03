@@ -19,11 +19,22 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     });
     return;
   }
+
+  // Повторы с транспозицией: opts.reps — массив смещений (полутоны), opts.repIndex — текущий.
+  const reps = opts.reps;
+  const repIndex = opts.repIndex || 0;
+  const step = (reps && reps.length) ? (reps[repIndex] || 0) : 0;
+  const baseTonic = exercise.root != null ? exercise.root : exercise.notes[0].midi;
+  const ex = step
+    ? { ...exercise, root: baseTonic + step, notes: exercise.notes.map((n) => ({ ...n, midi: n.midi + step })) }
+    : exercise;
+  const repLabel = (reps && reps.length > 1) ? ` · ${repIndex + 1}/${reps.length}` : '';
+
   app.innerHTML = `
     <div class="screen game">
       <div class="game-top">
         <button class="icon-btn" id="exit">‹ Меню</button>
-        <div class="ex-name">${exercise.name} · <span class="syl">«${exercise.syllable}»</span></div>
+        <div class="ex-name">${ex.name} · <span class="syl">«${ex.syllable}»</span>${repLabel}</div>
       </div>
       <div class="trace-wrap"><canvas class="trace" id="hw"></canvas></div>
       <div class="hud">
@@ -62,9 +73,9 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   // Темп применяется ДИНАМИЧНО при сборке (читаем текущую сложность) —
   // меняешь темп на экране объяснения/итога, и следующий проход уже с ним.
   const factor = progress.difficultyFactor();
-  const exRun = { ...exercise, tempo: Math.max(40, Math.round(exercise.tempo * factor)) };
+  const exRun = { ...ex, tempo: Math.max(40, Math.round(ex.tempo * factor)) };
   const highway = new NoteHighway(canvas, exRun);
-  const scorer = new Scorer(exercise.notes.length);
+  const scorer = new Scorer(ex.notes.length);
   let raf = null, startPerf = 0, lastPerf = 0, finished = false, pausedAbort = false, lastVoicedMs = 0;
   const guideHandles = [];
   const timers = [];
@@ -104,16 +115,23 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   wireControls(document.getElementById('gsettings'), restart);
 
   // 0) Аккорд тоники → 1) эталон-мелодия → 2) отсчёт
-  const tonic = exercise.root != null ? exercise.root : exercise.notes[0].midi;
-  const freqs = referenceFreqs(exercise);
+  const tonic = ex.root != null ? ex.root : ex.notes[0].midi;
+  const freqs = referenceFreqs(ex);
   highway.draw(0, null, false);
-  msg.textContent = 'Слушай тонику…';
-  playChord(mic.ctx, tonic, 0, 1.4);
-  later(() => {
-    msg.textContent = 'Образец…';
-    const refDur = playSequence(mic.ctx, freqs, 0.34);
-    later(countIn, refDur * 1000 + 250);
-  }, 1650);
+  if (repIndex === 0) {
+    msg.textContent = 'Слушай тонику…';
+    playChord(mic.ctx, tonic, 0, 1.4);
+    later(() => {
+      msg.textContent = 'Образец…';
+      const refDur = playSequence(mic.ctx, freqs, 0.34);
+      later(countIn, refDur * 1000 + 250);
+    }, 1650);
+  } else {
+    // Повтор выше/ниже — короткое интро: новая тоника + один клик.
+    msg.textContent = (step > 0 ? '↑ выше' : '↓ ниже') + ` · повтор ${repIndex + 1}/${reps.length}`;
+    playChord(mic.ctx, tonic, 0, 0.8);
+    later(() => { playClick(mic.ctx, 0, true); later(startRun, 480); }, 950);
+  }
 
   // 2) Отсчёт
   function countIn() {
@@ -166,8 +184,9 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     let voiced = false, sungHz = null;
     if (buf) {
       const r = tracker.process(buf);
-      // Гейт по громкости: тихий фон/шум не должен засчитываться как пение.
-      voiced = r.voiced && mic.rms() > 0.01;
+      // Гейт по громкости: тихий фон/шум не считаем пением, но порог низкий,
+      // чтобы ловить тихий голос на телефоне (жалобы «плохо слышит»).
+      voiced = r.voiced && mic.rms() > 0.006;
       sungHz = r.smoothedHz;
     }
 
@@ -222,18 +241,36 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   function finish() {
     const res = scorer.result();
     cleanup();
-    // Режим сессии: итог не показываем, отдаём результат контроллеру.
-    if (onComplete) { onComplete(res); return; }
-    const stars = '★'.repeat(res.stars) + '☆'.repeat(3 - res.stars);
-    const pct = Math.round(res.pct * 100);
-    const verdict = res.stars >= 3 ? 'Отлично!' : res.stars === 2 ? 'Хорошо!' : res.stars === 1 ? 'Неплохо' : 'Ещё разок';
-    const tip = diagnose(res, exercise);
+    const acc = opts._acc || [];
+    acc.push(res);
+    // Ещё есть повторы (транспозиция) — продолжаем выше/ниже, итог не показываем.
+    if (reps && reps.length > 1 && repIndex < reps.length - 1) {
+      renderGame(app, mic, tracker, exercise, { ...opts, repIndex: repIndex + 1, _acc: acc });
+      return;
+    }
+    // Агрегат по всем повторам.
+    const avgPct = acc.reduce((a, r) => a + (r.pct || 0), 0) / acc.length;
+    const agg = {
+      pct: avgPct,
+      stars: avgPct >= 0.85 ? 3 : avgPct >= 0.6 ? 2 : avgPct >= 0.35 ? 1 : 0,
+      notesHit: res.notesHit, notesTotal: res.notesTotal, avgCents: res.avgCents, perNote: res.perNote,
+      repsDone: acc.length,
+    };
+    if (onComplete) { onComplete(agg); return; }
+    renderSummary(agg);
+  }
+
+  function renderSummary(agg) {
+    const stars = '★'.repeat(agg.stars) + '☆'.repeat(3 - agg.stars);
+    const pct = Math.round(agg.pct * 100);
+    const verdict = agg.stars >= 3 ? 'Отлично!' : agg.stars === 2 ? 'Хорошо!' : agg.stars === 1 ? 'Неплохо' : 'Ещё разок';
+    const tip = diagnose(agg, exercise);
     app.innerHTML = `
       <div class="screen summary">
         <div class="stars">${stars}</div>
         <div class="verdict">${verdict}</div>
         <div class="big-pct">${pct}<span>%</span></div>
-        <p class="hint">в зелёной зоне · попал ${res.notesHit} из ${res.notesTotal} нот</p>
+        <p class="hint">средняя точность${agg.repsDone > 1 ? ` за ${agg.repsDone} повтор${agg.repsDone < 5 ? 'а' : 'ов'}` : ''}</p>
         <div class="card tip-card"><p class="how"><b>Разбор.</b> ${tip}</p></div>
         ${controlsBlock()}
         <div class="row">
@@ -242,7 +279,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
         </div>
       </div>
     `;
-    wireControls(app, finish);
+    wireControls(app, () => renderSummary(agg));
     document.getElementById('again').addEventListener('click', onAgain);
     document.getElementById('menu').addEventListener('click', onExit);
   }

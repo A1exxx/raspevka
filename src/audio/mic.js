@@ -32,7 +32,9 @@ export class MicEngine {
         audio: {
           echoCancellation: false,
           noiseSuppression: false,
-          autoGainControl: false,
+          // Авто-усиление включено: помогает ловить тихий голос на телефоне.
+          // На высоту тона (MPM) не влияет — меняет только громкость.
+          autoGainControl: true,
         },
         video: false,
       });

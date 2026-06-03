@@ -3,7 +3,7 @@
 // интонация → беглость → охлаждение. Между упражнениями — короткая заставка.
 import { renderGame } from './game.js';
 import { renderRhythm, RHYTHM } from './rhythm.js';
-import { hum3, lipTrill } from '../theory/exercises.js';
+import { hum3, lipTrill, transposePlan } from '../theory/exercises.js';
 import { getVoiceType } from '../theory/voice-types.js';
 import * as progress from '../state/progress.js';
 
@@ -12,6 +12,8 @@ export function renderSession(app, mic, tracker, { onExit }) {
   const v = progress.getVoice();
   const t = v && getVoiceType(v.key);
   const root = t ? t.center : 60;
+  const range = (v && v.low != null && v.high != null) ? { low: v.low, high: v.high }
+    : (t ? { low: t.low, high: t.high } : { low: 48, high: 72 });
 
   // Порядок по запросу: дыхание/артикуляция (с/ш) → мычание → губной тренаж.
   const seq = [
@@ -30,8 +32,12 @@ export function renderSession(app, mic, tracker, { onExit }) {
     const step = seq[i];
     interstitial(step, i, () => {
       const onComplete = (res) => { results.push(res); i += 1; next(); };
-      if (step.rhythm) renderRhythm(app, mic, root, step.rhythm, { onExit, onComplete });
-      else renderGame(app, mic, tracker, step.ex, { onExit, onComplete });
+      if (step.rhythm) {
+        renderRhythm(app, mic, root, step.rhythm, { onExit, onComplete });
+      } else {
+        const reps = transposePlan(step.ex, range.low, range.high, 2); // короче в составе сессии
+        renderGame(app, mic, tracker, step.ex, { onExit, onComplete, reps });
+      }
     });
   }
 

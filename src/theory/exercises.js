@@ -89,3 +89,20 @@ export function lipTrill(rootMidi) {
 export function referenceFreqs(exercise) {
   return exercise.notes.map((n) => midiToHz(n.midi));
 }
+
+/**
+ * План транспозиций для повторов: вверх по полутону до верха диапазона, затем вниз.
+ * Возвращает массив смещений в полутонах, напр. [0,1,2,1,0,-1,-2]. maxEach ограничивает
+ * число шагов в каждую сторону, чтобы сессия не была бесконечной.
+ */
+export function transposePlan(exercise, rangeLow, rangeHigh, maxEach = 4) {
+  const mids = exercise.notes.map((n) => n.midi);
+  const lo = Math.min(...mids), hi = Math.max(...mids);
+  if (!Number.isFinite(rangeLow) || !Number.isFinite(rangeHigh)) return [0];
+  const up = Math.max(0, Math.min(maxEach, rangeHigh - hi));
+  const down = Math.max(0, Math.min(maxEach, lo - rangeLow));
+  const plan = [];
+  for (let s = 0; s <= up; s++) plan.push(s);          // вверх до верха
+  for (let s = up - 1; s >= -down; s--) plan.push(s);  // вниз через 0 до низа
+  return plan.length ? plan : [0];
+}
