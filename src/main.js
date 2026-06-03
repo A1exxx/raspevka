@@ -9,6 +9,7 @@ import { renderVoice } from './screens/voice.js';
 import { renderDashboard } from './screens/progress-dash.js';
 import { getVoiceType } from './theory/voice-types.js';
 import { renderBreathing, BREATHING } from './screens/breathing.js';
+import { renderRhythm, RHYTHM } from './screens/rhythm.js';
 import * as progress from './state/progress.js';
 
 const app = document.getElementById('app');
@@ -101,6 +102,12 @@ function renderMenu() {
       <span class="li-sub">${b.kind === 'exhale' ? 'замер ровного выдоха' : 'ведомое дыхание'}</span>
     </button>
   `).join('');
+  const rhythmItems = Object.entries(RHYTHM).map(([k, r]) => `
+    <button class="list-item" data-rhythm="${k}">
+      <span class="li-main">${r.name}</span>
+      <span class="li-sub">метроном + подложка</span>
+    </button>
+  `).join('');
   const streak = progress.getStreak();
   const voice = progress.getVoice();
   const vType = voice && getVoiceType(voice.key);
@@ -135,7 +142,8 @@ function renderMenu() {
           <span class="li-main">Живой тюнер</span>
           <span class="li-sub">проверь, как тебя слышит микрофон</span>
         </button>
-        <div class="list-sep">Дыхание</div>
+        <div class="list-sep">Дыхание и артикуляция</div>
+        ${rhythmItems}
         ${breathItems}
         <div class="list-sep">Распевочные упражнения</div>
         ${items}
@@ -162,6 +170,9 @@ function renderMenu() {
   });
   app.querySelectorAll('[data-breath]').forEach((btn) => {
     btn.addEventListener('click', () => renderBreathing(app, mic, btn.dataset.breath, { onExit: renderMenu }));
+  });
+  app.querySelectorAll('[data-rhythm]').forEach((btn) => {
+    btn.addEventListener('click', () => renderRhythm(app, mic, voiceRoot(), RHYTHM[btn.dataset.rhythm], { onExit: renderMenu }));
   });
   app.querySelectorAll('[data-diff]').forEach((btn) => {
     btn.addEventListener('click', () => { progress.setDifficulty(btn.dataset.diff); renderMenu(); });

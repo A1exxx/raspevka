@@ -367,3 +367,13 @@ canvas.trace { height: 300px; }
 /* ============ Мини-клавиатура диапазона ============ */
 .mini-kb { margin-top: 10px; }
 .mini-kb svg { width: 100%; max-width: 440px; height: auto; display: block; }
+
+/* ============ Ритмические распевки (с/ш) ============ */
+.rhythm-stage { display: flex; flex-direction: column; align-items: center; gap: 26px; padding: 26px 0; }
+.rhythm-label { font-size: clamp(38px, 13vw, 68px); font-weight: 800; min-height: 1.2em; text-align: center; color: var(--accent-2); }
+.rhythm-beat { width: 56px; height: 56px; border-radius: 50%; background: var(--surface); border: 2px solid var(--line); }
+.rhythm-beat.pulse { animation: beatpulse .18s ease-out; }
+@keyframes beatpulse {
+  from { transform: scale(1.45); background: var(--accent); border-color: var(--accent); box-shadow: 0 0 24px -4px var(--accent); }
+  to { transform: scale(1); }
+}

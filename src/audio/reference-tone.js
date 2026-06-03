@@ -48,16 +48,27 @@ export function playSequence(ctx, freqs, secPerNote = 0.42) {
   return freqs.length * secPerNote;
 }
 
-/** Короткий метроном-«тик» (для отсчёта). */
-export function playClick(ctx, when = 0) {
+/** Короткий метроном-«тик». accent=true — выше и громче (сильная доля). */
+export function playClick(ctx, when = 0, accent = false) {
   const t = ctx.currentTime + when;
   const osc = ctx.createOscillator();
   const g = ctx.createGain();
-  osc.frequency.value = 1100;
+  osc.frequency.value = accent ? 1600 : 1050;
+  const peak = accent ? 0.4 : 0.26;
   g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(0.3, t + 0.005);
+  g.gain.exponentialRampToValueAtTime(peak, t + 0.005);
   g.gain.exponentialRampToValueAtTime(0.0001, t + 0.08);
   osc.connect(g).connect(ctx.destination);
   osc.start(t);
   osc.stop(t + 0.1);
+}
+
+/** Подложка-дрон (тоника: основа + квинта + октава), тихо, на всё упражнение.
+ *  Возвращает хэндл со stop(). */
+export function playDrone(ctx, rootMidi, dur, gain = 0.05) {
+  const handles = [0, 7, 12].map((s) => {
+    const hz = 440 * Math.pow(2, (rootMidi + s - 69) / 12);
+    return playTone(ctx, hz, dur, 0, gain);
+  });
+  return { stop() { try { handles.forEach((h) => h.stop()); } catch (e) { /* ok */ } } };
 }
