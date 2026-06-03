@@ -78,7 +78,7 @@ export function difficultyFactor() {
   return DIFF_FACTOR[getDifficulty()] || 0.6;
 }
 
-/** Звук-поводырь (тон активной ноты во время пения). По умолчанию включён. */
+/** Звук-поводырь (главный выключатель). По умолчанию включён. */
 export function getGuide() {
   return load().guide !== false;
 }
@@ -87,6 +87,28 @@ export function setGuide(on) {
   p.guide = !!on;
   save(p);
   return p.guide;
+}
+
+/** Наушники: если да — поводырь может звучать непрерывно (нет протечки в микрофон). */
+export function getHeadphones() {
+  return load().headphones === true;
+}
+export function setHeadphones(on) {
+  const p = load();
+  p.headphones = !!on;
+  save(p);
+  return p.headphones;
+}
+
+/**
+ * Режим поводыря:
+ *  'off'        — выключен;
+ *  'continuous' — тон звучит весь шаг (только для наушников, иначе протекает в микрофон);
+ *  'prehear'    — тон звучит коротко ДО ноты и молчит пока поёшь (без протечки, дефолт на динамике).
+ */
+export function getGuideMode() {
+  if (!getGuide()) return 'off';
+  return getHeadphones() ? 'continuous' : 'prehear';
 }
 
 /** Рекорд ровного выдоха «с-с-с» (сек). */

@@ -321,3 +321,16 @@ canvas.trace { height: 300px; }
 .inline-settings { width: 100%; }
 .tip-card { text-align: left; width: 100%; }
 .tip-card .how { margin-top: 0; }
+.toggle-row { display: flex; gap: 8px; }
+.toggle-row .toggle { flex: 1; text-align: center; }
+
+/* Сворачиваемая панель настроек прямо в упражнении */
+.game-settings { border: 1px solid var(--line); border-radius: 12px; background: var(--bg-soft); padding: 0 12px; }
+.game-settings > summary {
+  padding: 12px 2px; cursor: pointer; color: var(--text-dim); font-size: 14px; font-weight: 600;
+  list-style: none; display: flex; align-items: center; gap: 6px;
+}
+.game-settings > summary::-webkit-details-marker { display: none; }
+.game-settings > summary::before { content: "⚙"; opacity: .8; }
+.game-settings[open] > summary { color: var(--text); }
+.game-settings .inline-settings { padding-bottom: 14px; }

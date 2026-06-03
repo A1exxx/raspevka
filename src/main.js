@@ -64,7 +64,7 @@ function renderWelcome() {
     err.textContent = '';
     try {
       const { sampleRate } = await mic.start();
-      tracker = new PitchTracker(sampleRate, { fftSize: 2048, minClarity: 0.9 });
+      tracker = new PitchTracker(sampleRate, { fftSize: 2048, minClarity: 0.93 });
       // Первый запуск без типа голоса — предложим определить (можно пропустить).
       if (progress.getVoice()) {
         applyTrackerRange();
@@ -103,6 +103,7 @@ function renderMenu() {
   const vType = voice && getVoiceType(voice.key);
   const diff = progress.getDifficulty();
   const guideOn = progress.getGuide();
+  const hp = progress.getHeadphones();
   const diffBtn = (key, label) => `<button data-diff="${key}" class="${diff === key ? 'on' : ''}">${label}</button>`;
   app.innerHTML = `
     <div class="screen">
@@ -113,7 +114,10 @@ function renderMenu() {
       <div class="settings">
         <div class="seg-label">Темп упражнений</div>
         <div class="seg">${diffBtn('easy', 'Медленно')}${diffBtn('medium', 'Средне')}${diffBtn('fast', 'Быстро')}</div>
-        <button class="toggle ${guideOn ? 'on' : ''}" id="guide">Подсказка тоном: ${guideOn ? 'вкл' : 'выкл'}</button>
+        <div class="toggle-row">
+          <button class="toggle ${guideOn ? 'on' : ''}" id="guide">Подсказка тоном: ${guideOn ? 'вкл' : 'выкл'}</button>
+          <button class="toggle ${hp ? 'on' : ''}" id="hp">Наушники: ${hp ? 'да' : 'нет'}</button>
+        </div>
       </div>
       <div class="card list">
         <button class="list-item" data-voice="1">
@@ -129,7 +133,7 @@ function renderMenu() {
         <div class="list-sep">Распевочные упражнения</div>
         ${items}
       </div>
-      <p class="hint">«Подсказка тоном» подыгрывает нужную ноту — попадать легче. Темп ставь «Медленно», пока не привыкнешь.</p>
+      <p class="hint">«Подсказка тоном»: без наушников тон звучит ПЕРЕД нотой (чтобы не попадал в микрофон), с наушниками — непрерывно. Темп и подсказку можно менять и прямо в упражнении.</p>
     </div>
   `;
   document.getElementById('session').addEventListener('click', () => {
@@ -156,6 +160,10 @@ function renderMenu() {
   });
   document.getElementById('guide').addEventListener('click', () => {
     progress.setGuide(!progress.getGuide());
+    renderMenu();
+  });
+  document.getElementById('hp').addEventListener('click', () => {
+    progress.setHeadphones(!progress.getHeadphones());
     renderMenu();
   });
 }

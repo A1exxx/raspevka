@@ -35,6 +35,10 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
         </div>
         <div class="cue" id="cue"></div>
       </div>
+      <details class="game-settings" id="gsettings">
+        <summary>Темп и подсказка тоном</summary>
+        ${controlsBlock()}
+      </details>
     </div>
   `;
 
@@ -69,6 +73,14 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     onExit();
   });
 
+  // Панель настроек прямо в упражнении: смена темпа/поводыря → мягкий рестарт прохода.
+  function restart() {
+    if (raf) cancelAnimationFrame(raf);
+    window.removeEventListener('resize', resize);
+    renderGame(app, mic, tracker, exercise, { ...opts, explain: false });
+  }
+  wireControls(document.getElementById('gsettings'), restart);
+
   // 1) Эталон
   const freqs = referenceFreqs(exercise);
   const refDur = playSequence(mic.ctx, freqs, 0.34);
@@ -94,15 +106,23 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
 
   // 3) Проход
   function startRun() {
-    msg.textContent = progress.getGuide() ? 'Пой за подсказкой!' : 'Пой!';
+    const mode = progress.getGuideMode();
+    msg.textContent = mode === 'continuous' ? 'Пой за подсказкой!'
+      : mode === 'prehear' ? 'Слушай тон и повторяй!' : 'Пой!';
     tracker.reset();
     startPerf = performance.now();
     lastPerf = startPerf;
-    // Звук-поводырь: тихо проигрываем тон каждой ноты ровно когда она у линии,
-    // чтобы попадать ухом, а не только глазом. Аудио-часы стартуют вместе с игрой.
-    if (progress.getGuide()) {
+    // Поводырь. 'continuous' — тон звучит весь шаг (для наушников).
+    // 'prehear' — короткий тон ЗАКАНЧИВАЕТСЯ к моменту, когда нота у линии,
+    // и молчит пока ты поёшь → не протекает в микрофон на динамике.
+    if (mode === 'continuous') {
       highway.timed.forEach((seg) => {
-        playTone(mic.ctx, seg.hz, Math.max(0.2, seg.dur * 0.92), seg.start, 0.1);
+        playTone(mic.ctx, seg.hz, Math.max(0.2, seg.dur * 0.92), seg.start, 0.10);
+      });
+    } else if (mode === 'prehear') {
+      highway.timed.forEach((seg) => {
+        const cue = Math.min(0.4, seg.dur);
+        playTone(mic.ctx, seg.hz, cue, Math.max(0, seg.start - cue), 0.18);
       });
     }
     loop();
@@ -118,7 +138,8 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     let voiced = false, sungHz = null;
     if (buf) {
       const r = tracker.process(buf);
-      voiced = r.voiced;
+      // Гейт по громкости: тихий фон/шум не должен засчитываться как пение.
+      voiced = r.voiced && mic.rms() > 0.01;
       sungHz = r.smoothedHz;
     }
 
@@ -222,12 +243,16 @@ function renderExplain(app, exercise, { onExit, onStart }) {
 function controlsBlock() {
   const diff = progress.getDifficulty();
   const guideOn = progress.getGuide();
+  const hp = progress.getHeadphones();
   const b = (k, l) => `<button data-diff="${k}" class="${diff === k ? 'on' : ''}">${l}</button>`;
   return `
     <div class="settings inline-settings">
       <div class="seg-label">Темп</div>
       <div class="seg">${b('easy', 'Медл.')}${b('medium', 'Средне')}${b('fast', 'Быстро')}</div>
-      <button class="toggle ${guideOn ? 'on' : ''}" data-guidetoggle="1">Подсказка тоном: ${guideOn ? 'вкл' : 'выкл'}</button>
+      <div class="toggle-row">
+        <button class="toggle ${guideOn ? 'on' : ''}" data-guidetoggle="1">Подсказка тоном: ${guideOn ? 'вкл' : 'выкл'}</button>
+        <button class="toggle ${hp ? 'on' : ''}" data-hptoggle="1">Наушники: ${hp ? 'да' : 'нет'}</button>
+      </div>
     </div>
   `;
 }
@@ -238,6 +263,8 @@ function wireControls(root, rerender) {
   });
   const g = root.querySelector('[data-guidetoggle]');
   if (g) g.addEventListener('click', () => { progress.setGuide(!progress.getGuide()); rerender(); });
+  const h = root.querySelector('[data-hptoggle]');
+  if (h) h.addEventListener('click', () => { progress.setHeadphones(!progress.getHeadphones()); rerender(); });
 }
 
 // «Почему» — короткий разбор по итогам: тенденция занижения/завышения + слабые ноты.
