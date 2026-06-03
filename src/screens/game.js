@@ -1,7 +1,7 @@
 // game.js — экран упражнения: слушаем эталон → отсчёт → проход по хайвею → итог.
 import { Scorer } from '../game/scoring.js';
 import { NoteHighway } from '../game/note-highway.js';
-import { playSequence, playClick, playTone } from '../audio/reference-tone.js';
+import { playSequence, playClick, playTone, playChord } from '../audio/reference-tone.js';
 import { referenceFreqs } from '../theory/exercises.js';
 import { hzToNoteInfo, centsOff } from '../theory/note-map.js';
 import * as progress from '../state/progress.js';
@@ -103,12 +103,17 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   }
   wireControls(document.getElementById('gsettings'), restart);
 
-  // 1) Эталон
+  // 0) Аккорд тоники → 1) эталон-мелодия → 2) отсчёт
+  const tonic = exercise.root != null ? exercise.root : exercise.notes[0].midi;
   const freqs = referenceFreqs(exercise);
-  const refDur = playSequence(mic.ctx, freqs, 0.34);
-  // рисуем статичный хайвей пока играет эталон
   highway.draw(0, null, false);
-  later(countIn, refDur * 1000 + 250);
+  msg.textContent = 'Слушай тонику…';
+  playChord(mic.ctx, tonic, 0, 1.4);
+  later(() => {
+    msg.textContent = 'Образец…';
+    const refDur = playSequence(mic.ctx, freqs, 0.34);
+    later(countIn, refDur * 1000 + 250);
+  }, 1650);
 
   // 2) Отсчёт
   function countIn() {
@@ -258,7 +263,7 @@ function renderExplain(app, exercise, { onExit, onStart }) {
       <div class="card">
         ${exercise.desc ? `<p class="blurb">${exercise.desc}</p>` : ''}
         ${exercise.how ? `<p class="how"><b>Как делать.</b> ${exercise.how}</p>` : ''}
-        <p class="how mech"><b>Как устроена игра.</b> Ноты едут к вертикальной линии слева. Пой так, чтобы твой светящийся шарик совпал с нотой по высоте: <b style="color:var(--green)">зелёный</b> — точно, <b style="color:var(--amber)">жёлтый</b> — почти, <b style="color:var(--coral)">красный</b> — мимо. Сначала прозвучит образец.</p>
+        <p class="how mech"><b>Как устроена игра.</b> Ноты едут к вертикальной линии слева. Пой так, чтобы твой светящийся шарик совпал с нотой по высоте: <b style="color:var(--green)">зелёный</b> — точно, <b style="color:var(--amber)">жёлтый</b> — почти, <b style="color:var(--coral)">красный</b> — мимо. Сначала прозвучит <b>аккорд тоники</b> и образец мелодии — это твоя опора, чтобы попасть. «Подсказка тоном» подыгрывает нужную ноту (без наушников — коротко перед тем, как её петь).</p>
       </div>
       ${controlsBlock()}
       <button class="btn btn-primary" id="go" style="width:100%">Начать</button>

@@ -1,9 +1,9 @@
 // exercises.js — генерация распевок/упражнений под заданный корневой тон (MIDI).
-// На Фазе 2 — пара упражнений-демо. На Фазе 3 корень берётся из диапазона юзера.
 //
 // Модель упражнения:
-//   { id, name, syllable, tempo, kind, notes: [{midi, beats}] }
-// kind: 'sustain' | 'glide' | 'scale' | 'agility' | 'jump'
+//   { id, name, syllable, tempo, kind, root, notes: [{midi, beats}] }
+// root — тоника (для аккорда-подсказки в начале).
+// kind: 'sustain' | 'glide' | 'scale' | 'agility' | 'jump' | 'hum' | 'trill'
 
 import { midiToHz } from './note-map.js';
 
@@ -12,7 +12,7 @@ const beat = (midi, beats = 1) => ({ midi, beats });
 /** Долгая нота — удержание (sustain). */
 export function sustain(rootMidi, beats = 8) {
   return {
-    id: 'sustain', name: 'Удержание ноты', syllable: 'А', tempo: 70, kind: 'sustain',
+    id: 'sustain', name: 'Удержание ноты', syllable: 'А', tempo: 70, kind: 'sustain', root: rootMidi,
     desc: 'Учит держать ровный стабильный звук и дыхательную опору — основа пения.',
     how: 'Слушай образец, потом тяни ноту на «А» как можно ровнее. Держи шарик в зелёной зоне без дрожи.',
     notes: [beat(rootMidi, beats)],
@@ -24,7 +24,7 @@ export function siren(rootMidi) {
   const up = [0, 3, 7, 12];
   const seq = [...up, ...up.slice(0, -1).reverse()];
   return {
-    id: 'siren', name: 'Сирена', syllable: 'Нг', tempo: 80, kind: 'glide',
+    id: 'siren', name: 'Сирена', syllable: 'Нг', tempo: 80, kind: 'glide', root: rootMidi,
     desc: 'Разогревает голос и плавно соединяет нижний и верхний регистр.',
     how: 'Скользи голосом вверх и вниз плавно, как сирена, без рывков. Веди шарик за нотами.',
     notes: seq.map((o) => beat(rootMidi + o, 1)),
@@ -35,7 +35,7 @@ export function siren(rootMidi) {
 export function fiveNoteScale(rootMidi) {
   const offs = [0, 2, 4, 5, 7, 5, 4, 2, 0];
   return {
-    id: 'scale5', name: 'Гамма «Ма-Мэ»', syllable: 'Ма', tempo: 104, kind: 'scale',
+    id: 'scale5', name: 'Гамма «Ма-Мэ»', syllable: 'Ма', tempo: 104, kind: 'scale', root: rootMidi,
     desc: 'Тренирует точность интонации — чистое попадание в каждую ступень гаммы.',
     how: 'Пой «Ма» и попадай в каждую ноту, которая подъезжает к линии. Старайся держать зелёный.',
     notes: offs.map((o) => beat(rootMidi + o, 1)),
@@ -46,20 +46,42 @@ export function fiveNoteScale(rootMidi) {
 export function agilityRun(rootMidi) {
   const offs = [0, 2, 4, 5, 7, 9, 7, 5, 4, 2, 0];
   return {
-    id: 'agility', name: 'Беглость «Ма»', syllable: 'Ма', tempo: 138, kind: 'agility',
+    id: 'agility', name: 'Беглость «Ма»', syllable: 'Ма', tempo: 138, kind: 'agility', root: rootMidi,
     desc: 'Развивает беглость: быстрые и точные переходы между нотами (как в Vocalista).',
     how: 'Пой «Ма» легко и быстро, попадая в каждую ноту пробегающего пассажа. Не зажимайся.',
     notes: offs.map((o) => beat(rootMidi + o, 0.5)),
   };
 }
 
-/** Октавный скачок вниз — координация регистров. */
+/** Октавный скачок — координация регистров. */
 export function octaveJump(rootMidi) {
   return {
-    id: 'jump', name: 'Октавный скачок', syllable: 'А', tempo: 84, kind: 'jump',
+    id: 'jump', name: 'Октавный скачок', syllable: 'А', tempo: 84, kind: 'jump', root: rootMidi,
     desc: 'Учит координации между нижним и верхним регистром голоса.',
     how: 'Пой «А», точно прыгая на октаву вверх и обратно вниз. Целься в центр ноты.',
     notes: [beat(rootMidi + 12, 2), beat(rootMidi, 2), beat(rootMidi + 12, 2), beat(rootMidi, 2)],
+  };
+}
+
+/** Мычание по гамме: I-II-III-II-I на «М». */
+export function hum3(rootMidi) {
+  const offs = [0, 2, 4, 2, 0];
+  return {
+    id: 'hum3', name: 'Мычание по гамме', syllable: 'М', tempo: 92, kind: 'hum', root: rootMidi,
+    desc: 'Мягкая активация голоса и резонаторов на «м-м-м» — три ступеньки вверх и обратно.',
+    how: 'Сомкни губы и мычи «м», идя по нотам: вверх три ступени и вниз. Звук в маску/нос.',
+    notes: offs.map((o) => beat(rootMidi + o, 1)),
+  };
+}
+
+/** Губной тренаж «brrr» (или «Р»): I-II-III-IV-V-IV-III-II-I, затем скачок V-I. */
+export function lipTrill(rootMidi) {
+  const offs = [0, 2, 4, 5, 7, 5, 4, 2, 0, 7, 0];
+  return {
+    id: 'trill', name: 'Губной тренаж «brrr»', syllable: 'brrr', tempo: 120, kind: 'trill', root: rootMidi,
+    desc: 'Ровный воздушный поток и гибкость: пять ступеней вверх-вниз и скачок на квинту.',
+    how: 'Губами «brrr» (если не выходит — на «Р»). Веди по нотам ровно, в конце — скачок на квинту и тонику.',
+    notes: offs.map((o) => beat(rootMidi + o, 0.75)),
   };
 }
 

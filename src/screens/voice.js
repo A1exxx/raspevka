@@ -3,6 +3,7 @@
 // мы усредняем устойчивый тон и классифицируем по диапазону.
 import { VOICE_TYPES, classifyVoice, getVoiceType, rangeLabel, midiName } from '../theory/voice-types.js';
 import { hzToNoteInfo } from '../theory/note-map.js';
+import { miniKeyboard } from '../ui/illustrations.js';
 import * as progress from '../state/progress.js';
 
 export function renderVoice(app, mic, tracker, { onDone, onExit, canSkip = false }) {
@@ -162,6 +163,7 @@ export function renderVoice(app, mic, tracker, { onDone, onExit, canSkip = false
         <p class="hint">${v.blurb}</p>
         <div class="card" style="text-align:left;width:100%">
           <p class="how"><b>Твой диапазон:</b> ${midiName(low)} – ${midiName(high)}</p>
+          ${miniKeyboard(low, high)}
           <p class="how"><b>Типичный для ${v.name.toLowerCase()}:</b> ${rangeLabel(v)}</p>
           <p class="how mech">Это ориентир по диапазону, а не окончательный вердикт — точный тип и тембр определит педагог. Упражнения подстроятся под тебя.</p>
         </div>

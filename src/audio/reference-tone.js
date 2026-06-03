@@ -33,6 +33,15 @@ export function playTone(ctx, hz, dur = 0.6, when = 0, gain = 0.22) {
   };
 }
 
+/** Аккорд тоники (мажорное трезвучие от rootMidi) — даёт ученику опору тональности. */
+export function playChord(ctx, rootMidi, when = 0, dur = 1.4, gain = 0.14) {
+  [0, 4, 7].forEach((s) => {
+    const hz = 440 * Math.pow(2, (rootMidi + s - 69) / 12);
+    playTone(ctx, hz, dur, when, gain);
+  });
+  return dur;
+}
+
 /** Проиграть последовательность опорных нот. Возвращает общую длительность (сек). */
 export function playSequence(ctx, freqs, secPerNote = 0.42) {
   freqs.forEach((hz, i) => playTone(ctx, hz, secPerNote * 0.9, i * secPerNote));

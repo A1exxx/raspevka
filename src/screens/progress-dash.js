@@ -1,6 +1,7 @@
 // progress-dash.js — дашборд прогресса: стрик, сессии, рост диапазона, точность, выдох.
 import * as progress from '../state/progress.js';
 import { getVoiceType, midiName } from '../theory/voice-types.js';
+import { miniKeyboard } from '../ui/illustrations.js';
 
 function dayStr(d) { return d.toISOString().slice(0, 10); }
 
@@ -46,6 +47,7 @@ export function renderDashboard(app, { onExit }) {
       <div class="card" style="text-align:left;width:100%">
         <div class="seg-label">Диапазон голоса</div>
         <p class="how" style="margin-top:6px"><b>${midiName(lowHigh.low)} – ${midiName(lowHigh.high)}</b> · ${span} полутонов${growth}</p>
+        ${miniKeyboard(lowHigh.low, lowHigh.high)}
         ${vType ? `<p class="how">Тип: ${vType.name}</p>` : ''}
       </div>`;
   }

@@ -363,3 +363,7 @@ canvas.trace { height: 300px; }
   }
   .screen { animation: none !important; }
 }
+
+/* ============ Мини-клавиатура диапазона ============ */
+.mini-kb { margin-top: 10px; }
+.mini-kb svg { width: 100%; max-width: 440px; height: auto; display: block; }

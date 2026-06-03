@@ -3,7 +3,7 @@ import { MicEngine } from './audio/mic.js';
 import { PitchTracker } from './audio/pitch-detector.js';
 import { hzToNoteInfo, hzToY, centsZone, midiToHz } from './theory/note-map.js';
 import { renderGame } from './screens/game.js';
-import { fiveNoteScale, agilityRun, sustain, octaveJump } from './theory/exercises.js';
+import { fiveNoteScale, agilityRun, sustain, octaveJump, hum3, lipTrill } from './theory/exercises.js';
 import { renderSession } from './screens/session.js';
 import { renderVoice } from './screens/voice.js';
 import { renderDashboard } from './screens/progress-dash.js';
@@ -20,6 +20,8 @@ let rafId = null;
 const DEFAULT_ROOT = 60;
 
 const EXERCISES = [
+  { label: 'Мычание по гамме', sub: '«М» · I-II-III-II-I', make: (r) => hum3(r) },
+  { label: 'Губной тренаж «brrr»', sub: 'brrr / «Р» · 5 нот + квинта', make: (r) => lipTrill(r) },
   { label: 'Удержание ноты', sub: 'держать ровный звук', make: (r) => sustain(r, 8) },
   { label: 'Гамма «Ма-Мэ»', sub: 'попадать в ноты гаммы', make: (r) => fiveNoteScale(r) },
   { label: 'Беглость «Ма»', sub: 'быстрые ноты — как в рекламе', make: (r) => agilityRun(r) },
