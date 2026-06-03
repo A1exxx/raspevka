@@ -18,6 +18,8 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
       <div class="game-top"><button class="icon-btn" id="back">‹ Меню</button></div>
       <div class="brand"><h1>Распевайся</h1><p>Мычи или тяни звук — и смотри, где твой голос. Без оценки.</p></div>
       <div class="fs-note silent" id="note">—</div>
+      <div class="cents-row"><span id="cents">центы: —</span></div>
+      <div class="bar"><i id="lvl"></i></div>
       <div class="trace-wrap"><canvas class="trace fs-canvas" id="fs"></canvas></div>
       <p class="hint">Шарик — твоя нота. Поднимается выше — поёшь выше. Слева — названия нот.</p>
     </div>
@@ -25,6 +27,8 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
   document.getElementById('back').addEventListener('click', () => { stop(); onExit(); });
 
   const noteEl = document.getElementById('note');
+  const centsEl = document.getElementById('cents');
+  const lvlEl = document.getElementById('lvl');
   const canvas = document.getElementById('fs');
   const ctx = canvas.getContext('2d');
 
@@ -74,11 +78,15 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
       const mm = (info.name || '').match(/^([A-G]#?)(-?\d+)$/);
       noteEl.innerHTML = mm ? `${mm[1]}<span class="oct">${mm[2]}</span>` : info.name;
       noteEl.classList.remove('silent');
+      centsEl.textContent = `центы: ${info.cents > 0 ? '+' : ''}${info.cents}`;
+      lvlEl.style.width = Math.min(100, mic.rms() * 350) + '%';
       const y = yFor(hz, h);
       trail.push(y);
     } else {
       noteEl.textContent = '—';
       noteEl.classList.add('silent');
+      centsEl.textContent = 'центы: —';
+      lvlEl.style.width = '0%';
       trail.push(null);
     }
     while (trail.length > 90) trail.shift();

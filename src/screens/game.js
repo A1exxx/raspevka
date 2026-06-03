@@ -117,19 +117,20 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   // 0) Аккорд тоники → 1) эталон-мелодия → 2) отсчёт
   const tonic = ex.root != null ? ex.root : ex.notes[0].midi;
   const freqs = referenceFreqs(ex);
+  const timbre = progress.getTimbre();
   highway.draw(0, null, false);
   if (repIndex === 0) {
     msg.textContent = 'Слушай тонику…';
-    playChord(mic.ctx, tonic, 0, 1.4);
+    playChord(mic.ctx, tonic, 0, 1.4, 0.14, timbre);
     later(() => {
       msg.textContent = 'Образец…';
-      const refDur = playSequence(mic.ctx, freqs, 0.34);
+      const refDur = playSequence(mic.ctx, freqs, 0.34, timbre);
       later(countIn, refDur * 1000 + 250);
     }, 1650);
   } else {
     // Повтор выше/ниже — короткое интро: новая тоника + один клик.
     msg.textContent = (step > 0 ? '↑ выше' : '↓ ниже') + ` · повтор ${repIndex + 1}/${reps.length}`;
-    playChord(mic.ctx, tonic, 0, 0.8);
+    playChord(mic.ctx, tonic, 0, 0.8, 0.14, timbre);
     later(() => { playClick(mic.ctx, 0, true); later(startRun, 480); }, 950);
   }
 
@@ -163,12 +164,12 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     // и молчит пока ты поёшь → не протекает в микрофон на динамике.
     if (mode === 'continuous') {
       highway.timed.forEach((seg) => {
-        guideHandles.push(playTone(mic.ctx, seg.hz, Math.max(0.2, seg.dur * 0.92), seg.start, 0.10));
+        guideHandles.push(playTone(mic.ctx, seg.hz, Math.max(0.2, seg.dur * 0.92), seg.start, 0.10, timbre));
       });
     } else if (mode === 'prehear') {
       highway.timed.forEach((seg) => {
         const cue = Math.min(0.4, seg.dur);
-        guideHandles.push(playTone(mic.ctx, seg.hz, cue, Math.max(0, seg.start - cue), 0.18));
+        guideHandles.push(playTone(mic.ctx, seg.hz, cue, Math.max(0, seg.start - cue), 0.18, timbre));
       });
     }
     loop();
@@ -316,11 +317,15 @@ function controlsBlock() {
   const diff = progress.getDifficulty();
   const guideOn = progress.getGuide();
   const hp = progress.getHeadphones();
+  const tb = progress.getTimbre();
   const b = (k, l) => `<button data-diff="${k}" class="${diff === k ? 'on' : ''}">${l}</button>`;
+  const tbtn = (k, l) => `<button data-timbre="${k}" class="${tb === k ? 'on' : ''}">${l}</button>`;
   return `
     <div class="settings inline-settings">
       <div class="seg-label">Темп</div>
       <div class="seg">${b('easy', 'Медл.')}${b('medium', 'Средне')}${b('fast', 'Быстро')}</div>
+      <div class="seg-label">Звук подсказки</div>
+      <div class="seg">${tbtn('piano', 'Пиано')}${tbtn('guitar', 'Гитара')}${tbtn('soft', 'Мягкий')}</div>
       <div class="toggle-row">
         <button class="toggle ${guideOn ? 'on' : ''}" data-guidetoggle="1">Подсказка тоном: ${guideOn ? 'вкл' : 'выкл'}</button>
         <button class="toggle ${hp ? 'on' : ''}" data-hptoggle="1">Наушники: ${hp ? 'да' : 'нет'}</button>
@@ -332,6 +337,9 @@ function controlsBlock() {
 function wireControls(root, rerender) {
   root.querySelectorAll('[data-diff]').forEach((btn) => {
     btn.addEventListener('click', () => { progress.setDifficulty(btn.dataset.diff); rerender(); });
+  });
+  root.querySelectorAll('[data-timbre]').forEach((btn) => {
+    btn.addEventListener('click', () => { progress.setTimbre(btn.dataset.timbre); rerender(); });
   });
   const g = root.querySelector('[data-guidetoggle]');
   if (g) g.addEventListener('click', () => { progress.setGuide(!progress.getGuide()); rerender(); });

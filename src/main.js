@@ -22,12 +22,12 @@ let rafId = null;
 const DEFAULT_ROOT = 60;
 
 const EXERCISES = [
-  { label: 'Мычание по гамме', sub: '«М» · I-II-III-II-I', make: (r) => hum3(r) },
-  { label: 'Губной тренаж «brrr»', sub: 'brrr / «Р» · 5 нот + квинта', make: (r) => lipTrill(r) },
-  { label: 'Удержание ноты', sub: 'держать ровный звук', make: (r) => sustain(r, 8) },
-  { label: 'Гамма «Ма-Мэ»', sub: 'попадать в ноты гаммы', make: (r) => fiveNoteScale(r) },
-  { label: 'Беглость «Ма»', sub: 'быстрые ноты — как в рекламе', make: (r) => agilityRun(r) },
-  { label: 'Октавный скачок', sub: 'прыжок на октаву и назад', make: (r) => octaveJump(r) },
+  { label: 'Мычание по гамме', sub: '«М» · I-II-III-II-I', ic: 'lips', make: (r) => hum3(r) },
+  { label: 'Губной тренаж «brrr»', sub: 'brrr / «Р» · 5 нот + квинта', ic: 'wave', make: (r) => lipTrill(r) },
+  { label: 'Удержание ноты', sub: 'держать ровный звук', ic: 'fork', make: (r) => sustain(r, 8) },
+  { label: 'Гамма «Ма-Мэ»', sub: 'попадать в ноты гаммы', ic: 'stairs', make: (r) => fiveNoteScale(r) },
+  { label: 'Беглость «Ма»', sub: 'быстрые ноты — как в рекламе', ic: 'bolt', make: (r) => agilityRun(r) },
+  { label: 'Октавный скачок', sub: 'прыжок на октаву и назад', ic: 'arrows', make: (r) => octaveJump(r) },
 ];
 
 // Корень упражнений из центра типа голоса (иначе C4).
@@ -105,6 +105,11 @@ function icon(name) {
     tuner: '<circle cx="12" cy="12" r="8"/><path d="M12 12l4-3"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/>',
     wave: '<path d="M2 12h2l2-6 3 14 3-12 2 8 2-4h6"/>',
     note: '<circle cx="7" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="M10 18V5l11-2v13"/>',
+    lips: '<path d="M3 12c4-5 14-5 18 0-4 5-14 5-18 0z"/><path d="M3 12h18"/>',
+    fork: '<path d="M9 3v8a3 3 0 0 0 6 0V3"/><path d="M12 14v7"/>',
+    stairs: '<path d="M3 19h4v-4h4v-4h4V7h4"/>',
+    bolt: '<path d="M13 2 4 14h6l-1 8 9-12h-6z"/>',
+    arrows: '<path d="M8 8l4-4 4 4M8 16l4 4 4-4M12 4v16"/>',
   }[name] || '';
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 }
@@ -119,7 +124,7 @@ function renderMenu() {
   // Распевки — крупные карточки (главное, «сок»).
   const exCards = EXERCISES.map((e, i) => `
     <button class="ex-card" data-ex="${i}">
-      ${icon('note')}
+      ${icon(e.ic || 'note')}
       <span class="ex-card-body"><span class="ex-card-main">${e.label}</span><span class="ex-card-sub">${e.sub}</span></span>
       <span class="ex-card-go">→</span>
     </button>
@@ -148,11 +153,10 @@ function renderMenu() {
         <span class="hero-arrow">→</span>
       </button>
 
-      <div class="tiles tiles-4">
+      <div class="tiles">
         <button class="tile tile-hl" data-freesing="1">${icon('wave')}<span class="tile-main">Распевайся</span><span class="tile-sub">видеть свой голос</span></button>
         <button class="tile" data-voice="1">${icon('mic')}<span class="tile-main">Мой голос</span><span class="tile-sub">${vType ? vType.name : 'определить'}</span></button>
         <button class="tile" data-dash="1">${icon('chart')}<span class="tile-main">Прогресс</span><span class="tile-sub">${streak > 0 ? streak + ' ' + dayWord(streak) + ' подряд' : 'статистика'}</span></button>
-        <button class="tile" data-tuner="1">${icon('tuner')}<span class="tile-main">Тюнер</span><span class="tile-sub">проверка</span></button>
       </div>
 
       <section class="home-sec">
@@ -179,7 +183,6 @@ function renderMenu() {
     });
   });
   app.querySelector('[data-dash]').addEventListener('click', () => renderDashboard(app, { onExit: renderMenu }));
-  app.querySelector('[data-tuner]').addEventListener('click', renderTuner);
   app.querySelector('[data-freesing]').addEventListener('click', () => {
     const r = voiceRange();
     renderFreesing(app, mic, tracker, {

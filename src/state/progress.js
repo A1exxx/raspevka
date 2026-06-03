@@ -121,6 +121,18 @@ export function getGuideMode() {
   return getHeadphones() ? 'continuous' : 'prehear';
 }
 
+/** Тембр поводыря/эталона: 'piano' | 'guitar' | 'soft'. По умолчанию пиано. */
+export function getTimbre() {
+  const v = load().timbre;
+  return v === 'guitar' || v === 'soft' ? v : 'piano';
+}
+export function setTimbre(t) {
+  const p = load();
+  p.timbre = t;
+  save(p);
+  return p.timbre;
+}
+
 /** Рекорд ровного выдоха «с-с-с» (сек). */
 export function getBreathBest() {
   return load().breathBest || 0;
