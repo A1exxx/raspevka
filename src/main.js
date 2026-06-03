@@ -78,7 +78,7 @@ function renderWelcome() {
     err.textContent = '';
     try {
       const { sampleRate } = await mic.start();
-      tracker = new PitchTracker(sampleRate, { fftSize: 2048, minClarity: 0.9 });
+      tracker = new PitchTracker(sampleRate, { fftSize: 2048, minClarity: 0.85 });
       // Первый запуск без типа голоса — предложим определить (можно пропустить).
       if (progress.getVoice()) {
         applyTrackerRange();

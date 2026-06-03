@@ -185,9 +185,8 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     let voiced = false, sungHz = null;
     if (buf) {
       const r = tracker.process(buf);
-      // Гейт по громкости: тихий фон/шум не считаем пением, но порог низкий,
-      // чтобы ловить тихий голос на телефоне (жалобы «плохо слышит»).
-      voiced = r.voiced && mic.rms() > 0.006;
+      // Гейт по громкости: очень низкий порог, чтобы уверенно ловить тихий голос.
+      voiced = r.voiced && mic.rms() > 0.0025;
       sungHz = r.smoothedHz;
     }
 
@@ -221,9 +220,10 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
       yoursEl.textContent = '—';
       yoursEl.style.color = 'var(--text-dim)';
       livebar.style.width = '0%';
-      // Долго не слышим голос во время прохода — мягкая подсказка.
-      if (now > 0.5 && nowMs - lastVoicedMs > 2500) {
-        cueEl.textContent = 'не слышу голос — громче / ближе к телефону';
+      // Подсказку «не слышу» показываем редко: только если есть активная нота
+      // и долго (>5с) нет голоса — чтобы не нудеть в паузах/между нотами.
+      if (active && nowMs - lastVoicedMs > 5000) {
+        cueEl.textContent = 'не слышу голос — спой громче';
         cueEl.style.color = 'var(--coral)';
       } else {
         cueEl.textContent = '';

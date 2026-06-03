@@ -29,6 +29,8 @@ export class NoteHighway {
     const mids = exercise.notes.map((n) => n.midi);
     this.minMidi = Math.min(...mids) - 3;
     this.maxMidi = Math.max(...mids) + 3;
+
+    this.trail = []; // последние позиции голоса (хвост — видно траекторию вверх/вниз)
   }
 
   // лог-шкала по локальному midi-диапазону (Hz -> Y)
@@ -115,21 +117,52 @@ export class NoteHighway {
       }
     }
 
-    // шарик голоса на линии попадания
+    // голос: шарик на линии попадания + ХВОСТ (история — видно куда ведёшь голос)
+    let curY = null, color = '#9aa3af';
     if (voiced && sungHz) {
-      const y = this.yFor(sungHz, h);
-      let color = '#888';
+      curY = this.yFor(sungHz, h);
       if (active) {
-        const cents = Math.abs(centsOff(sungHz, active.seg.hz));
-        const z = centsZone(cents);
+        const z = centsZone(Math.abs(centsOff(sungHz, active.seg.hz)));
         color = z === 'green' ? '#34dd98' : z === 'yellow' ? '#f3c45c' : '#ff6f61';
+      } else {
+        color = '#5ec9bd';
       }
+    }
+    this.trail.push(curY);
+    while (this.trail.length > 28) this.trail.shift();
+
+    const n = this.trail.length;
+    const dx = 3.4; // история уходит влево от линии попадания
+    // линия хвоста — её наклон показывает направление (вверх/вниз)
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.globalAlpha = 0.45;
+    ctx.beginPath();
+    let started = false;
+    for (let i = 0; i < n; i++) {
+      const y = this.trail[i];
+      if (y == null) { started = false; continue; }
+      const x = hitX - (n - 1 - i) * dx;
+      if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    // затухающие точки хвоста
+    for (let i = 0; i < n; i++) {
+      const y = this.trail[i];
+      if (y == null) continue;
+      const x = hitX - (n - 1 - i) * dx;
+      ctx.globalAlpha = 0.12 + (i / n) * 0.5;
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    // текущий шарик
+    if (curY != null) {
       ctx.fillStyle = color;
       ctx.shadowColor = color;
       ctx.shadowBlur = 16;
-      ctx.beginPath();
-      ctx.arc(hitX, y, 7, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(hitX, curY, 7, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur = 0;
     }
   }
