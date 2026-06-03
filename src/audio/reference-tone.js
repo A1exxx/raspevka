@@ -8,34 +8,38 @@ export function playTone(ctx, hz, dur = 0.6, when = 0, gain = 0.22, timbre = 'pi
   const out = ctx.createGain();
   out.connect(ctx.destination);
   const oscs = [];
+  let ring = dur; // фактическая длина звучания (нота «звенит» и затухает)
   const mk = (type, freq, amp, dest) => {
     const o = ctx.createOscillator(); const g = ctx.createGain();
     o.type = type; o.frequency.value = freq; g.gain.value = amp;
-    o.connect(g).connect(dest); o.start(t); o.stop(t + dur + 0.06); oscs.push(o);
+    o.connect(g).connect(dest); o.start(t); o.stop(t + ring + 0.08); oscs.push(o);
   };
 
   if (timbre === 'piano') {
-    // партиалы + перкуссивное затухание
+    // фортепиано: ударная атака + долгий естественный звон/затухание
+    ring = Math.max(1.6, dur);
     out.gain.setValueAtTime(0.0001, t);
     out.gain.linearRampToValueAtTime(gain, t + 0.008);
-    out.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(0.35, dur));
+    out.gain.exponentialRampToValueAtTime(0.0001, t + ring);
     [[1, 1], [2, 0.5], [3, 0.25], [4, 0.12]].forEach(([m, a]) => mk('sine', hz * m, a, out));
   } else if (timbre === 'guitar') {
-    // пиццикато: пила через затухающий low-pass
+    // струна: щипок + звон с затуханием
+    ring = Math.max(1.3, dur);
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass';
     lp.frequency.setValueAtTime(3800, t);
-    lp.frequency.exponentialRampToValueAtTime(800, t + Math.max(0.4, dur));
+    lp.frequency.exponentialRampToValueAtTime(700, t + ring);
     lp.connect(out);
     out.gain.setValueAtTime(0.0001, t);
     out.gain.linearRampToValueAtTime(gain, t + 0.006);
-    out.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(0.45, dur));
+    out.gain.exponentialRampToValueAtTime(0.0001, t + ring);
     [[1, 1], [2, 0.32]].forEach(([m, a]) => mk('sawtooth', hz * m, a, lp));
   } else {
-    // soft — мягкий «вокальный» тон (как было), ровная огибающая
+    // soft — мягкий «вокальный» тон (ровная огибающая, тянется на dur)
+    ring = Math.max(0.2, dur);
     out.gain.setValueAtTime(0, t);
     out.gain.linearRampToValueAtTime(gain, t + 0.025);
-    out.gain.setValueAtTime(gain, t + Math.max(0.05, dur - 0.1));
-    out.gain.linearRampToValueAtTime(0, t + dur);
+    out.gain.setValueAtTime(gain, t + Math.max(0.05, ring - 0.1));
+    out.gain.linearRampToValueAtTime(0, t + ring);
     mk('triangle', hz, 1, out); mk('triangle', hz * 2, 0.18, out);
   }
   return {
