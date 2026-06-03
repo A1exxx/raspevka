@@ -353,3 +353,13 @@ canvas.trace { height: 300px; }
 .acc-bar.g { background: var(--green); }
 .acc-bar.a { background: var(--amber); }
 .acc-bar.c { background: var(--coral); }
+
+/* ============ Доступность: меньше движения ============ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  .screen { animation: none !important; }
+}

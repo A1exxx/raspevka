@@ -65,7 +65,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   const exRun = { ...exercise, tempo: Math.max(40, Math.round(exercise.tempo * factor)) };
   const highway = new NoteHighway(canvas, exRun);
   const scorer = new Scorer(exercise.notes.length);
-  let raf = null, startPerf = 0, lastPerf = 0, finished = false, pausedAbort = false;
+  let raf = null, startPerf = 0, lastPerf = 0, finished = false, pausedAbort = false, lastVoicedMs = 0;
   const guideHandles = [];
   const timers = [];
   const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
@@ -134,6 +134,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     tracker.reset();
     startPerf = performance.now();
     lastPerf = startPerf;
+    lastVoicedMs = startPerf;
     // Поводырь. 'continuous' — тон звучит весь шаг (для наушников).
     // 'prehear' — короткий тон ЗАКАНЧИВАЕТСЯ к моменту, когда нота у линии,
     // и молчит пока ты поёшь → не протекает в микрофон на динамике.
@@ -178,6 +179,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     const active = highway.activeAt(now);
     targetEl.textContent = active ? noteName(active.seg.midi) : '—';
     if (voiced && sungHz) {
+      lastVoicedMs = nowMs;
       const info = hzToNoteInfo(sungHz);
       yoursEl.textContent = info ? info.name : '—';
       const color = ev.zone === 'green' ? 'var(--green)' : ev.zone === 'yellow' ? 'var(--yellow)' : 'var(--coral)';
@@ -194,7 +196,13 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
       yoursEl.textContent = '—';
       yoursEl.style.color = 'var(--text-dim)';
       livebar.style.width = '0%';
-      cueEl.textContent = '';
+      // Долго не слышим голос во время прохода — мягкая подсказка.
+      if (now > 0.5 && nowMs - lastVoicedMs > 2500) {
+        cueEl.textContent = 'не слышу голос — громче / ближе к телефону';
+        cueEl.style.color = 'var(--coral)';
+      } else {
+        cueEl.textContent = '';
+      }
     }
 
     if (now < highway.totalTime) {
