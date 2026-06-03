@@ -87,7 +87,21 @@ function renderWelcome() {
   });
 }
 
-// ---------- Экран 2: меню ----------
+// Маленькие линейные иконки (наследуют currentColor).
+function icon(name) {
+  const p = {
+    mic: '<path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+    chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+    tuner: '<circle cx="12" cy="12" r="8"/><path d="M12 12l4-3"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/>',
+  }[name] || '';
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+}
+function flameSvg() {
+  return '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1 3-1 4-2 6-1 1.7-.5 3.5 1 4 .8.3 1-.7.5-1.5 2 .6 3.5 2.3 3.5 4.5A5 5 0 0 1 7 19c-1.7-1-2.7-3-2.5-5 .2-2.4 2-3.7 2.8-5.6C8.4 6 9 3.6 12 2z"/></svg>';
+}
+const dayWord = (n) => (n % 10 === 1 && n % 100 !== 11 ? 'день' : 'дн.');
+
+// ---------- Экран 2: меню (домашний) ----------
 function renderMenu() {
   stopRaf();
   const items = EXERCISES.map((e, i) => `
@@ -98,7 +112,7 @@ function renderMenu() {
   `).join('');
   const breathItems = Object.entries(BREATHING).map(([k, b]) => `
     <button class="list-item" data-breath="${k}">
-      <span class="li-main">🫁 ${b.title}</span>
+      <span class="li-main">${b.title}</span>
       <span class="li-sub">${b.kind === 'exhale' ? 'замер ровного выдоха' : 'ведомое дыхание'}</span>
     </button>
   `).join('');
@@ -111,44 +125,35 @@ function renderMenu() {
   const streak = progress.getStreak();
   const voice = progress.getVoice();
   const vType = voice && getVoiceType(voice.key);
-  const diff = progress.getDifficulty();
-  const guideOn = progress.getGuide();
-  const hp = progress.getHeadphones();
-  const diffBtn = (key, label) => `<button data-diff="${key}" class="${diff === key ? 'on' : ''}">${label}</button>`;
   app.innerHTML = `
-    <div class="screen">
-      <div class="brand"><h1>Распевка</h1>
-        ${streak > 0 ? `<p class="streak-line">Стрик: ${streak} ${streak === 1 ? 'день' : 'дн.'} подряд</p>` : ''}
+    <div class="screen home">
+      <header class="home-head">
+        <h1>Распевка</h1>
+        ${streak > 0 ? `<div class="streak-chip">${flameSvg()} ${streak} ${dayWord(streak)}</div>` : ''}
+      </header>
+
+      <button class="hero-card" id="session">
+        <div class="hero-eyebrow">Ежедневная тренировка</div>
+        <div class="hero-title">Полная распевка</div>
+        <div class="hero-sub">5 упражнений · дыхание → распевка</div>
+        <span class="hero-arrow">→</span>
+      </button>
+
+      <div class="tiles">
+        <button class="tile" data-voice="1">${icon('mic')}<span class="tile-main">Мой голос</span><span class="tile-sub">${vType ? vType.name : 'определить'}</span></button>
+        <button class="tile" data-dash="1">${icon('chart')}<span class="tile-main">Прогресс</span><span class="tile-sub">${streak > 0 ? streak + ' ' + dayWord(streak) + ' подряд' : 'статистика'}</span></button>
+        <button class="tile" data-tuner="1">${icon('tuner')}<span class="tile-main">Тюнер</span><span class="tile-sub">проверка</span></button>
       </div>
-      <button class="btn btn-primary" id="session" style="width:100%">Полная распевка · 5 упражнений</button>
-      <div class="settings">
-        <div class="seg-label">Темп упражнений</div>
-        <div class="seg">${diffBtn('easy', 'Медленно')}${diffBtn('medium', 'Средне')}${diffBtn('fast', 'Быстро')}</div>
-        <div class="toggle-row">
-          <button class="toggle ${guideOn ? 'on' : ''}" id="guide">Подсказка тоном: ${guideOn ? 'вкл' : 'выкл'}</button>
-          <button class="toggle ${hp ? 'on' : ''}" id="hp">Наушники: ${hp ? 'да' : 'нет'}</button>
-        </div>
-      </div>
-      <div class="card list">
-        <button class="list-item" data-voice="1">
-          <span class="li-main">Мой голос: ${vType ? vType.name : 'не задан'}</span>
-          <span class="li-sub">${vType ? 'сменить или определить заново' : 'выбери тип или определи свой голос'}</span>
-        </button>
-        <button class="list-item" data-dash="1">
-          <span class="li-main">Прогресс</span>
-          <span class="li-sub">стрик, точность, рост диапазона</span>
-        </button>
-        <button class="list-item" data-tuner="1">
-          <span class="li-main">Живой тюнер</span>
-          <span class="li-sub">проверь, как тебя слышит микрофон</span>
-        </button>
-        <div class="list-sep">Дыхание и артикуляция</div>
-        ${rhythmItems}
-        ${breathItems}
-        <div class="list-sep">Распевочные упражнения</div>
-        ${items}
-      </div>
-      <p class="hint">«Подсказка тоном»: без наушников тон звучит ПЕРЕД нотой (чтобы не попадал в микрофон), с наушниками — непрерывно. Темп и подсказку можно менять и прямо в упражнении.</p>
+
+      <section class="home-sec">
+        <div class="sec-title">Дыхание и артикуляция</div>
+        <div class="sec-list">${rhythmItems}${breathItems}</div>
+      </section>
+      <section class="home-sec">
+        <div class="sec-title">Распевки</div>
+        <div class="sec-list">${items}</div>
+      </section>
+      <p class="hint">Темп и «подсказку тоном» настраивай прямо в упражнении — значок ⚙.</p>
     </div>
   `;
   document.getElementById('session').addEventListener('click', () => {
@@ -173,17 +178,6 @@ function renderMenu() {
   });
   app.querySelectorAll('[data-rhythm]').forEach((btn) => {
     btn.addEventListener('click', () => renderRhythm(app, mic, voiceRoot(), RHYTHM[btn.dataset.rhythm], { onExit: renderMenu }));
-  });
-  app.querySelectorAll('[data-diff]').forEach((btn) => {
-    btn.addEventListener('click', () => { progress.setDifficulty(btn.dataset.diff); renderMenu(); });
-  });
-  document.getElementById('guide').addEventListener('click', () => {
-    progress.setGuide(!progress.getGuide());
-    renderMenu();
-  });
-  document.getElementById('hp').addEventListener('click', () => {
-    progress.setHeadphones(!progress.getHeadphones());
-    renderMenu();
   });
 }
 
