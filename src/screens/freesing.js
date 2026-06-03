@@ -17,7 +17,7 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
     <div class="screen freesing">
       <div class="game-top"><button class="icon-btn" id="back">‹ Меню</button></div>
       <div class="brand"><h1>Распевайся</h1><p>Мычи или тяни звук — и смотри, где твой голос. Без оценки.</p></div>
-      <div class="fs-note" id="note">—</div>
+      <div class="fs-note silent" id="note">—</div>
       <div class="trace-wrap"><canvas class="trace fs-canvas" id="fs"></canvas></div>
       <p class="hint">Шарик — твоя нота. Поднимается выше — поёшь выше. Слева — названия нот.</p>
     </div>
