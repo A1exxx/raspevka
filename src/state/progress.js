@@ -49,6 +49,10 @@ export function getStreak() {
   return load().streak || 0;
 }
 
+export function getHistory() { return load().history || []; }
+export function getRangeHistory() { return load().rangeHistory || []; }
+export function getTotal() { return load().total || 0; }
+
 /** Тип голоса {key, low, high} или null. */
 export function getVoice() {
   const p = load();
@@ -58,7 +62,13 @@ export function setVoice(key, low = null, high = null) {
   const p = load();
   const prev = p.voice || {};
   p.voice = { key, low: low ?? prev.low ?? null, high: high ?? prev.high ?? null };
-  if (low != null && high != null) p.range = { low: Math.round(low), high: Math.round(high) };
+  if (low != null && high != null) {
+    p.range = { low: Math.round(low), high: Math.round(high) };
+    // История диапазона — чтобы показывать рост во времени в дашборде.
+    p.rangeHistory = p.rangeHistory || [];
+    p.rangeHistory.push({ date: dayStr(new Date()), low: Math.round(low), high: Math.round(high) });
+    if (p.rangeHistory.length > 100) p.rangeHistory = p.rangeHistory.slice(-100);
+  }
   save(p);
   return p.voice;
 }

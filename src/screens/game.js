@@ -65,18 +65,40 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   const exRun = { ...exercise, tempo: Math.max(40, Math.round(exercise.tempo * factor)) };
   const highway = new NoteHighway(canvas, exRun);
   const scorer = new Scorer(exercise.notes.length);
-  let raf = null, startPerf = 0, lastPerf = 0, finished = false;
+  let raf = null, startPerf = 0, lastPerf = 0, finished = false, pausedAbort = false;
+  const guideHandles = [];
+  const timers = [];
+  const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
 
-  document.getElementById('exit').addEventListener('click', () => {
-    if (raf) cancelAnimationFrame(raf);
+  function stopGuide() { guideHandles.forEach((h) => h && h.stop && h.stop()); guideHandles.length = 0; }
+  function cleanup() {
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+    timers.forEach(clearTimeout);
+    timers.length = 0;
     window.removeEventListener('resize', resize);
-    onExit();
-  });
+    document.removeEventListener('visibilitychange', onVisibility);
+    stopGuide();
+  }
+
+  // Свернули/заблокировали экран посреди прохода → стоп (без рассинхрона и хвостов звука);
+  // при возврате — аккуратный перезапуск упражнения.
+  function onVisibility() {
+    if (document.hidden) {
+      if (raf) { cancelAnimationFrame(raf); raf = null; }
+      stopGuide();
+      if (startPerf && !finished) { finished = true; pausedAbort = true; }
+    } else if (pausedAbort) {
+      pausedAbort = false;
+      restart();
+    }
+  }
+  document.addEventListener('visibilitychange', onVisibility);
+
+  document.getElementById('exit').addEventListener('click', () => { cleanup(); onExit(); });
 
   // Панель настроек прямо в упражнении: смена темпа/поводыря → мягкий рестарт прохода.
   function restart() {
-    if (raf) cancelAnimationFrame(raf);
-    window.removeEventListener('resize', resize);
+    cleanup();
     renderGame(app, mic, tracker, exercise, { ...opts, explain: false });
   }
   wireControls(document.getElementById('gsettings'), restart);
@@ -86,7 +108,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   const refDur = playSequence(mic.ctx, freqs, 0.34);
   // рисуем статичный хайвей пока играет эталон
   highway.draw(0, null, false);
-  setTimeout(countIn, refDur * 1000 + 250);
+  later(countIn, refDur * 1000 + 250);
 
   // 2) Отсчёт
   function countIn() {
@@ -96,7 +118,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
         playClick(mic.ctx);
         msg.textContent = 'Приготовься… ' + n;
         n -= 1;
-        setTimeout(tick, 600);
+        later(tick, 600);
       } else {
         startRun();
       }
@@ -117,12 +139,12 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     // и молчит пока ты поёшь → не протекает в микрофон на динамике.
     if (mode === 'continuous') {
       highway.timed.forEach((seg) => {
-        playTone(mic.ctx, seg.hz, Math.max(0.2, seg.dur * 0.92), seg.start, 0.10);
+        guideHandles.push(playTone(mic.ctx, seg.hz, Math.max(0.2, seg.dur * 0.92), seg.start, 0.10));
       });
     } else if (mode === 'prehear') {
       highway.timed.forEach((seg) => {
         const cue = Math.min(0.4, seg.dur);
-        playTone(mic.ctx, seg.hz, cue, Math.max(0, seg.start - cue), 0.18);
+        guideHandles.push(playTone(mic.ctx, seg.hz, cue, Math.max(0, seg.start - cue), 0.18));
       });
     }
     loop();
@@ -186,7 +208,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   // 4) Итог
   function finish() {
     const res = scorer.result();
-    window.removeEventListener('resize', resize);
+    cleanup();
     // Режим сессии: итог не показываем, отдаём результат контроллеру.
     if (onComplete) { onComplete(res); return; }
     const stars = '★'.repeat(res.stars) + '☆'.repeat(3 - res.stars);

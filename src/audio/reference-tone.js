@@ -12,6 +12,7 @@ export function playTone(ctx, hz, dur = 0.6, when = 0, gain = 0.22) {
   out.connect(ctx.destination);
 
   // основной тон + тихая октава для теплоты
+  const oscs = [];
   [[hz, 1], [hz * 2, 0.18]].forEach(([f, amp]) => {
     const osc = ctx.createOscillator();
     const g = ctx.createGain();
@@ -21,8 +22,15 @@ export function playTone(ctx, hz, dur = 0.6, when = 0, gain = 0.22) {
     osc.connect(g).connect(out);
     osc.start(t);
     osc.stop(t + dur + 0.03);
+    oscs.push(osc);
   });
-  return dur;
+  // Хэндл для немедленной остановки (выход/рестарт/сворачивание).
+  return {
+    dur,
+    stop() {
+      try { oscs.forEach((o) => { o.stop(); o.disconnect(); }); out.disconnect(); } catch (e) { /* уже остановлен */ }
+    },
+  };
 }
 
 /** Проиграть последовательность опорных нот. Возвращает общую длительность (сек). */

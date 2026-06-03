@@ -334,3 +334,22 @@ canvas.trace { height: 300px; }
 .game-settings > summary::before { content: "⚙"; opacity: .8; }
 .game-settings[open] > summary { color: var(--text); }
 .game-settings .inline-settings { padding-bottom: 14px; }
+
+/* ============ Дашборд прогресса ============ */
+.stat-row { display: flex; gap: 10px; width: 100%; }
+.stat-tile {
+  flex: 1; background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 16px 10px; text-align: center;
+}
+.stat-num { font-size: 30px; font-weight: 800; color: var(--accent-2); line-height: 1; font-variant-numeric: tabular-nums; }
+.stat-lbl { font-size: 12px; color: var(--text-dim); margin-top: 6px; }
+.cal-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.cal-dot { width: 16px; height: 16px; border-radius: 5px; background: var(--bg); border: 1px solid var(--line); }
+.cal-dot.done { background: var(--accent); border-color: var(--accent); }
+.acc-chart {
+  display: flex; align-items: flex-end; gap: 5px; height: 90px; margin-top: 10px;
+}
+.acc-bar { flex: 1; min-width: 6px; border-radius: 5px 5px 2px 2px; background: var(--accent); transition: height .2s; }
+.acc-bar.g { background: var(--green); }
+.acc-bar.a { background: var(--amber); }
+.acc-bar.c { background: var(--coral); }

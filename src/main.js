@@ -6,6 +6,7 @@ import { renderGame } from './screens/game.js';
 import { fiveNoteScale, agilityRun, sustain, octaveJump } from './theory/exercises.js';
 import { renderSession } from './screens/session.js';
 import { renderVoice } from './screens/voice.js';
+import { renderDashboard } from './screens/progress-dash.js';
 import { getVoiceType } from './theory/voice-types.js';
 import { renderBreathing, BREATHING } from './screens/breathing.js';
 import * as progress from './state/progress.js';
@@ -124,6 +125,10 @@ function renderMenu() {
           <span class="li-main">Мой голос: ${vType ? vType.name : 'не задан'}</span>
           <span class="li-sub">${vType ? 'сменить или определить заново' : 'выбери тип или определи свой голос'}</span>
         </button>
+        <button class="list-item" data-dash="1">
+          <span class="li-main">Прогресс</span>
+          <span class="li-sub">стрик, точность, рост диапазона</span>
+        </button>
         <button class="list-item" data-tuner="1">
           <span class="li-main">Живой тюнер</span>
           <span class="li-sub">проверь, как тебя слышит микрофон</span>
@@ -148,6 +153,7 @@ function renderMenu() {
       onExit: renderMenu,
     });
   });
+  app.querySelector('[data-dash]').addEventListener('click', () => renderDashboard(app, { onExit: renderMenu }));
   app.querySelector('[data-tuner]').addEventListener('click', renderTuner);
   app.querySelectorAll('[data-ex]').forEach((btn) => {
     btn.addEventListener('click', () => startExercise(Number(btn.dataset.ex)));
