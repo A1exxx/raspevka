@@ -11,8 +11,16 @@ export class MicEngine {
     this.ctx = null;
     this.stream = null;
     this.analyser = null;
+    this.gainNode = null;
     this.buf = null;
     this.ready = false;
+    this._sensitivity = 3; // усиление входа (чувствительность микрофона)
+  }
+
+  /** Чувствительность микрофона — множитель усиления входного сигнала. */
+  setSensitivity(mult) {
+    this._sensitivity = mult;
+    if (this.gainNode) this.gainNode.gain.value = mult;
   }
 
   /** Должен вызываться из пользовательского жеста (клик по кнопке). */
@@ -39,10 +47,13 @@ export class MicEngine {
         video: false,
       });
       const source = this.ctx.createMediaStreamSource(this.stream);
+      this.gainNode = this.ctx.createGain();
+      this.gainNode.gain.value = this._sensitivity; // усиление входа (чувствительность)
       this.analyser = this.ctx.createAnalyser();
       this.analyser.fftSize = this.fftSize;
       this.analyser.smoothingTimeConstant = 0; // во временной области не нужно
-      source.connect(this.analyser);
+      // source → gain → analyser (анализатор не выводит звук → без обратной связи)
+      source.connect(this.gainNode).connect(this.analyser);
       this.buf = new Float32Array(this.analyser.fftSize);
     }
 

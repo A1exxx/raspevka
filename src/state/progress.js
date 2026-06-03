@@ -133,6 +133,22 @@ export function setTimbre(t) {
   return p.timbre;
 }
 
+/** Чувствительность микрофона: 'low'|'med'|'high' -> множитель усиления входа. */
+const SENS = { low: 1.5, med: 3, high: 5.5 };
+export function getSensitivityKey() {
+  const k = load().sensitivity;
+  return SENS[k] ? k : 'med';
+}
+export function getSensitivity() {
+  return SENS[getSensitivityKey()];
+}
+export function setSensitivity(k) {
+  const p = load();
+  p.sensitivity = k;
+  save(p);
+  return k;
+}
+
 /** Рекорд ровного выдоха «с-с-с» (сек). */
 export function getBreathBest() {
   return load().breathBest || 0;

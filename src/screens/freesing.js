@@ -2,6 +2,7 @@
 // Вертикальная нотная шкала + светящийся шарик (без оценки). Для тех, кто плохо
 // слышит свою высоту и хочет просто сориентироваться.
 import { hzToNoteInfo, midiToHz } from '../theory/note-map.js';
+import * as progress from '../state/progress.js';
 
 const NAT = [0, 2, 4, 5, 7, 9, 11]; // натуральные ступени (без диезов)
 const isNatural = (m) => NAT.includes(((m % 12) + 12) % 12);
@@ -20,11 +21,28 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
       <div class="fs-note silent" id="note">—</div>
       <div class="cents-row"><span id="cents">центы: —</span></div>
       <div class="bar"><i id="lvl"></i></div>
+      <div class="settings" style="margin-top:6px">
+        <div class="seg-label">Чувствительность микрофона</div>
+        <div class="seg" id="sens"></div>
+      </div>
       <div class="trace-wrap"><canvas class="trace fs-canvas" id="fs"></canvas></div>
-      <p class="hint">Шарик — твоя нота. Поднимается выше — поёшь выше. Слева — названия нот.</p>
+      <p class="hint">Если индикатор почти не двигается — подними чувствительность. Если дёргается от шума — опусти. Шарик показывает твою ноту.</p>
     </div>
   `;
   document.getElementById('back').addEventListener('click', () => { stop(); onExit(); });
+
+  // регулятор чувствительности (усиление входа) — применяется ко всему приложению
+  function renderSens() {
+    const cur = progress.getSensitivityKey();
+    document.getElementById('sens').innerHTML = [['low', 'Низкая'], ['med', 'Средняя'], ['high', 'Высокая']]
+      .map(([k, l]) => `<button data-sens="${k}" class="${cur === k ? 'on' : ''}">${l}</button>`).join('');
+    document.querySelectorAll('[data-sens]').forEach((b) => b.addEventListener('click', () => {
+      progress.setSensitivity(b.dataset.sens);
+      if (mic.setSensitivity) mic.setSensitivity(progress.getSensitivity());
+      renderSens();
+    }));
+  }
+  renderSens();
 
   const noteEl = document.getElementById('note');
   const centsEl = document.getElementById('cents');
