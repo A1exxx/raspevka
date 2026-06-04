@@ -2,7 +2,6 @@
 // Вертикальная нотная шкала + светящийся шарик (без оценки). Для тех, кто плохо
 // слышит свою высоту и хочет просто сориентироваться.
 import { hzToNoteInfo, midiToHz } from '../theory/note-map.js';
-import { mascotMarkup, Mascot, KVAK, pickLine } from '../ui/mascot.js';
 import * as progress from '../state/progress.js';
 
 const NAT = [0, 2, 4, 5, 7, 9, 11]; // натуральные ступени (без диезов)
@@ -28,14 +27,9 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
       </div>
       <div class="trace-wrap"><canvas class="trace fs-canvas" id="fs"></canvas></div>
       <p class="hint">Если индикатор почти не двигается — подними чувствительность. Если дёргается от шума — опусти. Шарик показывает твою ноту.</p>
-      <div class="mascot-corner">${mascotMarkup()}</div>
     </div>
   `;
   document.getElementById('back').addEventListener('click', () => { stop(); onExit(); });
-
-  const mascot = new Mascot(app.querySelector('.mascot-corner .mascot'));
-  mascot.say(pickLine(KVAK.start), 3600);
-  let greenRun = 0;
 
   // регулятор чувствительности (усиление входа) — применяется ко всему приложению
   function renderSens() {
@@ -106,18 +100,12 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
       lvlEl.style.width = Math.min(100, mic.rms() * 350) + '%';
       const y = yFor(hz, h);
       trail.push(y);
-      const ac = Math.abs(info.cents);
-      const zone = ac < 18 ? 'green' : ac < 40 ? 'yellow' : 'red';
-      mascot.update({ voiced: true, rms: mic.rms(), zone });
-      if (zone === 'green') { if (++greenRun === 70) mascot.say(pickLine(KVAK.praise)); } else greenRun = 0;
     } else {
       noteEl.textContent = '—';
       noteEl.classList.add('silent');
       centsEl.textContent = 'центы: —';
       lvlEl.style.width = '0%';
       trail.push(null);
-      mascot.update({ voiced: false });
-      greenRun = 0;
     }
     while (trail.length > 90) trail.shift();
 
@@ -137,5 +125,5 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
   }
   loop();
 
-  function stop() { if (rafId) cancelAnimationFrame(rafId); rafId = null; window.removeEventListener('resize', resize); mascot.destroy(); }
+  function stop() { if (rafId) cancelAnimationFrame(rafId); rafId = null; window.removeEventListener('resize', resize); }
 }

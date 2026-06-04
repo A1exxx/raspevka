@@ -12,7 +12,6 @@ import { getVoiceType } from './theory/voice-types.js';
 import { renderBreathing, BREATHING } from './screens/breathing.js';
 import { renderRhythm, RHYTHM } from './screens/rhythm.js';
 import { contourGlyph } from './ui/illustrations.js';
-import { mascotMarkup, KVAK, pickLine } from './ui/mascot.js';
 import * as progress from './state/progress.js';
 
 const app = document.getElementById('app');
@@ -144,22 +143,12 @@ function renderMenu() {
   const streak = progress.getStreak();
   const voice = progress.getVoice();
   const vType = voice && getVoiceType(voice.key);
-  const mTalk = progress.getMascotTalk();
-  const greetLine = pickLine(KVAK.greet);
   app.innerHTML = `
     <div class="screen home">
       <header class="home-head">
         <h1>Распевка</h1>
         ${streak > 0 ? `<div class="streak-chip">${flameSvg()} ${streak} ${dayWord(streak)}</div>` : ''}
       </header>
-
-      <div class="mascot-greet">
-        ${mascotMarkup()}
-        <div class="mg-side">
-          ${mTalk ? `<div class="mg-line"><b>Кваковский:</b> «${greetLine}»</div>` : `<div class="mg-line">Кваковский притих — реплики выключены.</div>`}
-          <button class="m-talk-toggle" data-mtalk>${mTalk ? 'Реплики: вкл' : 'Реплики: выкл'}</button>
-        </div>
-      </div>
 
       <button class="hero-card" id="session">
         <div class="hero-eyebrow">Ежедневная тренировка</div>
@@ -185,8 +174,6 @@ function renderMenu() {
       <p class="hint">Темп и «подсказку тоном» настраивай прямо в упражнении — значок ⚙.</p>
     </div>
   `;
-  const mtBtn = app.querySelector('[data-mtalk]');
-  if (mtBtn) mtBtn.addEventListener('click', () => { progress.setMascotTalk(!progress.getMascotTalk()); renderMenu(); });
   document.getElementById('session').addEventListener('click', () => {
     applyTrackerRange();
     const go = () => renderSession(app, mic, tracker, { onExit: renderMenu });
