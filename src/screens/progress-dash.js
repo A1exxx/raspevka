@@ -2,6 +2,7 @@
 import * as progress from '../state/progress.js';
 import { getVoiceType, midiName } from '../theory/voice-types.js';
 import { miniKeyboard } from '../ui/illustrations.js';
+import { shareCard } from '../ui/share-card.js';
 
 function dayStr(d) { return d.toISOString().slice(0, 10); }
 
@@ -96,9 +97,19 @@ export function renderDashboard(app, { onExit }) {
 
       ${rangeBlock}
 
+      <button class="btn btn-primary" id="share" style="width:100%">Поделиться прогрессом</button>
       <button class="btn btn-ghost" id="back2" style="width:100%">В меню</button>
     </div>
   `;
   document.getElementById('back').addEventListener('click', onExit);
   document.getElementById('back2').addEventListener('click', onExit);
+  const shareBtn = document.getElementById('share');
+  if (shareBtn) shareBtn.addEventListener('click', () => {
+    if (lowHigh && lowHigh.low != null) {
+      const span = lowHigh.high - lowHigh.low;
+      shareCard({ headline: 'Мой диапазон', big: `${midiName(lowHigh.low)}–${midiName(lowHigh.high)}`, sub: `${span} полутонов${streak > 0 ? ` · стрик ${streak}` : ''}` });
+    } else {
+      shareCard({ headline: 'Мой прогресс', big: `${streak}`, sub: 'дней подряд в Распевке' });
+    }
+  });
 }

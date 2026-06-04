@@ -530,6 +530,42 @@ canvas.fs-canvas { height: 320px; }
   .mascot:not(.is-live) .m-lid { animation: none; }
 }
 
+/* ============ Теория (карточки) ============ */
+.theory-card { text-align: left; }
+.th-num { font-size: 12px; color: var(--text-dim); letter-spacing: .06em; }
+.th-title { font-size: 22px; font-weight: 800; margin: 6px 0 10px; letter-spacing: -.01em; }
+.th-body { font-size: 15px; line-height: 1.65; color: var(--text); }
+
+/* ============ Путь обучения (лесенка) ============ */
+.path-progress { height: 8px; width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.path-progress > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--green)); transition: width .3s ease-out; }
+.path-meta { font-size: 13px; color: var(--text-dim); }
+.path-list { display: flex; flex-direction: column; gap: 8px; }
+.path-node { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; color: var(--text); font: inherit;
+  transition: border-color .2s, transform .12s, opacity .2s; }
+.path-node:hover { border-color: var(--accent); }
+.path-node:active { transform: scale(.99); }
+.path-node .pn-dot { flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 14px; background: var(--bg-soft); color: var(--text-dim); border: 1px solid var(--line); }
+.path-node .pn-body { display: flex; flex-direction: column; gap: 2px; }
+.path-node .pn-main { font-weight: 700; font-size: 15px; }
+.path-node .pn-sub { font-size: 12px; color: var(--text-dim); }
+.path-node.done .pn-dot { background: var(--green); color: #fff; border-color: var(--green); }
+.path-node.now { border-color: var(--accent); box-shadow: var(--shadow); }
+.path-node.now .pn-dot { background: var(--accent); color: #fff; border-color: var(--accent); }
+.path-node.lock { opacity: .55; cursor: not-allowed; }
+.path-node:disabled { pointer-events: none; }
+
+/* ============ Ear-training (спой за мной) ============ */
+.ear { text-align: center; gap: 14px; align-items: center; }
+.ear-status { font-size: 13px; color: var(--text-dim); letter-spacing: .04em; }
+.ear-target { font-size: clamp(64px, 22vw, 120px); font-weight: 800; line-height: 1; color: var(--accent-2); min-height: 1em; transition: color .2s; }
+.ear-target.silent { color: var(--line); }
+.ear-target.hit { color: var(--green); }
+.ear-score { font-size: 15px; font-weight: 700; color: var(--text); }
+.ear .row { width: 100%; max-width: 360px; }
+
 /* ============ Фокус дня (быстрый старт) ============ */
 .focus-chip { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;
   background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px;

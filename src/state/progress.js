@@ -53,6 +53,15 @@ export function getHistory() { return load().history || []; }
 export function getRangeHistory() { return load().rangeHistory || []; }
 export function getTotal() { return load().total || 0; }
 
+/** Пройденные уроки структурированного пути (массив id). */
+export function getCompletedLessons() { return load().lessons || []; }
+export function markLessonDone(id) {
+  const p = load();
+  p.lessons = p.lessons || [];
+  if (!p.lessons.includes(id)) { p.lessons.push(id); save(p); }
+  return p.lessons;
+}
+
 /**
  * Записать уверенно взятую ноту (MIDI). Если она расширяет диапазон голоса —
  * обновляет диапазон, добавляет точку в историю и возвращает {extended:'high'|'low', midi}.

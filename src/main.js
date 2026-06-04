@@ -11,6 +11,10 @@ import { renderFreesing } from './screens/freesing.js';
 import { getVoiceType } from './theory/voice-types.js';
 import { renderBreathing, BREATHING } from './screens/breathing.js';
 import { renderRhythm, RHYTHM } from './screens/rhythm.js';
+import { renderTheory } from './screens/theory.js';
+import { renderEar } from './screens/ear-training.js';
+import { renderPath } from './screens/path.js';
+import { SONGS, songMidis } from './theory/songs.js';
 import { contourGlyph } from './ui/illustrations.js';
 import * as progress from './state/progress.js';
 
@@ -140,6 +144,12 @@ function renderMenu() {
   const rhythmThin = Object.entries(RHYTHM).map(([k, r]) => `
     <button class="thin-item" data-rhythm="${k}"><span>${r.name}</span><span class="thin-sub">метроном</span></button>
   `).join('');
+  const songCards = SONGS.map((s, i) => `
+    <button class="ex-tile" data-song="${i}">
+      ${contourGlyph(songMidis(s))}
+      <span class="ex-tile-main">${s.name}</span>
+      <span class="ex-tile-sub">мелодия · на «ля»</span>
+    </button>`).join('');
   const streak = progress.getStreak();
   const voice = progress.getVoice();
   const vType = voice && getVoiceType(voice.key);
@@ -182,6 +192,18 @@ function renderMenu() {
         <div class="sec-title">Дыхание и артикуляция</div>
         <div class="thin-list">${rhythmThin}${breathThin}</div>
       </section>
+      <section class="home-sec">
+        <div class="sec-title">Курс и развитие</div>
+        <div class="thin-list">
+          <button class="thin-item" data-path><span>Путь обучения</span><span class="thin-sub">по шагам</span></button>
+          <button class="thin-item" data-ear><span>Спой за мной</span><span class="thin-sub">тренировка слуха</span></button>
+          <button class="thin-item" data-theory><span>Теория голоса</span><span class="thin-sub">карточки</span></button>
+        </div>
+      </section>
+      <section class="home-sec">
+        <div class="sec-title">Песни</div>
+        <div class="ex-grid">${songCards}</div>
+      </section>
       <p class="hint">Темп и «подсказку тоном» настраивай прямо в упражнении — значок ⚙.</p>
     </div>
   `;
@@ -216,6 +238,15 @@ function renderMenu() {
   app.querySelectorAll('[data-rhythm]').forEach((btn) => {
     btn.addEventListener('click', () => renderRhythm(app, mic, voiceRoot(), RHYTHM[btn.dataset.rhythm], { onExit: renderMenu }));
   });
+  const pathBtn = app.querySelector('[data-path]');
+  if (pathBtn) pathBtn.addEventListener('click', renderPathScreen);
+  const earBtn = app.querySelector('[data-ear]');
+  if (earBtn) earBtn.addEventListener('click', () => { applyTrackerRange(); renderEar(app, mic, tracker, { onExit: renderMenu, root: voiceRoot() }); });
+  const theoryBtn = app.querySelector('[data-theory]');
+  if (theoryBtn) theoryBtn.addEventListener('click', () => renderTheory(app, { onExit: renderMenu }));
+  app.querySelectorAll('[data-song]').forEach((btn) => {
+    btn.addEventListener('click', () => startSong(Number(btn.dataset.song)));
+  });
 }
 
 function startExercise(i, explain = true) {
@@ -230,6 +261,37 @@ function startExercise(i, explain = true) {
     onExit: renderMenu,
     onAgain: () => startExercise(i, false),
   });
+}
+
+function startSong(i, explain = true) {
+  applyTrackerRange();
+  const ex = SONGS[i].make(voiceRoot());
+  renderGame(app, mic, tracker, ex, {
+    explain, reps: [0], onExit: renderMenu, onAgain: () => startSong(i, false),
+  });
+}
+
+function renderPathScreen() {
+  stopRaf();
+  renderPath(app, {
+    onExit: renderMenu,
+    onRun: launchLesson,
+    completed: progress.getCompletedLessons(),
+  });
+}
+
+function launchLesson(lesson) {
+  applyTrackerRange();
+  const back = () => { progress.markLessonDone(lesson.id); renderPathScreen(); };
+  if (lesson.type === 'breath') {
+    renderBreathing(app, mic, lesson.key, { onExit: back });
+  } else if (lesson.type === 'ex') {
+    const ex = EXERCISES[lesson.key].make(voiceRoot());
+    renderGame(app, mic, tracker, ex, { explain: true, reps: [0], onExit: back, onAgain: () => launchLesson(lesson) });
+  } else if (lesson.type === 'song') {
+    const ex = SONGS[lesson.key].make(voiceRoot());
+    renderGame(app, mic, tracker, ex, { explain: true, reps: [0], onExit: back, onAgain: () => launchLesson(lesson) });
+  }
 }
 
 // ---------- Дисклеймер здоровья голоса (один раз) ----------
