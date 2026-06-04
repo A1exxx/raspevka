@@ -157,6 +157,17 @@ export function setSensitivity(k) {
   return k;
 }
 
+/** Реплики маскота Кваковского: по умолчанию включены, с тумблером выключения. */
+export function getMascotTalk() {
+  return load().mascotTalk !== false;
+}
+export function setMascotTalk(on) {
+  const p = load();
+  p.mascotTalk = !!on;
+  save(p);
+  return p.mascotTalk;
+}
+
 /** Рекорд ровного выдоха «с-с-с» (сек). */
 export function getBreathBest() {
   return load().breathBest || 0;

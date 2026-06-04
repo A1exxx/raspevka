@@ -482,6 +482,54 @@ canvas.fs-canvas { height: 320px; }
 .ex-tile-main { font-weight: 700; font-size: 14px; line-height: 1.2; }
 .ex-tile-sub { font-size: 11px; color: var(--text-dim); margin-top: 3px; line-height: 1.25; }
 
+/* ============ Маскот «Кваковский» ============ */
+.mascot {
+  --frog: #74c06a; --frog-l: #9bd58f; --frog-d: #3f7a36;
+  --mouth: .18; --throat: 1; --lid: 0;
+  position: relative; display: inline-block; width: 120px; max-width: 40vw; line-height: 0;
+}
+.mascot .m-svg { width: 100%; height: auto; overflow: visible; display: block; }
+.mascot .m-body { transform-box: fill-box; transform-origin: 50% 100%; animation: m-bob 4.2s ease-in-out infinite; }
+.mascot .m-throat { transform-box: fill-box; transform-origin: 50% 25%; transform: scaleY(var(--throat)); transition: transform .25s cubic-bezier(.22,1,.36,1); }
+.mascot .m-mouth { transform-box: fill-box; transform-origin: center; transform: scaleY(var(--mouth)); transition: transform .07s linear; }
+.mascot .m-lid { transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(var(--lid)); transition: transform .12s ease-out; }
+.mascot .m-brow { transform-box: fill-box; transform-origin: center; transition: transform .15s ease-out; }
+.mascot.is-bliss { --lid: .5; }
+.mascot.is-wince { --lid: .8; }
+.mascot.is-wince .m-brow { transform: translateY(4px) rotate(-7deg); }
+/* idle-моргание — только когда маскот не в живом режиме */
+.mascot:not(.is-live) .m-lid { animation: m-blink 5.4s ease-in-out infinite; }
+@keyframes m-bob { 0%,100% { transform: translateY(0) scaleY(1); } 50% { transform: translateY(-4px) scaleY(1.015); } }
+@keyframes m-blink { 0%,90%,100% { transform: scaleY(0); } 94% { transform: scaleY(1); } }
+
+.m-bubble {
+  position: absolute; left: 50%; bottom: calc(100% + 9px); transform: translateX(-50%);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 9px 12px; font-size: 13px; line-height: 1.35; color: var(--text);
+  width: max-content; max-width: 210px; box-shadow: var(--shadow); text-align: left; z-index: 2;
+}
+.m-bubble::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 7px solid transparent; border-top-color: var(--surface); }
+.m-bubble[hidden] { display: none; }
+.m-bubble .m-name { display: block; font-weight: 700; font-size: 11px; color: var(--accent-2); margin-bottom: 2px; letter-spacing: .01em; }
+
+/* Приветственный блок на доме */
+.mascot-greet { display: flex; align-items: flex-end; gap: 12px; width: 100%; }
+.mascot-greet .mascot { width: 92px; flex: 0 0 auto; }
+.mascot-greet .mg-side { flex: 1; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.mascot-greet .mg-line { font-size: 13px; line-height: 1.4; color: var(--text-dim); }
+.mascot-greet .mg-line b { color: var(--text); }
+.m-talk-toggle { appearance: none; background: transparent; border: 1px solid var(--line); color: var(--text-dim); border-radius: 999px; padding: 5px 11px; font: inherit; font-size: 12px; cursor: pointer; transition: color .2s, border-color .2s; }
+.m-talk-toggle:hover { color: var(--text); border-color: var(--accent); }
+
+/* Живой маскот в углу экрана */
+.mascot-corner { position: fixed; left: 12px; bottom: 12px; width: 78px; z-index: 6; pointer-events: none; }
+.mascot-corner .m-bubble { font-size: 12px; max-width: 168px; pointer-events: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot .m-body { animation: none; }
+  .mascot:not(.is-live) .m-lid { animation: none; }
+}
+
 /* ============ Ритмические распевки (с/ш) ============ */
 .rhythm-stage { display: flex; flex-direction: column; align-items: center; gap: 26px; padding: 26px 0; }
 .rhythm-label { font-size: clamp(38px, 13vw, 68px); font-weight: 800; min-height: 1.2em; text-align: center; color: var(--accent-2); }
