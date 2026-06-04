@@ -1,25 +1,29 @@
-/* ============ Дизайн-токены (тёплая палитра, не AI-slop) ============ */
+/* ============ Дизайн-токены (СВЕТЛАЯ палитра, не AI-slop) ============ */
 :root {
-  /* Нейтральная спокойная база (cool charcoal/slate, без чистого чёрного) */
-  --bg:        #14161a;
-  --bg-soft:   #1a1d23;
-  --surface:   #20242b;
-  --surface-2: #272c34;
-  --line:      #313842;
-  --text:      #e9ecf1;
-  --text-dim:  #949daa;
-  /* Единственный спокойный акцент (десатурированный teal) — кнопки/активные */
-  --accent:    #46b3a8;
-  --accent-2:  #5ec9bd;
-  /* ЯРКИЕ цвета — только для живой обратной связи/анимаций */
-  --green:     #34dd98;   /* попал */
-  --amber:     #f3c45c;   /* почти */
-  --coral:     #ff6f61;   /* мимо / danger (только тут) */
-  --gold:      #f0c065;   /* стрик, второстепенные тёплые акценты */
+  /* Светлая воздушная база (off-white, прохладный slate-оттенок, без чистого белого холста) */
+  --bg:        #f5f7f9;
+  --bg-soft:   #eef1f5;
+  --surface:   #fcfdfe;   /* почти-белый с лёгким прохладным оттенком (не клинический #fff) */
+  --surface-2: #f1f4f8;
+  --line:      #e2e7ee;
+  /* Чернила: тёмный slate, не чистый чёрный */
+  --text:      #1b2430;
+  --text-dim:  #687485;
+  /* Единственный спокойный акцент (глубокий teal — контраст на белом ≥4.5:1) */
+  --accent:    #0e8d7f;   /* заливки/активные/иконки-на-белом */
+  --accent-2:  #0a766a;   /* текст-акцент на белом (тёмнее, для подписей) */
+  --accent-soft: #e3f3f0; /* мягкая teal-подложка (чипы/выделения) */
+  /* Цвета живой обратной связи — насыщенные, читаются на светлом */
+  --green:     #12a36b;   /* попал */
+  --amber:     #d98a00;   /* почти */
+  --coral:     #e0544b;   /* мимо / danger (только тут) */
+  --gold:      #c4880a;   /* стрик, второстепенные тёплые акценты */
+  /* Текст на акцентной заливке (белый — чистый контраст на глубоком teal) */
+  --on-accent: #ffffff;
   /* алиасы для обратной совместимости со старыми классами зон */
   --yellow:    var(--amber);
   --red:       var(--coral);
-  --shadow:    0 16px 44px -22px rgba(0,0,0,.66);
+  --shadow:    0 16px 40px -24px rgba(20,33,55,.30);
   --r:         18px;
   --font:      system-ui, -apple-system, 'Segoe UI', Roboto, 'Inter', sans-serif;
 }
@@ -30,7 +34,7 @@ body {
   font-family: var(--font);
   color: var(--text);
   background:
-    radial-gradient(120% 80% at 50% -12%, #1c2128 0%, var(--bg) 58%) fixed;
+    radial-gradient(125% 80% at 50% -10%, #ffffff 0%, var(--bg) 55%) fixed;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
   overflow-y: auto;
@@ -92,7 +96,7 @@ body {
 .btn:active { transform: scale(.97); }
 .btn-primary {
   background: var(--accent);
-  color: #08201d;
+  color: var(--on-accent);
   box-shadow: 0 8px 22px -14px var(--accent);
 }
 .btn-primary:hover { background: var(--accent-2); }
@@ -292,7 +296,7 @@ canvas.trace { height: 300px; }
   font: inherit; font-size: 14px; font-weight: 600; padding: 9px 0; border-radius: 9px; cursor: pointer;
   transition: background .18s, color .18s;
 }
-.seg button.on { background: var(--accent); color: #08201d; }
+.seg button.on { background: var(--accent); color: var(--on-accent); }
 .toggle {
   appearance: none; border: 1px solid var(--line); background: var(--bg-soft);
   color: var(--text-dim); font: inherit; font-size: 14px; font-weight: 600;
@@ -384,12 +388,13 @@ canvas.trace { height: 300px; }
 .hero-card {
   position: relative; width: 100%; text-align: left; cursor: pointer; overflow: hidden;
   border: 1px solid var(--line); border-radius: 20px; padding: 22px 22px 26px; color: var(--text);
-  background: linear-gradient(135deg, #243038, #191c22);
+  background: linear-gradient(140deg, #ffffff 0%, var(--accent-soft) 135%);
+  box-shadow: var(--shadow);
   transition: transform .12s ease, border-color .2s ease;
 }
 .hero-card::after {
   content: ''; position: absolute; right: -34px; top: -34px; width: 150px; height: 150px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(70,179,168,.28), transparent 70%);
+  background: radial-gradient(circle, rgba(14,141,127,.18), transparent 70%);
 }
 .hero-card:hover { border-color: var(--accent); }
 .hero-card:active { transform: scale(.99); }
@@ -399,7 +404,7 @@ canvas.trace { height: 300px; }
 .hero-arrow {
   position: absolute; right: 18px; bottom: 18px; width: 36px; height: 36px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700;
-  background: var(--accent); color: #08201d;
+  background: var(--accent); color: var(--on-accent);
 }
 
 .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
@@ -415,7 +420,7 @@ canvas.trace { height: 300px; }
 .tile-sub { font-size: 11px; color: var(--text-dim); line-height: 1.2; }
 
 .tiles-4 { grid-template-columns: repeat(2, 1fr); }
-.tile-hl { background: linear-gradient(135deg, #233039, #1b1f26); border-color: var(--accent); }
+.tile-hl { background: linear-gradient(140deg, #ffffff, var(--accent-soft)); border-color: var(--accent); }
 .tile-hl svg { color: var(--accent); }
 
 .home-sec { width: 100%; }
@@ -429,7 +434,7 @@ canvas.trace { height: 300px; }
   background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 16px;
   color: var(--text); transition: border-color .2s, transform .12s, background .2s;
 }
-.ex-card:hover { border-color: var(--accent); background: #2c333d; }
+.ex-card:hover { border-color: var(--accent); background: var(--accent-soft); }
 .ex-card:active { transform: scale(.985); }
 .ex-card > svg { width: 26px; height: 26px; color: var(--accent-2); flex: 0 0 auto; }
 .ex-card-body { display: flex; flex-direction: column; gap: 3px; flex: 1; }
@@ -454,6 +459,28 @@ canvas.trace { height: 300px; }
 .fs-note.silent { color: var(--line); }
 .fs-note .oct { font-size: .42em; color: var(--text-dim); font-weight: 600; vertical-align: super; }
 canvas.fs-canvas { height: 320px; }
+
+/* ============ Распевки — сетка карточек с рисунком-контуром ============ */
+/* Рисунок мелодии (как в Vocalista) — наглядно «куда ведёт» голос. */
+.ex-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.ex-tile {
+  display: flex; flex-direction: column; gap: 0; width: 100%; cursor: pointer; text-align: left;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  padding: 12px 12px 13px; color: var(--text);
+  transition: border-color .2s, transform .12s, box-shadow .2s;
+}
+.ex-tile:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+.ex-tile:active { transform: scale(.985); }
+.ex-glyph {
+  width: 100%; height: 58px; background: var(--surface-2);
+  border: 1px solid var(--line); border-radius: 11px; margin-bottom: 11px;
+  display: block;
+}
+.ex-glyph svg { width: 100%; height: 100%; display: block; }
+.ex-glyph rect { fill: var(--text); }
+.ex-glyph .gh-hi { fill: var(--accent); }
+.ex-tile-main { font-weight: 700; font-size: 14px; line-height: 1.2; }
+.ex-tile-sub { font-size: 11px; color: var(--text-dim); margin-top: 3px; line-height: 1.25; }
 
 /* ============ Ритмические распевки (с/ш) ============ */
 .rhythm-stage { display: flex; flex-direction: column; align-items: center; gap: 26px; padding: 26px 0; }

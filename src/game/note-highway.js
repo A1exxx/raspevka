@@ -75,18 +75,18 @@ export class NoteHighway {
       const y = this.yFor(midiToHz(m), h);
       const name = Note.fromMidi(m);
       const isC = name && name.startsWith('C');
-      ctx.strokeStyle = isC ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.05)';
+      ctx.strokeStyle = isC ? 'rgba(27,36,48,.18)' : 'rgba(27,36,48,.07)';
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
       if (isC) {
-        ctx.fillStyle = 'rgba(255,255,255,.3)';
+        ctx.fillStyle = 'rgba(27,36,48,.42)';
         ctx.font = '10px Inter, sans-serif';
         ctx.fillText(name, 4, y - 3);
       }
     }
 
     // линия попадания
-    ctx.strokeStyle = 'rgba(70,179,168,.5)';
+    ctx.strokeStyle = 'rgba(14,141,127,.6)';
     ctx.lineWidth = 2;
     ctx.setLineDash([5, 6]);
     ctx.beginPath(); ctx.moveTo(hitX, 0); ctx.lineTo(hitX, h); ctx.stroke();
@@ -105,12 +105,12 @@ export class NoteHighway {
       const isActive = i === activeIdx;
       const r = 8;
       ctx.fillStyle = isActive
-        ? 'rgba(94,201,189,.95)'
-        : 'rgba(94,201,189,.30)';
+        ? 'rgba(14,141,127,.95)'
+        : 'rgba(14,141,127,.26)';
       roundRect(ctx, x, y - noteH / 2, Math.max(wgt, 10), noteH, r);
       ctx.fill();
       if (isActive) {
-        ctx.shadowColor = 'rgba(94,201,189,.75)';
+        ctx.shadowColor = 'rgba(14,141,127,.5)';
         ctx.shadowBlur = 18;
         ctx.fill();
         ctx.shadowBlur = 0;
@@ -118,14 +118,14 @@ export class NoteHighway {
     }
 
     // голос: шарик на линии попадания + ХВОСТ (история — видно куда ведёшь голос)
-    let curY = null, color = '#9aa3af';
+    let curY = null, color = '#5e6b7a';
     if (voiced && sungHz) {
       curY = this.yFor(sungHz, h);
       if (active) {
         const z = centsZone(Math.abs(centsOff(sungHz, active.seg.hz)));
-        color = z === 'green' ? '#34dd98' : z === 'yellow' ? '#f3c45c' : '#ff6f61';
+        color = z === 'green' ? '#12a36b' : z === 'yellow' ? '#d98a00' : '#e0544b';
       } else {
-        color = '#5ec9bd';
+        color = '#0e8d7f';
       }
     }
     this.trail.push(curY);

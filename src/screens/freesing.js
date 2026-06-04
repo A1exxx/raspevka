@@ -78,11 +78,11 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
     for (let m = Math.ceil(loM); m <= hiM; m++) {
       const y = yFor(midiToHz(m), h);
       const isC = ((m % 12) + 12) % 12 === 0;
-      ctx.strokeStyle = isC ? 'rgba(255,255,255,.14)' : isNatural(m) ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.02)';
+      ctx.strokeStyle = isC ? 'rgba(27,36,48,.20)' : isNatural(m) ? 'rgba(27,36,48,.08)' : 'rgba(27,36,48,.03)';
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(34, y); ctx.lineTo(w, y); ctx.stroke();
       if (isNatural(m)) {
-        ctx.fillStyle = isC ? 'rgba(255,255,255,.45)' : 'rgba(255,255,255,.22)';
+        ctx.fillStyle = isC ? 'rgba(27,36,48,.55)' : 'rgba(27,36,48,.32)';
         ctx.fillText(nm(m), 4, y + 3);
       }
     }
@@ -115,8 +115,8 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
       if (trail[i] == null) continue;
       const x = bx - (trail.length - 1 - i) * 2.4;
       const last = i === trail.length - 1;
-      ctx.fillStyle = last ? '#34dd98' : 'rgba(52,221,152,.35)';
-      if (last) { ctx.shadowColor = '#34dd98'; ctx.shadowBlur = 16; }
+      ctx.fillStyle = last ? '#12a36b' : 'rgba(18,163,107,.35)';
+      if (last) { ctx.shadowColor = '#12a36b'; ctx.shadowBlur = 16; }
       ctx.beginPath(); ctx.arc(x, trail[i], last ? 8 : 2.5, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur = 0;
     }

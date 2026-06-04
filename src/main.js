@@ -11,6 +11,7 @@ import { renderFreesing } from './screens/freesing.js';
 import { getVoiceType } from './theory/voice-types.js';
 import { renderBreathing, BREATHING } from './screens/breathing.js';
 import { renderRhythm, RHYTHM } from './screens/rhythm.js';
+import { contourGlyph } from './ui/illustrations.js';
 import * as progress from './state/progress.js';
 
 const app = document.getElementById('app');
@@ -68,7 +69,7 @@ function renderWelcome() {
         <p class="hint" style="margin-bottom:18px">
           Разреши доступ к микрофону. Лучше в тихой комнате, без наушников с шумоподавлением.
         </p>
-        <button class="btn btn-primary" id="start" style="width:100%">🎙 Разрешить микрофон</button>
+        <button class="btn btn-primary" id="start" style="width:100%"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Разрешить микрофон</button>
       </div>
       <p class="hint" id="err"></p>
     </div>
@@ -122,14 +123,16 @@ const dayWord = (n) => (n % 10 === 1 && n % 100 !== 11 ? 'день' : 'дн.');
 // ---------- Экран 2: меню (домашний) ----------
 function renderMenu() {
   stopRaf();
-  // Распевки — крупные карточки (главное, «сок»).
-  const exCards = EXERCISES.map((e, i) => `
-    <button class="ex-card" data-ex="${i}">
-      ${icon(e.ic || 'note')}
-      <span class="ex-card-body"><span class="ex-card-main">${e.label}</span><span class="ex-card-sub">${e.sub}</span></span>
-      <span class="ex-card-go">→</span>
-    </button>
-  `).join('');
+  // Распевки — сетка карточек с РИСУНКОМ МЕЛОДИИ (наглядно «куда ведёт» голос).
+  const exCards = EXERCISES.map((e, i) => {
+    const midis = e.make(60).notes.map((n) => n.midi); // форма от фикс. тоники (root не влияет на рисунок)
+    return `
+    <button class="ex-tile" data-ex="${i}">
+      ${contourGlyph(midis)}
+      <span class="ex-tile-main">${e.label}</span>
+      <span class="ex-tile-sub">${e.sub}</span>
+    </button>`;
+  }).join('');
   // Дыхание/артикуляция — тонкие компактные строки.
   const breathThin = Object.entries(BREATHING).map(([k, b]) => `
     <button class="thin-item" data-breath="${k}"><span>${b.title}</span><span class="thin-sub">${b.kind === 'exhale' ? 'выдох' : 'дыхание'}</span></button>
@@ -162,7 +165,7 @@ function renderMenu() {
 
       <section class="home-sec">
         <div class="sec-title">Распевки</div>
-        <div class="ex-cards">${exCards}</div>
+        <div class="ex-grid">${exCards}</div>
       </section>
       <section class="home-sec">
         <div class="sec-title">Дыхание и артикуляция</div>
@@ -327,13 +330,13 @@ function drawTrace(ctx, canvas, history, noteLines) {
   ctx.font = '11px Inter, sans-serif';
   noteLines.forEach((ln) => {
     const y = hzToY(ln.hz, h);
-    ctx.strokeStyle = 'rgba(255,255,255,.07)';
+    ctx.strokeStyle = 'rgba(27,36,48,.08)';
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
-    ctx.fillStyle = 'rgba(255,255,255,.25)';
+    ctx.fillStyle = 'rgba(27,36,48,.4)';
     ctx.fillText(ln.name, 6, y - 4);
   });
-  const zoneColor = { green: '#34dd98', yellow: '#f3c45c', red: '#ff6f61' };
+  const zoneColor = { green: '#12a36b', yellow: '#d98a00', red: '#e0544b' };
   for (let i = 0; i < history.length; i++) {
     const p = history[i];
     if (!p.voiced || p.y == null) continue;
