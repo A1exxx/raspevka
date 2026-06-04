@@ -27,7 +27,14 @@ git push -f https://github.com/A1exxx/raspevka.git gh-pages
 ## Откат к рабочим версиям (теги)
 - `git tag -l "approved-*"` — список чекпоинтов.
 - `git checkout <tag>` — вернуться. Запушить как live: собрать и задеплоить ветку gh-pages из этого состояния.
-- Чекпоинты: `approved-2026-06-03-home-rhythm` (домашний экран + ритм с/ш), `approved-2026-06-04-instruments-trail` (инструменты поводыря + хвост + чувствительность микро + картинка-человек), `approved-2026-06-04-light-theme-contours` (СВЕТЛАЯ тема + рисунок мелодии на карточках распевок).
+- Чекпоинты: `approved-2026-06-03-home-rhythm` (домашний экран + ритм с/ш), `approved-2026-06-04-instruments-trail` (инструменты поводыря + хвост + чувствительность микро + картинка-человек), `approved-2026-06-04-light-theme-contours` (СВЕТЛАЯ тема + рисунок мелодии), `approved-2026-06-04-mascot-kvakovsky` (маскот Кваковский — СЕЙЧАС ОТКЛЮЧЁН в UI, код в src/ui/mascot.js), `approved-2026-06-04-dashboard-newnote` (график диапазона + «новая нота»), `approved-2026-06-04-seven-features` (теория-карточки + путь обучения + ear-training + песни + шеринг + звук громче на телефоне).
+
+## Новое (2026-06-04, batch «семёрка»)
+- **Громче звук на телефоне:** `reference-tone.js` masterIn(ctx) = DynamicsCompressor + Gain ×2.5 mobile.
+- **Дашборд:** график роста диапазона (`progress-dash.rangeTimeline`); **«новая нота»** (`progress.recordNote` + тост в `freesing.js`).
+- **«Сегодня»/«Фокус дня»** на доме (`main.js`).
+- **Теория** (`screens/theory.js`, 8 карточек), **Путь обучения** (`screens/path.js` + `progress.getCompletedLessons/markLessonDone`, 8 шагов с разблокировкой; запуск уроков из `main.launchLesson`), **Ear-training «Спой за мной»** (`screens/ear-training.js`), **Песни** (`theory/songs.js`, 6 оригинальных мелодий через renderGame), **Шеринг-карточка** (`ui/share-card.js`, canvas→Web Share/скачивание, кнопка в дашборде).
+- Маскот Кваковский — собран, но ОТКЛЮЧЁН (вернуть позже).
 
 ## Что есть сейчас (функционал)
 **Главный экран:** чип стрика (огонь), крупная карточка «Полная распевка», бенто-плитки
