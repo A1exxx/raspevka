@@ -143,6 +143,12 @@ function renderMenu() {
   const streak = progress.getStreak();
   const voice = progress.getVoice();
   const vType = voice && getVoiceType(voice.key);
+  // «Сегодня»: сделана ли тренировка сегодня + ротация «фокуса дня»
+  const today = new Date().toISOString().slice(0, 10);
+  const todayDone = progress.getHistory().some((h) => h.date === today);
+  const _d = new Date();
+  const focusIdx = (_d.getDate() + _d.getMonth()) % EXERCISES.length;
+  const focus = EXERCISES[focusIdx];
   app.innerHTML = `
     <div class="screen home">
       <header class="home-head">
@@ -151,10 +157,15 @@ function renderMenu() {
       </header>
 
       <button class="hero-card" id="session">
-        <div class="hero-eyebrow">Ежедневная тренировка</div>
+        <div class="hero-eyebrow">Сегодня</div>
         <div class="hero-title">Полная распевка</div>
-        <div class="hero-sub">5 упражнений · дыхание → распевка</div>
+        <div class="hero-sub">${todayDone ? `Сегодня выполнено ✓${streak > 0 ? ` · стрик ${streak} ${dayWord(streak)}` : ''} — возвращайся завтра` : 'Дыхание → распевка · ~10 минут'}</div>
         <span class="hero-arrow">→</span>
+      </button>
+
+      <button class="focus-chip" data-focus>
+        <span class="fc-label">Фокус дня — <b>${focus.label}</b></span>
+        <span class="fc-go">→</span>
       </button>
 
       <div class="tiles">
@@ -180,6 +191,8 @@ function renderMenu() {
     if (progress.load().safetyAccepted) go();
     else renderSafety(go);
   });
+  const focusBtn = app.querySelector('[data-focus]');
+  if (focusBtn) focusBtn.addEventListener('click', () => startExercise(focusIdx));
   app.querySelector('[data-voice]').addEventListener('click', () => {
     renderVoice(app, mic, tracker, {
       onDone: () => { applyTrackerRange(); renderMenu(); },
