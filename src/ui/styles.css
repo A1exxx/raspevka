@@ -530,6 +530,25 @@ canvas.fs-canvas { height: 320px; }
   .mascot:not(.is-live) .m-lid { animation: none; }
 }
 
+/* ============ Празднование «новая нота» + график диапазона ============ */
+.celebrate {
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 8px; z-index: 30;
+  background: var(--accent); color: #fff; font-weight: 700; font-size: 14px;
+  padding: 10px 16px; border-radius: 999px; box-shadow: 0 14px 32px -12px var(--accent);
+  animation: cele-in .4s cubic-bezier(.2,.9,.3,1) both;
+}
+.celebrate[hidden] { display: none; }
+.celebrate svg { color: var(--gold); flex: 0 0 auto; }
+@keyframes cele-in { from { opacity: 0; transform: translateX(-50%) translateY(-12px) scale(.92); } to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
+
+.range-tl { width: 100%; height: 70px; display: block; margin-top: 6px; }
+.range-tl .tl-high { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
+.range-tl .tl-low { fill: none; stroke: var(--accent-2); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
+.range-tl .tl-dot-h { fill: var(--accent); }
+.range-tl .tl-dot-l { fill: var(--accent-2); }
+@media (prefers-reduced-motion: reduce) { .celebrate { animation: none; } }
+
 /* ============ Ритмические распевки (с/ш) ============ */
 .rhythm-stage { display: flex; flex-direction: column; align-items: center; gap: 26px; padding: 26px 0; }
 .rhythm-label { font-size: clamp(38px, 13vw, 68px); font-weight: 800; min-height: 1.2em; text-align: center; color: var(--accent-2); }

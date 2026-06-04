@@ -53,6 +53,26 @@ export function getHistory() { return load().history || []; }
 export function getRangeHistory() { return load().rangeHistory || []; }
 export function getTotal() { return load().total || 0; }
 
+/**
+ * Записать уверенно взятую ноту (MIDI). Если она расширяет диапазон голоса —
+ * обновляет диапазон, добавляет точку в историю и возвращает {extended:'high'|'low', midi}.
+ * Иначе {extended:null}. Нужен уже определённый диапазон (тест голоса).
+ */
+export function recordNote(midi) {
+  const p = load();
+  if (!p.range || !Number.isFinite(p.range.low)) return { extended: null };
+  let extended = null;
+  if (midi > p.range.high) { p.range.high = midi; extended = 'high'; }
+  else if (midi < p.range.low) { p.range.low = midi; extended = 'low'; }
+  if (extended) {
+    p.rangeHistory = p.rangeHistory || [];
+    p.rangeHistory.push({ date: dayStr(new Date()), low: p.range.low, high: p.range.high });
+    if (p.rangeHistory.length > 100) p.rangeHistory = p.rangeHistory.slice(-100);
+    save(p);
+  }
+  return { extended, midi };
+}
+
 /** Тип голоса {key, low, high} или null. */
 export function getVoice() {
   const p = load();

@@ -5,6 +5,26 @@ import { miniKeyboard } from '../ui/illustrations.js';
 
 function dayStr(d) { return d.toISOString().slice(0, 10); }
 
+/** Мини-график роста диапазона во времени: линии низа и верха по точкам истории. */
+function rangeTimeline(hist) {
+  if (!hist || hist.length < 2) return '';
+  const n = hist.length;
+  const lows = hist.map((p) => p.low), highs = hist.map((p) => p.high);
+  const mn = Math.min(...lows) - 1, mx = Math.max(...highs) + 1, span = Math.max(1, mx - mn);
+  const W = 300, H = 70, pad = 5;
+  const x = (i) => (pad + (i * (W - 2 * pad)) / (n - 1)).toFixed(1);
+  const y = (m) => (pad + (1 - (m - mn) / span) * (H - 2 * pad)).toFixed(1);
+  const path = (arr) => arr.map((m, i) => `${i ? 'L' : 'M'}${x(i)} ${y(m)}`).join(' ');
+  return `
+    <div class="seg-label" style="margin-top:14px">Рост диапазона</div>
+    <svg class="range-tl" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="График роста диапазона">
+      <path d="${path(highs)}" class="tl-high"/>
+      <path d="${path(lows)}" class="tl-low"/>
+      <circle cx="${x(n - 1)}" cy="${y(highs[n - 1])}" r="3.5" class="tl-dot-h"/>
+      <circle cx="${x(n - 1)}" cy="${y(lows[n - 1])}" r="3.5" class="tl-dot-l"/>
+    </svg>`;
+}
+
 export function renderDashboard(app, { onExit }) {
   const history = progress.getHistory();
   const rangeHist = progress.getRangeHistory();
@@ -48,6 +68,7 @@ export function renderDashboard(app, { onExit }) {
         <div class="seg-label">Диапазон голоса</div>
         <p class="how" style="margin-top:6px"><b>${midiName(lowHigh.low)} – ${midiName(lowHigh.high)}</b> · ${span} полутонов${growth}</p>
         ${miniKeyboard(lowHigh.low, lowHigh.high)}
+        ${rangeTimeline(rangeHist)}
         ${vType ? `<p class="how">Тип: ${vType.name}</p>` : ''}
       </div>`;
   }

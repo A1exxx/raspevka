@@ -27,6 +27,7 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
       </div>
       <div class="trace-wrap"><canvas class="trace fs-canvas" id="fs"></canvas></div>
       <p class="hint">Если индикатор почти не двигается — подними чувствительность. Если дёргается от шума — опусти. Шарик показывает твою ноту.</p>
+      <div class="celebrate" id="cele" hidden></div>
     </div>
   `;
   document.getElementById('back').addEventListener('click', () => { stop(); onExit(); });
@@ -69,6 +70,17 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
   if (tracker.setRange) tracker.setRange(55, 1300); // широко: показываем любую ноту
   tracker.reset();
 
+  // детекция «новой ноты» (расширение диапазона) + празднование
+  const celeEl = document.getElementById('cele');
+  let stableMidi = null, stableFrames = 0, lastCele = 0, celeTimer = null;
+  function celebrate(text) {
+    if (!celeEl) return;
+    celeEl.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2l2.4 6.3L21 9l-5 4.1L17.8 20 12 16.3 6.2 20 8 13.1 3 9l6.6-.7z"/></svg> ${text}`;
+    celeEl.hidden = false;
+    clearTimeout(celeTimer);
+    celeTimer = setTimeout(() => { if (celeEl) celeEl.hidden = true; }, 3400);
+  }
+
   function loop() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
     ctx.clearRect(0, 0, w, h);
@@ -100,12 +112,22 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
       lvlEl.style.width = Math.min(100, mic.rms() * 350) + '%';
       const y = yFor(hz, h);
       trail.push(y);
+      // новая нота? — держим стабильно рядом с нотой → расширяем диапазон
+      const m = Math.round(69 + 12 * Math.log2(hz / 440));
+      if (Math.abs(info.cents) < 42) {
+        if (m === stableMidi) stableFrames++; else { stableMidi = m; stableFrames = 1; }
+        if (stableFrames === 26 && Date.now() - lastCele > 4000) {
+          const res = progress.recordNote(m);
+          if (res.extended) { lastCele = Date.now(); celebrate(`Новая нота — ${nm(m)}! Диапазон растёт.`); }
+        }
+      } else { stableMidi = null; stableFrames = 0; }
     } else {
       noteEl.textContent = '—';
       noteEl.classList.add('silent');
       centsEl.textContent = 'центы: —';
       lvlEl.style.width = '0%';
       trail.push(null);
+      stableMidi = null; stableFrames = 0;
     }
     while (trail.length > 90) trail.shift();
 
@@ -125,5 +147,5 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
   }
   loop();
 
-  function stop() { if (rafId) cancelAnimationFrame(rafId); rafId = null; window.removeEventListener('resize', resize); }
+  function stop() { if (rafId) cancelAnimationFrame(rafId); rafId = null; window.removeEventListener('resize', resize); clearTimeout(celeTimer); }
 }
