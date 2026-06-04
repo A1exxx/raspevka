@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Распевка × Прояви — рабочая стратегия</title>
+<style>
+  :root{
+    --bg:#eef2f4; --surface:#ffffff; --ink:#1b2430; --dim:#5c6775;
+    --accent:#0e8d7f; --accent-2:#0a766a; --soft:#e3f3f0; --line:#e4e9ef;
+    --gold:#c4880a; --green:#12a36b; --coral:#e0544b;
+    --shadow:0 18px 50px -28px rgba(20,33,55,.30); --r:16px;
+    --font:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);color:var(--ink);background:
+    radial-gradient(130% 55% at 50% -8%,#fff 0%,var(--bg) 60%) fixed;
+    line-height:1.6;-webkit-font-smoothing:antialiased;padding:40px 20px 80px}
+  .doc{max-width:880px;margin:0 auto}
+  .brandbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+    font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-2);font-weight:700;margin-bottom:26px}
+  .brandbar .tag{color:var(--dim);font-weight:600;text-transform:none;letter-spacing:0}
+  .title{background:linear-gradient(140deg,#fff,var(--soft) 150%);border:1px solid var(--line);
+    border-radius:22px;padding:34px 32px;box-shadow:var(--shadow);margin-bottom:14px}
+  .title h1{font-size:clamp(24px,4vw,34px);font-weight:800;letter-spacing:-.02em;line-height:1.15}
+  .title p{color:var(--dim);margin-top:10px;font-size:16px}
+  .toc{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 8px}
+  .toc a{font-size:12.5px;color:var(--accent-2);text-decoration:none;border:1px solid var(--line);
+    background:var(--surface);border-radius:999px;padding:5px 12px}
+  .toc a:hover{border-color:var(--accent)}
+  section{margin-top:34px;scroll-margin-top:20px}
+  h2{font-size:18px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px}
+  h2 .ix{color:var(--accent-2);margin-right:8px}
+  .rule{height:1px;background:var(--line);margin:10px 0 14px}
+  p{color:var(--dim);margin-bottom:10px}
+  p b,li b{color:var(--ink)}
+  ul{list-style:none;display:flex;flex-direction:column;gap:9px;margin:4px 0 6px}
+  ul li{position:relative;padding-left:18px;color:var(--ink)}
+  ul li::before{content:'';position:absolute;left:2px;top:11px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  code{background:#eef2f5;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px;font-family:ui-monospace,Menlo,Consolas,monospace;color:#2a3a44}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:14px;
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--dim);font-weight:700;background:#f7f9fb}
+  tr:last-child td{border-bottom:none}
+  tr.best td:first-child{font-weight:800;color:var(--accent-2)}
+  tr.best td{background:var(--soft)}
+  .box{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:16px 18px;margin-top:8px}
+  .warn{background:#fdeeec;border:1px solid #f4cdc7;border-radius:14px;padding:16px 18px;margin-top:8px}
+  .warn h3{color:var(--coral);font-size:15px;margin-bottom:6px}
+  .warn p{color:#7a2f29}
+  .funnel{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.7;color:var(--ink);
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;white-space:pre-wrap}
+  .ref{font-size:13px;color:var(--dim)}
+  @media (max-width:560px){.title{padding:26px 22px}table{font-size:12.5px}th,td{padding:8px 8px}}
+  @media print{body{background:#fff;padding:0}.title,table,.box{box-shadow:none}section{break-inside:avoid}.toc{display:none}}
+</style>
+</head>
+<body>
+<div class="doc">
+
+  <div class="brandbar"><span>Распевка × Прояви</span><span class="tag">Рабочая версия · для владельца · с тех-слоем</span></div>
+
+  <div class="title">
+    <h1>Рабочая стратегия: приложение + школа вокала</h1>
+    <p>Сводит go-to-market, маркетинг и продуктовый роадмап в один операционный документ. Источники с датами — в исходных .md.</p>
+    <div class="toc">
+      <a href="#p1">Продукт/тех</a><a href="#p2">Публикация</a><a href="#p3">Биллинг</a><a href="#p4">Каналы</a>
+      <a href="#p5">Воронка</a><a href="#p6">Экономика</a><a href="#p7">Контент-завод</a><a href="#p8">Роадмап</a><a href="#p9">Риски</a><a href="#p10">Шаги</a>
+    </div>
+  </div>
+
+  <section id="p1"><h2><span class="ix">1</span>Продукт и технологии</h2><div class="rule"></div>
+    <ul>
+      <li><b>Приложение «Распевка»:</b> web-first PWA (vanilla JS + Vite + Canvas), детекция высоты тона в реальном времени (pitchy/MPM), без бэкенда — всё в localStorage. Нулевая инфра-стоимость, мгновенный деплой. Live: a1exxx.github.io/raspevka/</li>
+      <li><b>Школа «Прояви»:</b> онлайн-уроки + лендинг + CRM. Главный денежный поток на старте.</li>
+      <li><b>Маскот «Кваковский»</b> (вектор-SVG-риг) собран, временно отключён (код в <code>src/ui/mascot.js</code>, тег <code>approved-2026-06-04-mascot-kvakovsky</code>).</li>
+    </ul>
+  </section>
+
+  <section id="p2"><h2><span class="ix">2</span>Публикация приложения</h2><div class="rule"></div>
+    <ul>
+      <li><b>Google Play:</b> обёртка PWA через <b>Bubblewrap (TWA)</b> или PWABuilder. $25 разово. Нюансы: микрофон <code>RECORD_AUDIO</code> дописывать патчем, Digital Asset Links, target API 35, Data Safety + Privacy Policy. Риск «web-wrapper» → нужны нативные плюсы.</li>
+      <li><b>iOS:</b> чистый PWA не пройдёт (4.2) → <b>Capacitor</b> + 2–3 нативных элемента, $99/год, <code>NSMicrophoneUsageDescription</code>.</li>
+      <li><b>RuStore:</b> через Capacitor (TWA не поддерживается), комиссия 15%, оплата работает в РФ.</li>
+    </ul>
+    <p class="ref">Подробно → go-to-market.md</p>
+  </section>
+
+  <section id="p3"><h2><span class="ix">3</span>Монетизация / биллинг (РФ-реалии)</h2><div class="rule"></div>
+    <div class="warn"><h3>Google Play Billing для РФ-разработчиков отключён с дек 2024</h3>
+      <p>Деньги — через <b>веб-подписку</b>: ЮKassa / CloudPayments (МИР/СБП/рекуррент/54-ФЗ, комиссия ~3%) + RuStore Pay (15%) + Telegram Stars. В магазинах — бесплатное приложение со ссылкой на веб-оплату.</p></div>
+    <p style="margin-top:12px">Цена приложения: <b>690 ₽/мес или 3 990 ₽/год</b>; школа — абонемент <b>18 000 ₽/мес</b>, педагогу 40–50%.</p>
+  </section>
+
+  <section id="p4"><h2><span class="ix">4</span>Каналы (РФ-легальные) и цифры</h2><div class="rule"></div>
+    <table>
+      <thead><tr><th>Канал</th><th>Реальные цифры</th><th>Для чего</th></tr></thead>
+      <tbody>
+        <tr><td><b>VK Реклама</b></td><td>лид школы 190–520 ₽; CPI приложения 35–89 ₽</td><td>Основной — школа и приложение</td></tr>
+        <tr><td><b>Яндекс Директ Поиск</b></td><td>CPL 400–1000 ₽; конв. лид→клиент до 32%</td><td>Горячий спрос «уроки вокала»</td></tr>
+        <tr><td><b>Telegram</b></td><td>МТС Маркетолог CPM от 75 ₽; посевы 1–8к ₽/пост</td><td>Прогрев, нишевые каналы</td></tr>
+        <tr><td><b>VK Клипы / Shorts</b></td><td>органика 0 ₽</td><td>Контент-завод</td></tr>
+      </tbody>
+    </table>
+    <div class="warn"><h3>Instagram для РФ — НЕЛЬЗЯ как канал</h3>
+      <p>Meta — экстремист; закон 72-ФЗ с 01.09.2025 запрещает рекламу НА Instagram (штраф 100–500к ₽ за каждый пост юрлицу); оплата Meta Verified = ст. 282.3 УК. Только органика под глобал/диаспору, без оплаты и продающих CTA.</p></div>
+    <p class="ref">Подробно → marketing-strategy.md</p>
+  </section>
+
+  <section id="p5"><h2><span class="ix">5</span>Воронка и перелив app ↔ школа</h2><div class="rule"></div>
+    <div class="funnel">Короткое видео (VK Клипы / Shorts / Telegram)
+  → общий Telegram-бот (app + школа)
+    → квиз «какой у тебя голос» (лид-магнит)
+      → бесплатный пробный урок школы + «качай приложение»
+        → абонемент (20–35% от пришедших на пробный)
+          → приложение удерживает между уроками</div>
+    <p style="margin-top:12px">Прямой мост «free app → дорогой курс» НЕ работает без промежуточного шага (Babbel/JoyTunes сворачивали). Рабочее: <b>app = habit-движок, школа = отдельная воронка, пересекаются через триггеры</b> (in-app CTA по intent, companion-офферы, общий бот, контент педагога). Синергия → CAC −20–30%.</p>
+  </section>
+
+  <section id="p6"><h2><span class="ix">6</span>Юнит-экономика — до $20k/мес (≈1,85 млн ₽)</h2><div class="rule"></div>
+    <table>
+      <thead><tr><th>Сценарий</th><th>Студентов</th><th>Подписчиков</th><th>Реклама/мес</th><th>Прибыль/мес</th><th>Маржа</th><th>Старт-бюджет</th><th>Срок</th></tr></thead>
+      <tbody>
+        <tr class="best"><td>A: школа</td><td>82</td><td>881</td><td>~110к</td><td>657к</td><td>36%</td><td>~500к ₽</td><td>8–12 мес</td></tr>
+        <tr><td>C: баланс</td><td>52</td><td>2 202</td><td>~138к</td><td>888к</td><td>48%</td><td>~1–1,5 млн</td><td>12–18 мес</td></tr>
+        <tr><td>B: приложение</td><td>21</td><td>3 524</td><td>~156к</td><td>1,14 млн</td><td>61%</td><td>~2–3 млн</td><td>18–24 мес</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:12px"><b>Рекомендация: старт по A → миграция в C.</b> Школа даёт деньги сразу, приложению нужна масса. Расходы: педагог 40–50%, эквайринг ~4%, УСН 6%, менеджер 80–120к, куратор 50–70к, CRM, инфра.</p>
+    <p class="ref">Полная P&L → marketing-strategy.md §4</p>
+  </section>
+
+  <section id="p7"><h2><span class="ix">7</span>Контент-завод (Claude Code + Higgsfield)</h2><div class="rule"></div>
+    <ul>
+      <li>Льём в <b>VK Клипы / Shorts / Telegram</b> (НЕ Instagram-таргет РФ).</li>
+      <li>Форматы: до/после голоса, «5 ошибок», «упражнение за 60 сек», страх сцены, каверы.</li>
+      <li><b>Анти-бан:</b> каждый ролик — уникальный угол (не шаблон-клоны — кейс @deadline.dev); 2 аккаунта = 2 стиля; прогрев 14 дней; ~1 ролик/день; только официальные API.</li>
+    </ul>
+  </section>
+
+  <section id="p8"><h2><span class="ix">8</span>Продуктовый роадмап</h2><div class="rule"></div>
+    <p>Кваковский (вернуть) → дашборд + «новая нота» → «Сегодня» + план → теория-карточки → структурированный путь (якорь подписки) → ear-training/дуэты → лёгкие песни → шеринг-карточка.</p>
+    <p>Монетизация: <b>free</b> = ядро + первые уроки; <b>paid</b> = весь путь + ear-training + песни. Адаптация устройств — на этапе обёртки; сейчас верстать гибко (rem/%/dvh).</p>
+    <p class="ref">Подробно → feature-roadmap.md</p>
+  </section>
+
+  <section id="p9"><h2><span class="ix">9</span>Риски</h2><div class="rule"></div>
+    <ul>
+      <li><b>Instagram/РФ-легал</b> — обходим каналами (VK/Telegram/Яндекс).</li>
+      <li><b>Чёрн школы</b> (вокал-хобби 10–15%/мес) — держим контентом + дашбордом прогресса + приложением.</li>
+      <li><b>App-конверсия</b> (freemium 3–5%) — зависит от onboarding + paywall по intent.</li>
+      <li><b>Платёжная инфра РФ</b> — ЮKassa/CloudPayments как основа.</li>
+    </ul>
+  </section>
+
+  <section id="p10"><h2><span class="ix">10</span>Ближайшие шаги</h2><div class="rule"></div>
+    <div class="box"><ul>
+      <li>Включить веб-оплату приложения (триал 7 дн → 690 ₽/мес / 3990 год) через ЮKassa.</li>
+      <li>Поднять школу как поток №1: лендинг + квиз + общий Telegram-бот + пробный урок.</li>
+      <li>Запустить VK + Яндекс Директ (тест 100–150к ₽/мес), контент-завод в VK Клипы/Shorts.</li>
+      <li>Достроить приложение по роадмапу (дашборд → план → теория → путь).</li>
+      <li>Обернуть в Google Play (Bubblewrap) + RuStore (Capacitor); iOS — по решению.</li>
+    </ul></div>
+  </section>
+
+</div>
+</body>
+</html>
