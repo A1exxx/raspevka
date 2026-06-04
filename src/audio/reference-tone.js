@@ -2,11 +2,30 @@
 // микрофон (контекст уже разрешён пользовательским жестом). Без внешних зависимостей.
 // Мягкая огибающая + лёгкие обертоны → приятный «вокальный» тембр, не резкий синус.
 
+// На телефоне динамик тише → бустим общий выход. Лимитер (компрессор) не даёт клиппинга.
+const _MOBILE = (() => {
+  try { return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints || 0) > 1; }
+  catch (e) { return false; }
+})();
+const OUTPUT_GAIN = _MOBILE ? 2.5 : 1.5;
+
+/** Общий мастер-выход на контексте: тоны → компрессор-лимитер → усиление → колонки. */
+function masterIn(ctx) {
+  if (ctx.__rtMaster) return ctx.__rtMaster;
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -10; comp.knee.value = 24; comp.ratio.value = 4;
+  comp.attack.value = 0.003; comp.release.value = 0.25;
+  const g = ctx.createGain(); g.gain.value = OUTPUT_GAIN;
+  comp.connect(g).connect(ctx.destination);
+  ctx.__rtMaster = comp;
+  return comp;
+}
+
 // Тембр поводыря/эталона: 'piano' | 'guitar' | 'soft'. По умолчанию пиано (узнаваемо).
 export function playTone(ctx, hz, dur = 0.6, when = 0, gain = 0.22, timbre = 'piano') {
   const t = ctx.currentTime + when;
   const out = ctx.createGain();
-  out.connect(ctx.destination);
+  out.connect(masterIn(ctx));
   const oscs = [];
   let ring = dur; // фактическая длина звучания (нота «звенит» и затухает)
   const mk = (type, freq, amp, dest) => {
@@ -73,7 +92,7 @@ export function playClick(ctx, when = 0, accent = false) {
   g.gain.setValueAtTime(0.0001, t);
   g.gain.exponentialRampToValueAtTime(peak, t + 0.005);
   g.gain.exponentialRampToValueAtTime(0.0001, t + 0.08);
-  osc.connect(g).connect(ctx.destination);
+  osc.connect(g).connect(masterIn(ctx));
   osc.start(t);
   osc.stop(t + 0.1);
 }
