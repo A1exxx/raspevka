@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Распевка × Прояви — инвест-презентация</title>
+<style>
+  :root{
+    --bg:#0f1620; --bg2:#13202c; --surface:#172430; --surface2:#1d2c3a; --line:#27384a;
+    --ink:#eaf1f6; --dim:#9fb0c0; --accent:#19b8a6; --accent2:#34d6c4; --soft:#13322e;
+    --gold:#e0b24a; --green:#27c08a; --ru:#19b8a6; --intl:#4aa3e0; --danger:#e0645a;
+    --shadow:0 24px 60px -30px rgba(0,0,0,.7);
+    --font:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .deck{max-width:960px;margin:0 auto;padding:0 18px 80px}
+  .slide{min-height:auto;padding:54px 0 10px;border-bottom:1px solid var(--line)}
+  .slide:last-child{border-bottom:none}
+  .kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);font-weight:700}
+  h1{font-size:clamp(30px,6vw,54px);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin:14px 0}
+  h2{font-size:clamp(24px,4vw,34px);font-weight:800;letter-spacing:-.02em;margin:10px 0 18px}
+  h3{font-size:19px;font-weight:800;margin-bottom:6px}
+  .lead{font-size:clamp(17px,2.4vw,21px);color:var(--dim);max-width:64ch}
+  p{color:var(--dim);margin-bottom:12px}
+  b,strong{color:var(--ink)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+  .stat{font-size:clamp(34px,6vw,52px);font-weight:800;color:var(--accent2);line-height:1;letter-spacing:-.02em}
+  .stat-lbl{font-size:13px;color:var(--dim);margin-top:8px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--dim);background:var(--bg2);font-weight:700}
+  tr:last-child td{border-bottom:none}
+  td b{color:var(--accent2)}
+  .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700}
+  .tag.ru{background:rgba(25,184,166,.16);color:var(--accent2)}
+  .tag.intl{background:rgba(74,163,224,.16);color:#7dc0f0}
+  .tag.est{background:rgba(224,178,74,.14);color:var(--gold)}
+  ul{list-style:none;display:flex;flex-direction:column;gap:10px;margin:6px 0}
+  ul li{position:relative;padding-left:24px;color:var(--ink)}
+  ul li::before{content:'';position:absolute;left:2px;top:10px;width:8px;height:8px;border-radius:2px;background:var(--accent)}
+  .bars{display:flex;flex-direction:column;gap:10px}
+  .barrow{display:grid;grid-template-columns:130px 1fr auto;gap:10px;align-items:center;font-size:13px}
+  .barrow .nm{font-weight:600;font-size:12.5px}
+  .track{background:#0c161f;border-radius:7px;height:24px;overflow:hidden;border:1px solid var(--line)}
+  .fill{height:100%;border-radius:7px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:700;color:#03110e;white-space:nowrap}
+  .meta{color:var(--dim);font-size:12px;white-space:nowrap}
+  .funds{display:flex;height:34px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+  .funds span{display:flex;align-items:center;justify-content:center;color:#03110e;font-size:12px;font-weight:800}
+  .big-ask{font-size:clamp(40px,9vw,72px);font-weight:800;color:var(--accent2);letter-spacing:-.03em;line-height:1}
+  .hl{background:linear-gradient(180deg,transparent 60%,rgba(25,184,166,.28) 0)}
+  .quote{font-size:clamp(20px,3.4vw,28px);font-weight:700;color:var(--ink);line-height:1.3;letter-spacing:-.01em}
+  .src{font-size:11px;color:#6b7d8d;margin-top:10px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--dim);margin-top:10px}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .cover{background:radial-gradient(120% 80% at 70% 0%,#1a3b3a 0%,var(--bg) 55%);border-radius:0 0 28px 28px;padding-bottom:40px}
+  @media(max-width:640px){.grid2,.grid3{grid-template-columns:1fr}.barrow{grid-template-columns:90px 1fr}.barrow .meta{grid-column:1/3}}
+  @media print{body{background:#fff;color:#15202b}.slide{break-inside:avoid;border-color:#e2e7ee}
+    .card,table{box-shadow:none;background:#fff;border-color:#e2e7ee} .stat,.big-ask,td b{color:#0a766a}
+    h1,h2,h3{color:#15202b} .lead,p,.dim{color:#5c6775} th{background:#f7f9fb;color:#5c6775}}
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- 1. COVER -->
+  <section class="slide cover">
+    <div class="kicker">Инвестиционное предложение · 2026</div>
+    <h1>Голос — массовое желание.<br>Мы делаем его <span class="hl">привычкой и доходом.</span></h1>
+    <p class="lead">«Распевка» (приложение-тренажёр) + «Прояви» (онлайн-школа вокала). Один поток трафика кормит два продукта, которые усиливают друг друга. Просим <b>2 млн ₽</b> — и заходим в рынок, где конкуренты подняли сотни миллионов.</p>
+    <div class="grid3" style="margin-top:24px">
+      <div class="card"><div class="stat">$2,1 млрд</div><div class="stat-lbl">рынок музыкальных обучающих приложений, 2024 (+14%/год)</div></div>
+      <div class="card"><div class="stat">2 продукта</div><div class="stat-lbl">приложение приводит, школа монетизирует</div></div>
+      <div class="card"><div class="stat">2 рынка</div><div class="stat-lbl">Россия + зарубеж, разные каналы</div></div>
+    </div>
+  </section>
+
+  <!-- 2. PROBLEM/SOLUTION -->
+  <section class="slide">
+    <div class="kicker">Возможность</div>
+    <h2>Петь хотят миллионы — но бросают в одиночку</h2>
+    <div class="grid2">
+      <div class="card"><h3>Проблема</h3><ul>
+        <li>Педагог — дорого и страшно начать.</li>
+        <li>Ролики в сети не дают обратной связи и системы.</li>
+        <li>Приложения учат «в вакууме» → быстро надоедает.</li>
+      </ul></div>
+      <div class="card"><h3>Решение — маховик</h3><ul>
+        <li><b>Приложение:</b> поёшь → видишь высоту в реальном времени, прогресс, привычка.</li>
+        <li><b>Школа:</b> живые уроки, быстрый результат, высокая маржа.</li>
+        <li><b>⇄ Перелив:</b> app ведёт в школу, школа практикует в app → CAC −20–30%.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <!-- 3. COMPETITORS -->
+  <section class="slide">
+    <div class="kicker">Анализ конкурентов</div>
+    <h2>В этой нише — большие деньги. И есть «бережливый» прецедент.</h2>
+    <p>Конкуренты подняли от <b>$1,4M до $211M</b> и тратят на маркетинг <b>$9–50M в год</b>. Но ключевой ориентир для нас — <b>Vocal Image</b>: вырос до <b>$12M ARR</b> на сид-раунде <b>$4,8M</b>, на перформанс-рекламе. Доказательство, что в нише можно расти бережливо.</p>
+    <table style="margin-top:6px">
+      <thead><tr><th>Компания</th><th>Выручка / ARR</th><th>Аудитория</th><th>Маркетинг/год*</th><th>Привлечено</th><th>Каналы</th></tr></thead>
+      <tbody>
+        <tr><td><b>Smule</b></td><td>~$100–200M <span class="tag est">оц.</span></td><td>~50M MAU</td><td>~$30–50M <span class="tag est">оц.</span></td><td>$211M</td><td>Meta, ASA, инфлюенсеры</td></tr>
+        <tr><td><b>Simply (Sing)</b></td><td>~$200M <span class="tag est">оц.</span></td><td>млн.</td><td>~$40–60M <span class="tag est">оц.</span></td><td>$97M</td><td>ТВ, Meta, YouTube, ASA</td></tr>
+        <tr><td><b>Yousician</b></td><td>€53M (2024)</td><td>20M+</td><td>~$9–15M <span class="tag est">оц.</span></td><td>$35M</td><td>YouTube/органика, Meta</td></tr>
+        <tr><td><b>Vocal Image</b> ⭐</td><td>$12M ARR (2025)</td><td>160K MAU · 50K платных</td><td>~$0,5–1M <span class="tag est">оц.</span></td><td>$4,8M</td><td>Meta, ASA, freemium</td></tr>
+        <tr><td><b>Vanido</b></td><td>&lt;$0,5M <span class="tag est">оц.</span></td><td>~48K устан./мес</td><td>малый</td><td>$0,14M</td><td>ASO, органика</td></tr>
+        <tr><td><b>Vocaberry</b> (РФ)</td><td>не раскрыто</td><td>&lt;500K <span class="tag est">оц.</span></td><td>малый</td><td>—</td><td>ASO, VK</td></tr>
+        <tr><td><b>Singing Carrots</b></td><td>$106K (2024)</td><td>69K клиентов</td><td>~$10–20K <span class="tag est">оц.</span></td><td>—</td><td>SEO/контент</td></tr>
+      </tbody>
+    </table>
+    <p class="src">*Маркетинг — оценка по выручке × типовая доля 12–25% (якорь: Duolingo 12,1% S&M = $90,5M на $748M, SEC 10-K FY2024). Источники: Tracxn, Latka, Crunchbase, Sacra, TechCrunch, SensorTower — 2024–2026. Частные компании финансы не раскрывают, цифры — оценки.</p>
+    <div class="card" style="margin-top:16px;background:var(--soft);border-color:#1c5a52">
+      <div class="quote">Им нужны были десятки миллионов. Нам — 2 млн ₽. Продукт готов, разработка на подряде, рынок тот же.</div>
+    </div>
+  </section>
+
+  <!-- 4. TWO MARKETS -->
+  <section class="slide">
+    <div class="kicker">Стратегия · два рынка</div>
+    <h2>Разные рынки — разные каналы</h2>
+    <div class="grid2">
+      <div class="card">
+        <span class="tag ru">Россия</span>
+        <h3 style="margin-top:10px">Школа-ориентированный, быстрые деньги</h3>
+        <p>Instagram в РФ под запретом для рекламы — работаем там, где аудитория и где легально.</p>
+        <table><tbody>
+          <tr><td><b>VK Реклама</b></td><td>лид <b>190–520 ₽</b> (кейсы школ)</td></tr>
+          <tr><td><b>Яндекс Директ</b></td><td>CPL <b>400–1000 ₽</b>, конв. до 32%</td></tr>
+          <tr><td><b>Telegram</b> Ads/посевы</td><td>CPM от 75 ₽</td></tr>
+          <tr><td><b>VK Клипы</b> (органика)</td><td>0 ₽ · контент-завод</td></tr>
+        </tbody></table>
+        <p style="margin-top:10px;font-size:13px">Воронка: видео → общий Telegram-бот + квиз → пробный урок → абонемент <b>18 000 ₽/мес</b>.</p>
+      </div>
+      <div class="card">
+        <span class="tag intl">Зарубеж</span>
+        <h3 style="margin-top:10px">Приложение-ориентированный, масштаб</h3>
+        <p>Глобально каналы открыты — играем на performance-рекламе, как Vocal Image.</p>
+        <table><tbody>
+          <tr><td><b>Apple Search Ads</b></td><td>CPI <b>$2,11</b> (Music) · самый дешёвый intent</td></tr>
+          <tr><td><b>TikTok Ads</b></td><td>CPI <b>$2–5</b> · CPM в 2–3× ниже Meta</td></tr>
+          <tr><td><b>Meta (FB+IG)</b> Advantage+</td><td>CPI <b>$3–6</b> · ретаргет + охват</td></tr>
+          <tr><td><b>Инфлюенсеры / ASO</b></td><td>вокальные блогеры · органика</td></tr>
+        </tbody></table>
+        <p style="margin-top:10px;font-size:13px">Воронка: установка → 7-дн триал → подписка <b>$35–50/год</b>. CAC <b>$31–65</b>.</p>
+      </div>
+    </div>
+    <div class="legend"><span><i style="background:var(--ru)"></i>Россия — школа + app</span><span><i style="background:var(--intl)"></i>Зарубеж — app (perfomance)</span></div>
+    <p class="src">Источники: AppTweak Apple Ads 2025 (Music CPI $2,11 на $1B spend), Business of Apps / Mapendo CPI 2025, RevenueCat 2025; РФ-кейсы: MishkaDigital, eLama, click.ru 2025.</p>
+  </section>
+
+  <!-- 5. CAC/ECONOMICS grounded -->
+  <section class="slide">
+    <div class="kicker">Экономика на данных конкурентов</div>
+    <h2>Мы покупаем клиента дешевле, чем стоит его LTV — в разы</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3>LTV : CAC</h3>
+        <div class="bars" style="margin-top:10px">
+          <div class="barrow"><span class="nm">Школа (РФ)</span><div class="track"><div class="fill" style="width:100%;background:var(--ru)">LTV ~200к ₽ / CAC ~4к ₽ → 50×</div></div><span class="meta"></span></div>
+          <div class="barrow"><span class="nm">App (зарубеж)</span><div class="track"><div class="fill" style="width:34%;background:var(--intl)">3–5×</div></div><span class="meta">LTV $150–200 / CAC $35–65</span></div>
+          <div class="barrow"><span class="nm">Норма для инвестора</span><div class="track"><div class="fill" style="width:20%;background:#46586a;color:#dfe8f0">≥3×</div></div><span class="meta">здоровый порог</span></div>
+        </div>
+        <p class="src" style="margin-top:14px">App-экономика — на бенчмарках Music-приложений (RevenueCat, AppTweak). Школа — на РФ-кейсах (чек 18к ₽, удержание 6–10 мес).</p>
+      </div>
+      <div class="card">
+        <h3>Что купит рекламный бюджет</h3>
+        <p style="font-size:13px">При смешанном миксе и CPI/CAC из реальных кампаний конкурентов:</p>
+        <table><tbody>
+          <tr><th>$10 000</th><th>~3 800 устан.</th><th>~230 подписчиков</th></tr>
+          <tr><td>$50 000</td><td>~18 000 устан.</td><td>~1 080 подписчиков</td></tr>
+          <tr><td>+ органика</td><td>+25–50% устан.</td><td>halo-эффект</td></tr>
+        </tbody></table>
+        <p class="src" style="margin-top:10px">Расчёт: blended CPI ~$2,7–2,9; install→paid ~6% (триал-воронка). Источник: AppTweak/RevenueCat/Business of Apps 2025.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. FORECAST -->
+  <section class="slide">
+    <div class="kicker">Прогноз</div>
+    <h2>Путь к 1,85 млн ₽/мес ($20K) за 18 месяцев</h2>
+    <div class="card">
+      <svg viewBox="0 0 320 150" width="100%" role="img" aria-label="Прогноз выручки">
+        <line x1="10" y1="118" x2="310" y2="118" stroke="#27384a"/>
+        <line x1="10" y1="65" x2="310" y2="65" stroke="#1c2b39"/>
+        <line x1="10" y1="20" x2="310" y2="20" stroke="#1c2b39"/>
+        <text x="2" y="121" font-size="8" fill="#6b7d8d">0</text>
+        <text x="2" y="68" font-size="8" fill="#6b7d8d">1М</text>
+        <text x="2" y="23" font-size="8" fill="#6b7d8d">2М</text>
+        <line x1="10" y1="20" x2="310" y2="20" stroke="#e0b24a" stroke-width="1" stroke-dasharray="4 4"/>
+        <text x="236" y="17" font-size="8" fill="#e0b24a">цель ~1,85 млн ₽/мес</text>
+        <path d="M10 113.2 L45.3 98.9 L98.2 78.8 L151.2 59.7 L204.1 38.5 L257.1 26.8 L310 20 L310 118 L10 118 Z" fill="rgba(25,184,166,.18)"/>
+        <path d="M10 113.2 L45.3 98.9 L98.2 78.8 L151.2 59.7 L204.1 38.5 L257.1 26.8 L310 20" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linejoin="round"/>
+        <circle cx="45.3" cy="98.9" r="3.2" fill="var(--accent2)"/>
+        <circle cx="98.2" cy="78.8" r="3.2" fill="var(--accent2)"/>
+        <circle cx="204.1" cy="38.5" r="3.2" fill="var(--accent2)"/>
+        <circle cx="310" cy="20" r="4" fill="var(--gold)"/>
+        <text x="8" y="132" font-size="8" fill="#6b7d8d">мес 1</text>
+        <text x="42" y="132" font-size="8" fill="#6b7d8d">3</text>
+        <text x="95" y="132" font-size="8" fill="#6b7d8d">6</text>
+        <text x="200" y="132" font-size="8" fill="#6b7d8d">12</text>
+        <text x="300" y="132" font-size="8" fill="#6b7d8d">18</text>
+      </svg>
+      <table style="margin-top:12px"><thead><tr><th>Веха</th><th>Школа</th><th>Приложение</th><th>Выручка/мес</th></tr></thead>
+      <tbody>
+        <tr><td>3 мес</td><td>~20</td><td>~200</td><td><b>~360к ₽</b></td></tr>
+        <tr><td>6 мес</td><td>~50</td><td>~800</td><td><b>~740к ₽</b></td></tr>
+        <tr><td>12 мес</td><td>~82</td><td>~1 500</td><td><b>~1,5 млн ₽</b></td></tr>
+        <tr><td>18 мес</td><td>стабильно</td><td>растёт</td><td><b>~1,85 млн ₽</b></td></tr>
+      </tbody></table>
+      <p class="src">Прогноз консервативный, на бенчмарках ниши (CPL/CAC, конверсии, удержание). Без вирусных всплесков.</p>
+    </div>
+  </section>
+
+  <!-- 7. THE ASK -->
+  <section class="slide">
+    <div class="kicker">Запрос</div>
+    <h2>Нам нужно</h2>
+    <div class="big-ask">2 000 000 ₽</div>
+    <p class="lead" style="margin:14px 0 22px">Бережливый запуск: продукт готов, разработка на подряде — поэтому <b>75% идёт прямо в рекламу</b>, а не в инфраструктуру.</p>
+    <div class="funds">
+      <span style="width:75%;background:var(--accent)">Реклама · 1,5 млн ₽</span>
+      <span style="width:25%;background:var(--intl)">Запуск и команда · 0,5 млн ₽</span>
+    </div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card">
+        <h3>1,5 млн ₽ — реклама</h3>
+        <table><tbody>
+          <tr><td><span class="tag ru">РФ</span> школа + app</td><td><b>~900к ₽</b> · VK / Яндекс / Telegram</td></tr>
+          <tr><td><span class="tag intl">Зарубеж</span> app</td><td><b>~600к ₽</b> · ASA / TikTok / Meta</td></tr>
+        </tbody></table>
+        <p class="src" style="margin-top:10px">≈ 200+ учеников школы и сотни платных подписчиков на старте; LTV:CAC 3–50×.</p>
+      </div>
+      <div class="card">
+        <h3>0,5 млн ₽ — запуск и команда</h3>
+        <table><tbody>
+          <tr><td>Доводка + обёртка (Google Play / RuStore / iOS) + веб-оплата</td><td><b>150к ₽</b></td></tr>
+          <tr><td>Контент-производство (видео, лендинги, квиз-бот, ИИ-ассеты)</td><td><b>120к ₽</b></td></tr>
+          <tr><td>Найм: менеджер продаж + куратор + таргетолог (подряд)</td><td><b>180к ₽</b></td></tr>
+          <tr><td>CRM, аналитика, юр., резерв</td><td><b>50к ₽</b></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. TEAM / WHY US -->
+  <section class="slide">
+    <div class="kicker">Команда и почему мы</div>
+    <h2>Сильная команда + бережливая модель</h2>
+    <div class="grid3">
+      <div class="card"><h3>Музыкант-методист</h3><p>Экспертиза вокала, методика, доверие аудитории и контент, который реально учит. Лицо школы.</p></div>
+      <div class="card"><h3>Менеджер</h3><p>Продажи, ведение учеников, расписание, воронка. Превращает заявки в абонементы.</p></div>
+      <div class="card"><h3>Разработка — на подряде</h3><p>Своя команда разработки и поддержки продуктов на подряде. Нет дорогого штата → запуск дёшев.</p></div>
+    </div>
+    <div class="card" style="margin-top:16px;background:var(--soft);border-color:#1c5a52">
+      <ul>
+        <li><b>Продукт уже работает</b> — живое приложение, действующая школа.</li>
+        <li><b>Каждый рубль — в рост:</b> разработка закрыта подрядом, маркетинг — главная статья.</li>
+        <li><b>Модель проверена рынком:</b> кейсы VK-школ (лид 190–520 ₽), рост Vocal Image ($12M ARR на $4,8M).</li>
+        <li><b>Два рынка, два потока:</b> РФ-школа даёт деньги быстро, зарубеж-app даёт масштаб и оценку.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 9. CLOSE -->
+  <section class="slide">
+    <div class="kicker">Предложение</div>
+    <h1>Готовый продукт. Проверенный рынок.<br>Бережливая команда. <span class="hl">2 млн ₽ — и мы растём.</span></h1>
+    <p class="lead">Конкуренты доказали спрос и подняли сотни миллионов. Мы заходим в тот же рынок в разы дешевле — и просим ровно столько, сколько нужно, чтобы запустить маховик из двух продуктов на двух рынках.</p>
+    <p class="src" style="margin-top:24px">Цифры — на основе рыночного ресёрча 2025–2026 (Tracxn, Crunchbase, Sacra, RevenueCat, AppTweak, Business of Apps, РФ-кейсы). Оценки помечены. Прогноз консервативный.</p>
+  </section>
+
+</div>
+</body>
+</html>
