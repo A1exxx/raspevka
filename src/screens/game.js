@@ -1,17 +1,16 @@
 // game.js — экран упражнения: слушаем эталон → отсчёт → проход по хайвею → итог.
 import { Scorer } from '../game/scoring.js';
 import { NoteHighway } from '../game/note-highway.js';
-import { playSequence, playClick, playTone, playChord, playDrone } from '../audio/reference-tone.js';
+import { playSequence, playClick, playTone, playChord, playDrone, setOutputVolume } from '../audio/reference-tone.js';
 import { referenceFreqs } from '../theory/exercises.js';
 import { startGroove } from '../audio/backing.js';
 import { hzToNoteInfo, centsOff } from '../theory/note-map.js';
 import * as progress from '../state/progress.js';
 
-// Компенсация задержки: голос детектится позже, чем нота прошла линию.
-const LATENCY_S = 0.09;
-
 export function renderGame(app, mic, tracker, exercise, opts = {}) {
-  const { onExit, onAgain, onComplete, explain } = opts;
+  const { onExit, onAgain, onComplete, onResult, explain } = opts;
+  // Громкость подсказки/эталона — применяем при входе (регулятор в настройках/панели).
+  setOutputVolume(progress.getVolumeMult());
   // Первый вход в упражнение — короткое объяснение, потом сам интерактив.
   if (explain) {
     renderExplain(app, exercise, {
@@ -77,6 +76,11 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   const exRun = { ...ex, tempo: Math.max(40, Math.round(ex.tempo * factor)) };
   const highway = new NoteHighway(canvas, exRun);
   const scorer = new Scorer(ex.notes.length);
+  // Компенсация задержки — из калибровки/маршрута вывода (Bluetooth опаздывает сильнее).
+  const latency = progress.getLatency();
+  // На динамике (не наушники/не BT) грув протекает в микрофон → будем приглушать на голос.
+  const noBleed = progress.getHeadphones() || progress.getRouteKey() !== 'speaker';
+  let grooveHandle = null;
   let raf = null, startPerf = 0, lastPerf = 0, finished = false, pausedAbort = false, lastVoicedMs = 0;
   const guideHandles = [];
   const timers = [];
@@ -113,7 +117,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     cleanup();
     renderGame(app, mic, tracker, exercise, { ...opts, explain: false });
   }
-  wireControls(document.getElementById('gsettings'), restart);
+  wireControls(document.getElementById('gsettings'), restart, mic);
 
   // 0) Аккорд тоники → 1) эталон-мелодия → 2) отсчёт
   const tonic = ex.root != null ? ex.root : ex.notes[0].midi;
@@ -177,7 +181,10 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     if (ex.drone) guideHandles.push(playDrone(mic.ctx, tonic, highway.totalTime + 0.5, 0.05));
     // Грув-подложка (ритм для драйва, поднимается на полутон вместе с тоникой повтора).
     const groove = progress.getGroove();
-    if (groove !== 'off') guideHandles.push(startGroove(mic.ctx, { rootMidi: tonic, tempo: exRun.tempo, dur: highway.totalTime, style: groove, gain: 0.45 }));
+    if (groove !== 'off') {
+      grooveHandle = startGroove(mic.ctx, { rootMidi: tonic, tempo: exRun.tempo, dur: highway.totalTime, style: groove, gain: 0.45 });
+      guideHandles.push(grooveHandle);
+    }
     loop();
   }
 
@@ -196,8 +203,11 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
       sungHz = r.smoothedHz;
     }
 
+    // Грув на динамике приглушаем, пока поёшь (иначе барабаны/бас портят детекцию).
+    if (grooveHandle && !noBleed) grooveHandle.duck(voiced);
+
     // Скоринг — с учётом задержки голоса; отрисовка — по «настоящему» времени.
-    const ev = highway.evaluate(now - LATENCY_S, voiced ? sungHz : null, voiced);
+    const ev = highway.evaluate(now - latency, voiced ? sungHz : null, voiced);
     if (ev.index >= 0) {
       let cents = null;
       if (ev.voiced && sungHz && highway.timed[ev.index]) cents = centsOff(sungHz, highway.timed[ev.index].hz);
@@ -263,11 +273,14 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
       notesHit: res.notesHit, notesTotal: res.notesTotal, avgCents: res.avgCents, perNote: res.perNote,
       repsDone: acc.length,
     };
+    // Сообщаем результат вызывающему (напр. «Путь» засчитывает урок только при успехе).
+    if (onResult) onResult(agg);
     if (onComplete) { onComplete(agg); return; }
-    // Энергия/жизни (по ТЗ): <50% нот → упражнение заново со списанием энергии; ≥50% → пополнение.
-    if (avgPct < 0.5) {
+    // Энергия/жизни (по ТЗ, смягчено): <40% → разбор и предложение заново со списанием
+    // энергии (без авто-рестарта — выбор за тобой); ≥50% → пополнение. Энергия восстанавливается со временем.
+    if (avgPct < 0.4) {
       if (progress.getEnergy() > 0) { progress.addEnergy(-1); renderFailRetry(agg); return; }
-    } else {
+    } else if (avgPct >= 0.5) {
       progress.addEnergy(avgPct >= 0.8 ? 2 : 1);
     }
     renderSummary(agg);
@@ -293,29 +306,33 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
         </div>
       </div>
     `;
-    wireControls(app, () => renderSummary(agg));
+    wireControls(app, () => renderSummary(agg), mic);
     document.getElementById('again').addEventListener('click', onAgain);
     document.getElementById('menu').addEventListener('click', onExit);
   }
 
-  // <50% нот → упражнение начинается заново (энергия уже списана). Авто-рестарт + кнопки.
+  // <40% нот → разбор и предложение пройти заново (энергия уже списана). Выбор за пользователем,
+  // без авто-рестарта — чтобы не «выкидывало» в цикл. Энергия восстанавливается со временем.
   function renderFailRetry(agg) {
     const pct = Math.round(agg.pct * 100);
+    const tip = diagnose(agg, exercise);
     app.innerHTML = `
       <div class="screen summary">
-        <div class="verdict" style="color:var(--coral)">Меньше половины — ещё разок!</div>
+        <div class="verdict" style="color:var(--coral)">Сложновато — попробуем ещё</div>
         <div class="big-pct" style="color:var(--coral)">${pct}<span>%</span></div>
         ${energyRow(progress.getEnergy(), progress.getMaxEnergy())}
-        <p class="hint">Упражнение начинается заново. Энергия −1. Пройди чисто — энергия вернётся.</p>
+        <div class="card tip-card"><p class="how"><b>Подсказка.</b> ${tip}</p></div>
+        <p class="hint">Энергия −1 (восстанавливается со временем). Сбавь темп или включи «подсказку тоном» — станет легче.</p>
+        ${controlsBlock()}
         <div class="row">
           <button class="btn btn-ghost" id="menu">Меню</button>
-          <button class="btn btn-primary" id="again">Заново</button>
+          <button class="btn btn-primary" id="again">Пройти заново</button>
         </div>
       </div>`;
     const go = () => renderGame(app, mic, tracker, exercise, { ...opts, explain: false, repIndex: 0, _acc: undefined });
-    const t = setTimeout(go, 2000);
-    document.getElementById('menu').addEventListener('click', () => { clearTimeout(t); onExit(); });
-    document.getElementById('again').addEventListener('click', () => { clearTimeout(t); go(); });
+    wireControls(app, () => renderFailRetry(agg), mic);
+    document.getElementById('menu').addEventListener('click', onExit);
+    document.getElementById('again').addEventListener('click', go);
   }
 }
 
@@ -368,8 +385,12 @@ function controlsBlock() {
   const tbtn = (k, l) => `<button data-timbre="${k}" class="${tb === k ? 'on' : ''}">${l}</button>`;
   const gr = progress.getGroove();
   const gbtn = (k, l) => `<button data-groove="${k}" class="${gr === k ? 'on' : ''}">${l}</button>`;
+  const vol = progress.getVolumeKey();
+  const vbtn = (k, l) => `<button data-vol="${k}" class="${vol === k ? 'on' : ''}">${l}</button>`;
   return `
     <div class="settings inline-settings">
+      <div class="seg-label">Громкость подсказки</div>
+      <div class="seg">${vbtn('quiet', 'Тихо')}${vbtn('normal', 'Норм')}${vbtn('loud', 'Громко')}${vbtn('max', 'Макс')}</div>
       <div class="seg-label">Темп</div>
       <div class="seg">${b('easy', 'Медл.')}${b('medium', 'Средне')}${b('fast', 'Быстро')}</div>
       <div class="seg-label">Звук подсказки</div>
@@ -384,7 +405,7 @@ function controlsBlock() {
   `;
 }
 
-function wireControls(root, rerender) {
+function wireControls(root, rerender, micEngine) {
   root.querySelectorAll('[data-diff]').forEach((btn) => {
     btn.addEventListener('click', () => { progress.setDifficulty(btn.dataset.diff); rerender(); });
   });
@@ -393,6 +414,15 @@ function wireControls(root, rerender) {
   });
   root.querySelectorAll('[data-groove]').forEach((btn) => {
     btn.addEventListener('click', () => { progress.setGroove(btn.dataset.groove); rerender(); });
+  });
+  root.querySelectorAll('[data-vol]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      progress.setVolume(btn.dataset.vol);
+      setOutputVolume(progress.getVolumeMult());
+      // короткий тест-«дин», чтобы сразу услышать выбранную громкость
+      if (micEngine && micEngine.ctx) { try { playTone(micEngine.ctx, 523.25, 0.5, 0, 0.22, progress.getTimbre()); } catch (e) { /* ok */ } }
+      rerender();
+    });
   });
   const g = root.querySelector('[data-guidetoggle]');
   if (g) g.addEventListener('click', () => { progress.setGuide(!progress.getGuide()); rerender(); });

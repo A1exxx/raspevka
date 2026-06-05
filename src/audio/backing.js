@@ -82,6 +82,12 @@ export function startGroove(ctx, { rootMidi = 60, tempo = 100, dur = 16, style =
   }
 
   return {
+    // На динамике грув протекает в микрофон и портит детекцию высоты. Пока пользователь
+    // поёт — приглушаем подложку (duck), в паузах возвращаем полную громкость.
+    duck(on) {
+      const target = on ? gain * 0.25 : gain;
+      try { out.gain.setTargetAtTime(target, ctx.currentTime, 0.04); } catch (e) { /* ok */ }
+    },
     stop() {
       try { nodes.forEach((n) => { try { n.stop(); } catch (e) { /* уже остановлен */ } n.disconnect && n.disconnect(); }); out.disconnect(); comp.disconnect(); }
       catch (e) { /* ok */ }

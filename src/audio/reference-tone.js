@@ -7,17 +7,29 @@ const _MOBILE = (() => {
   try { return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints || 0) > 1; }
   catch (e) { return false; }
 })();
-const OUTPUT_GAIN = _MOBILE ? 2.5 : 1.5;
+const OUTPUT_GAIN = _MOBILE ? 2.8 : 1.8;
+
+// Пользовательский множитель громкости выхода (регулятор в настройках/упражнении).
+// По умолчанию — дефолт устройства; setOutputVolume меняет на лету (и на уже открытом контексте).
+let _userVol = OUTPUT_GAIN;
+let _lastCtx = null;
+export function setOutputVolume(mult) {
+  if (!Number.isFinite(mult) || mult <= 0) return;
+  _userVol = mult;
+  if (_lastCtx && _lastCtx.__rtGain) {
+    try { _lastCtx.__rtGain.gain.setTargetAtTime(mult, _lastCtx.currentTime, 0.02); } catch (e) { /* ok */ }
+  }
+}
 
 /** Общий мастер-выход на контексте: тоны → компрессор-лимитер → усиление → колонки. */
 function masterIn(ctx) {
-  if (ctx.__rtMaster) return ctx.__rtMaster;
+  if (ctx.__rtMaster) { _lastCtx = ctx; return ctx.__rtMaster; }
   const comp = ctx.createDynamicsCompressor();
   comp.threshold.value = -10; comp.knee.value = 24; comp.ratio.value = 4;
   comp.attack.value = 0.003; comp.release.value = 0.25;
-  const g = ctx.createGain(); g.gain.value = OUTPUT_GAIN;
+  const g = ctx.createGain(); g.gain.value = _userVol;
   comp.connect(g).connect(ctx.destination);
-  ctx.__rtMaster = comp;
+  ctx.__rtMaster = comp; ctx.__rtGain = g; _lastCtx = ctx;
   return comp;
 }
 

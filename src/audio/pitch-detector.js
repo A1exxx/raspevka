@@ -25,6 +25,7 @@ export class PitchTracker {
     this.maxHz = maxHz;
     this.k = smoothing;
     this.smoothed = null;
+    this.win = []; // окно последних измерений (медиана давит одиночные выбросы)
   }
 
   /**
@@ -40,12 +41,26 @@ export class PitchTracker {
       return { hz: null, clarity, smoothedHz: this.smoothed, voiced: false };
     }
 
+    // Октавный гард: одиночный скачок ровно на ~октаву от текущего тона — почти всегда
+    // ошибка детектора (поймал гармонику/субгармонику), а не реальное пение. Подтягиваем.
+    let measured = hz;
+    if (this.smoothed) {
+      const c = centsBetween(measured, this.smoothed);
+      if (Math.abs(Math.abs(c) - 1200) < 70) measured = c > 0 ? measured / 2 : measured * 2;
+    }
+
+    // Медиана окна из 5 измерений — убивает одиночные выбросы (щелчки, шум), почти без лага.
+    this.win.push(measured);
+    if (this.win.length > 5) this.win.shift();
+    const sorted = [...this.win].sort((a, b) => a - b);
+    const med = sorted[Math.floor(sorted.length / 2)];
+
     if (this.smoothed == null) {
-      this.smoothed = hz;
-    } else if (Math.abs(centsBetween(hz, this.smoothed)) > CENTS_SNAP_THRESHOLD) {
-      this.smoothed = hz; // настоящий скачок ноты — снапим мгновенно
+      this.smoothed = med;
+    } else if (Math.abs(centsBetween(med, this.smoothed)) > CENTS_SNAP_THRESHOLD) {
+      this.smoothed = med; // настоящий скачок ноты — снапим мгновенно
     } else {
-      this.smoothed = this.smoothed + this.k * (hz - this.smoothed);
+      this.smoothed = this.smoothed + this.k * (med - this.smoothed);
     }
 
     return { hz, clarity, smoothedHz: this.smoothed, voiced: true };
@@ -53,6 +68,7 @@ export class PitchTracker {
 
   reset() {
     this.smoothed = null;
+    this.win = [];
   }
 
   /** Сузить рабочий диапазон (Hz) — кламп по голосу режет октавные ошибки и шум. */

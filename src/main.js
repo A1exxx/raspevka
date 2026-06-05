@@ -16,6 +16,8 @@ import { renderEar } from './screens/ear-training.js';
 import { renderPath } from './screens/path.js';
 import { SONGS, songMidis } from './theory/songs.js';
 import { renderModesPicker } from './screens/modes-picker.js';
+import { renderSettings } from './screens/settings.js';
+import { setOutputVolume } from './audio/reference-tone.js';
 import { getMode } from './theory/modes.js';
 import { contourGlyph } from './ui/illustrations.js';
 import * as progress from './state/progress.js';
@@ -28,15 +30,17 @@ let rafId = null;
 // Корневой тон по умолчанию (C4) — если тип голоса не задан.
 const DEFAULT_ROOT = 60;
 
+// Ладозависимые упражнения берут текущий лад (progress.getModeKey()) → выбор лада
+// реально меняет все гаммовые распевки (а не одну), что и даёт ценность тарифу Pro.
 const EXERCISES = [
-  { label: 'Мычание по гамме', sub: '«М» · I-II-III-II-I', ic: 'lips', make: (r) => hum3(r) },
-  { label: 'Губной тренаж «brrr»', sub: 'brrr / «Р» · 5 нот + квинта', ic: 'wave', make: (r) => lipTrill(r) },
+  { label: 'Мычание по гамме', sub: '«М» · I-II-III-II-I', ic: 'lips', make: (r) => hum3(r, progress.getModeKey()) },
+  { label: 'Губной тренаж «brrr»', sub: 'brrr / «Р» · 5 нот + квинта', ic: 'wave', make: (r) => lipTrill(r, progress.getModeKey()) },
   { label: 'Удержание ноты', sub: 'держать ровный звук', ic: 'fork', make: (r) => sustain(r, 8) },
-  { label: 'Гамма «Ма-Мэ»', sub: 'попадать в ноты гаммы', ic: 'stairs', make: (r) => fiveNoteScale(r) },
-  { label: 'Беглость «Ма»', sub: 'быстрые ноты — как в рекламе', ic: 'bolt', make: (r) => agilityRun(r) },
+  { label: 'Гамма «Ма-Мэ»', sub: 'попадать в ноты гаммы', ic: 'stairs', make: (r) => fiveNoteScale(r, progress.getModeKey()) },
+  { label: 'Беглость «Ма»', sub: 'быстрые ноты — как в рекламе', ic: 'bolt', make: (r) => agilityRun(r, progress.getModeKey()) },
   { label: 'Октавный скачок', sub: 'прыжок на октаву и назад', ic: 'arrows', make: (r) => octaveJump(r) },
-  { label: 'Цепочка гласных', sub: 'Ми-Ме-Ма · выравнивание', ic: 'lips', make: (r) => vowelChain(r) },
-  { label: 'Скачок к V ступени', sub: 'Ям · атака интервала', ic: 'arrows', make: (r) => jumpToFifth(r) },
+  { label: 'Цепочка гласных', sub: 'Ми-Ме-Ма · выравнивание', ic: 'lips', make: (r) => vowelChain(r, progress.getModeKey()) },
+  { label: 'Скачок к V ступени', sub: 'Ям · атака интервала', ic: 'arrows', make: (r) => jumpToFifth(r, progress.getModeKey()) },
   { label: 'Ладовая «ЯМ»', sub: 'гамма лада вверх-вниз', ic: 'stairs', make: (r) => ladVocalise(r, progress.getModeKey()) },
 ];
 
@@ -90,6 +94,7 @@ function renderWelcome() {
       const { sampleRate } = await mic.start();
       tracker = new PitchTracker(sampleRate, { fftSize: 2048, minClarity: 0.85 });
       mic.setSensitivity(progress.getSensitivity());
+      setOutputVolume(progress.getVolumeMult()); // громкость подсказки по устройству/настройке
       // Первый запуск без типа голоса — предложим определить (можно пропустить).
       if (progress.getVoice()) {
         applyTrackerRange();
@@ -174,6 +179,7 @@ function renderMenu() {
         <div class="home-chips">
           <div class="energy-chip" title="Энергия — копится за точные распевки"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>${energy}/${maxE}</div>
           ${streak > 0 ? `<div class="streak-chip">${flameSvg()} ${streak} ${dayWord(streak)}</div>` : ''}
+          <button class="gear-btn" data-settings aria-label="Настройки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
         </div>
       </header>
 
@@ -258,6 +264,8 @@ function renderMenu() {
   if (theoryBtn) theoryBtn.addEventListener('click', () => renderTheory(app, { onExit: renderMenu }));
   const modesBtn = app.querySelector('[data-modes]');
   if (modesBtn) modesBtn.addEventListener('click', renderModesScreen);
+  const setBtn = app.querySelector('[data-settings]');
+  if (setBtn) setBtn.addEventListener('click', renderSettingsScreen);
   app.querySelectorAll('[data-song]').forEach((btn) => {
     btn.addEventListener('click', () => startSong(Number(btn.dataset.song)));
   });
@@ -295,6 +303,17 @@ function renderModesScreen() {
   renderModesPicker(app, { onExit: renderMenu });
 }
 
+function renderSettingsScreen() {
+  stopRaf();
+  renderSettings(app, mic, {
+    onExit: renderMenu,
+    onVoice: () => renderVoice(app, mic, tracker, {
+      onDone: () => { applyTrackerRange(); renderSettingsScreen(); },
+      onExit: renderSettingsScreen,
+    }),
+  });
+}
+
 function renderPathScreen() {
   stopRaf();
   renderPath(app, {
@@ -306,15 +325,18 @@ function renderPathScreen() {
 
 function launchLesson(lesson) {
   applyTrackerRange();
-  const back = () => { progress.markLessonDone(lesson.id); renderPathScreen(); };
+  // Урок засчитывается только при реальном прохождении (≥50% точности), а не на любом выходе.
+  const PASS = 0.5;
+  const markPass = (agg) => { if (agg && agg.pct >= PASS) progress.markLessonDone(lesson.id); };
   if (lesson.type === 'breath') {
-    renderBreathing(app, mic, lesson.key, { onExit: back });
+    // Дыхательные не оцениваются по высоте — засчитываем за выполнение (дошёл до конца/вышел).
+    renderBreathing(app, mic, lesson.key, { onExit: () => { progress.markLessonDone(lesson.id); renderPathScreen(); } });
   } else if (lesson.type === 'ex') {
     const ex = EXERCISES[lesson.key].make(voiceRoot());
-    renderGame(app, mic, tracker, ex, { explain: true, reps: [0], onExit: back, onAgain: () => launchLesson(lesson) });
+    renderGame(app, mic, tracker, ex, { explain: true, reps: [0], onResult: markPass, onExit: renderPathScreen, onAgain: () => launchLesson(lesson) });
   } else if (lesson.type === 'song') {
     const ex = SONGS[lesson.key].make(voiceRoot());
-    renderGame(app, mic, tracker, ex, { explain: true, reps: [0], onExit: back, onAgain: () => launchLesson(lesson) });
+    renderGame(app, mic, tracker, ex, { explain: true, reps: [0], onResult: markPass, onExit: renderPathScreen, onAgain: () => launchLesson(lesson) });
   }
 }
 

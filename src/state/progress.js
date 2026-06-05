@@ -9,6 +9,11 @@ export function save(p) {
   try { localStorage.setItem(KEY, JSON.stringify(p)); } catch { /* приватный режим */ }
 }
 
+/** Полный сброс прогресса/настроек (по явному действию пользователя в настройках). */
+export function resetAll() {
+  try { localStorage.removeItem(KEY); } catch (e) { /* приватный режим */ }
+}
+
 /** Диапазон голоса {low, high} в MIDI, или null. */
 export function getRange() {
   const p = load();
@@ -70,15 +75,28 @@ export function setModeKey(k) { const p = load(); p.modeKey = k; save(p); return
 export function getTier() { return load().tier || 'free'; }
 export function setTier(t) { const p = load(); p.tier = t; save(p); return t; }
 
-/** Энергия/жизни (по ТЗ): тратится при перезапуске неудачного упражнения, копится за чистое прохождение. */
+/** Энергия/жизни (по ТЗ): тратится при перезапуске неудачного упражнения, копится за чистое прохождение.
+ *  Смягчено: энергия сама восстанавливается со временем (1 за REGEN_MIN минут) — не «насухо». */
 const MAX_ENERGY = 5;
+const REGEN_MIN = 25; // минут на восстановление одной единицы энергии
 export function getMaxEnergy() { return MAX_ENERGY; }
-export function getEnergy() { const e = load().energy; return e == null ? MAX_ENERGY : e; }
+export function getEnergy() {
+  const p = load();
+  let e = p.energy == null ? MAX_ENERGY : p.energy;
+  if (e < MAX_ENERGY && p.energyTs) {
+    const regen = Math.floor((Date.now() - p.energyTs) / (REGEN_MIN * 60000));
+    if (regen > 0) e = Math.min(MAX_ENERGY, e + regen);
+  }
+  return e;
+}
 export function setEnergy(v) {
   const p = load();
-  p.energy = Math.max(0, Math.min(MAX_ENERGY, Math.round(v)));
+  const clamped = Math.max(0, Math.min(MAX_ENERGY, Math.round(v)));
+  p.energy = clamped;
+  // если не полная — запомним момент, от которого пойдёт восстановление
+  p.energyTs = clamped < MAX_ENERGY ? Date.now() : null;
   save(p);
-  return p.energy;
+  return clamped;
 }
 export function addEnergy(delta) { return setEnergy(getEnergy() + delta); }
 
@@ -196,16 +214,48 @@ export function setTimbre(t) {
   return p.timbre;
 }
 
+// Телефон/планшет? — у них тише и динамик, и микрофон → другие дефолты.
+export function isMobileDevice() {
+  try {
+    const ua = navigator.userAgent || '';
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(ua) || (navigator.maxTouchPoints || 0) > 1;
+  } catch (e) { return false; }
+}
+
+/** Громкость подсказки/эталона (выход): множитель поверх компрессора-лимитера.
+ *  Дефолт по устройству: на телефоне громче (динамик тише). */
+const VOL = { quiet: 1.0, normal: 1.8, loud: 2.8, max: 4.2 };
+function deviceDefaultVolume() { return isMobileDevice() ? 'loud' : 'normal'; }
+export function getVolumeKey() { const k = load().volume; return VOL[k] ? k : deviceDefaultVolume(); }
+export function getVolumeMult() { return VOL[getVolumeKey()]; }
+export function setVolume(k) { const p = load(); if (VOL[k]) { p.volume = k; save(p); } return getVolumeKey(); }
+
+/** Маршрут вывода → компенсация задержки (Bluetooth заметно опаздывает). */
+const ROUTE_LATENCY = { speaker: 0.09, wired: 0.12, bt: 0.24 };
+function deviceDefaultRoute() { return 'speaker'; }
+export function getRouteKey() { const k = load().route; return ROUTE_LATENCY[k] ? k : deviceDefaultRoute(); }
+export function setRoute(k) {
+  const p = load();
+  if (ROUTE_LATENCY[k]) { p.route = k; delete p.latencyManual; save(p); }
+  return getRouteKey();
+}
+/** Итоговая компенсация задержки (сек): ручная калибровка имеет приоритет над маршрутом. */
+export function getLatency() {
+  const m = load().latencyManual;
+  if (Number.isFinite(m)) return m;
+  return ROUTE_LATENCY[getRouteKey()];
+}
+export function setLatencyManual(sec) {
+  const p = load();
+  p.latencyManual = Math.max(0, Math.min(0.5, sec));
+  save(p);
+  return p.latencyManual;
+}
+
 /** Чувствительность микрофона: 'low'|'med'|'high' -> множитель усиления входа. */
 const SENS = { low: 1.5, med: 3, high: 5.5 };
 // Дефолт по устройству: у телефонов микрофон тише → начинаем с «высокой».
-function deviceDefaultSensitivity() {
-  try {
-    const ua = navigator.userAgent || '';
-    const mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua) || (navigator.maxTouchPoints || 0) > 1;
-    return mobile ? 'high' : 'med';
-  } catch (e) { return 'med'; }
-}
+function deviceDefaultSensitivity() { return isMobileDevice() ? 'high' : 'med'; }
 export function getSensitivityKey() {
   const k = load().sensitivity;
   return SENS[k] ? k : deviceDefaultSensitivity();

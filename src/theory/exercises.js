@@ -10,22 +10,22 @@ import { degreesToSemitones } from './modes.js';
 
 const beat = (midi, beats = 1) => ({ midi, beats });
 
-/** Цепочка гласных (трихорд) I-II-III-II-I — выравнивание гласных (по ТЗ Игоря). */
-export function vowelChain(rootMidi) {
-  const offs = [0, 2, 4, 2, 0];
+/** Цепочка гласных (трихорд) I-II-III-II-I — выравнивание гласных (по ТЗ Игоря). Ладозависима. */
+export function vowelChain(rootMidi, modeKey = 'ionian') {
+  const offs = degreesToSemitones([1, 2, 3, 2, 1], modeKey);
   return {
-    id: 'vowels', name: 'Цепочка гласных', syllable: 'Ми-Ме-Ма', tempo: 90, kind: 'scale', root: rootMidi,
+    id: 'vowels', name: 'Цепочка гласных', syllable: 'Ми-Ме-Ма', tempo: 90, kind: 'scale', root: rootMidi, modeKey,
     desc: 'Выравнивание гласных и сохранение позиции при смене звука.',
     how: 'Пой по кругу гласные «Ми-Ме-Ма-Мо», широко раскрывая рот, держи единую позицию.',
     notes: offs.map((o) => beat(rootMidi + o, 1)),
   };
 }
 
-/** Скачок к V ступени I-I-III-II-I-I-V-I-I-III-II-I — точная атака интервала (по ТЗ Игоря). */
-export function jumpToFifth(rootMidi) {
-  const offs = [0, 0, 4, 2, 0, 0, 7, 0, 0, 4, 2, 0];
+/** Скачок к V ступени I-I-III-II-I-I-V-I-I-III-II-I — точная атака интервала (по ТЗ Игоря). Ладозависим. */
+export function jumpToFifth(rootMidi, modeKey = 'ionian') {
+  const offs = degreesToSemitones([1, 1, 3, 2, 1, 1, 5, 1, 1, 3, 2, 1], modeKey);
   return {
-    id: 'jump5', name: 'Скачок к V ступени', syllable: 'Ям', tempo: 100, kind: 'jump', root: rootMidi,
+    id: 'jump5', name: 'Скачок к V ступени', syllable: 'Ям', tempo: 100, kind: 'jump', root: rootMidi, modeKey,
     desc: 'Точная атака интервалов и контроль регистра при скачках.',
     how: 'Пой на «Ям». Перед скачком на квинту не зажимайся — целься точно в ноту.',
     notes: offs.map((o) => beat(rootMidi + o, 1)),
@@ -66,22 +66,22 @@ export function siren(rootMidi) {
   };
 }
 
-/** Пятинотная гамма вверх-вниз. */
-export function fiveNoteScale(rootMidi) {
-  const offs = [0, 2, 4, 5, 7, 5, 4, 2, 0];
+/** Пятинотная гамма вверх-вниз. Ладозависима. */
+export function fiveNoteScale(rootMidi, modeKey = 'ionian') {
+  const offs = degreesToSemitones([1, 2, 3, 4, 5, 4, 3, 2, 1], modeKey);
   return {
-    id: 'scale5', name: 'Гамма «Ма-Мэ»', syllable: 'Ма', tempo: 104, kind: 'scale', root: rootMidi,
+    id: 'scale5', name: 'Гамма «Ма-Мэ»', syllable: 'Ма', tempo: 104, kind: 'scale', root: rootMidi, modeKey,
     desc: 'Тренирует точность интонации — чистое попадание в каждую ступень гаммы.',
     how: 'Пой «Ма» и попадай в каждую ноту, которая подъезжает к линии. Старайся держать зелёный.',
     notes: offs.map((o) => beat(rootMidi + o, 1)),
   };
 }
 
-/** Беглость — быстрый пассаж вверх до сексты и обратно (Vocalista «Sing on Mah»). */
-export function agilityRun(rootMidi) {
-  const offs = [0, 2, 4, 5, 7, 9, 7, 5, 4, 2, 0];
+/** Беглость — быстрый пассаж вверх до сексты и обратно (Vocalista «Sing on Mah»). Ладозависима. */
+export function agilityRun(rootMidi, modeKey = 'ionian') {
+  const offs = degreesToSemitones([1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1], modeKey);
   return {
-    id: 'agility', name: 'Беглость «Ма»', syllable: 'Ма', tempo: 138, kind: 'agility', root: rootMidi,
+    id: 'agility', name: 'Беглость «Ма»', syllable: 'Ма', tempo: 138, kind: 'agility', root: rootMidi, modeKey,
     desc: 'Развивает беглость: быстрые и точные переходы между нотами (как в Vocalista).',
     how: 'Пой «Ма» легко и быстро, попадая в каждую ноту пробегающего пассажа. Не зажимайся.',
     notes: offs.map((o) => beat(rootMidi + o, 0.5)),
@@ -98,22 +98,22 @@ export function octaveJump(rootMidi) {
   };
 }
 
-/** Мычание по гамме: I-II-III-II-I на «М». */
-export function hum3(rootMidi) {
-  const offs = [0, 2, 4, 2, 0];
+/** Мычание по гамме: I-II-III-II-I на «М». Ладозависимо. */
+export function hum3(rootMidi, modeKey = 'ionian') {
+  const offs = degreesToSemitones([1, 2, 3, 2, 1], modeKey);
   return {
-    id: 'hum3', name: 'Мычание по гамме', syllable: 'М', tempo: 92, kind: 'hum', root: rootMidi,
+    id: 'hum3', name: 'Мычание по гамме', syllable: 'М', tempo: 92, kind: 'hum', root: rootMidi, modeKey,
     desc: 'Мягкая активация голоса и резонаторов на «м-м-м» — три ступеньки вверх и обратно.',
     how: 'Сомкни губы и мычи «м», идя по нотам: вверх три ступени и вниз. Звук в маску/нос.',
     notes: offs.map((o) => beat(rootMidi + o, 1)),
   };
 }
 
-/** Губной тренаж «brrr» (или «Р»): I-II-III-IV-V-IV-III-II-I, затем скачок V-I. */
-export function lipTrill(rootMidi) {
-  const offs = [0, 2, 4, 5, 7, 5, 4, 2, 0, 7, 0];
+/** Губной тренаж «brrr» (или «Р»): I-II-III-IV-V-IV-III-II-I, затем скачок V-I. Ладозависим. */
+export function lipTrill(rootMidi, modeKey = 'ionian') {
+  const offs = degreesToSemitones([1, 2, 3, 4, 5, 4, 3, 2, 1, 5, 1], modeKey);
   return {
-    id: 'trill', name: 'Губной тренаж «brrr»', syllable: 'brrr', tempo: 120, kind: 'trill', root: rootMidi,
+    id: 'trill', name: 'Губной тренаж «brrr»', syllable: 'brrr', tempo: 120, kind: 'trill', root: rootMidi, modeKey,
     desc: 'Ровный воздушный поток и гибкость: пять ступеней вверх-вниз и скачок на квинту.',
     how: 'Губами «brrr» (если не выходит — на «Р»). Веди по нотам ровно, в конце — скачок на квинту и тонику.',
     notes: offs.map((o) => beat(rootMidi + o, 0.75)),

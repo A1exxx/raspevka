@@ -36,6 +36,11 @@ eq('agility fast beats', agilityRun(60).notes[0].beats, 0.5);
 eq('sustain 1 note', sustain(60, 8).notes.length, 1);
 eq('octaveJump top', octaveJump(60).notes[0].midi, 72);
 eq('refFreqs len', referenceFreqs(fiveNoteScale(60)).length, 9);
+// лад реально меняет гаммовые упражнения: III ступень в миноре = +3 полутона (мажор = +4)
+eq('scale5 ionian deg3', fiveNoteScale(60, 'ionian').notes[2].midi, 64);
+eq('scale5 aeolian deg3', fiveNoteScale(60, 'aeolian').notes[2].midi, 63);
+eq('hum3 aeolian deg3', hum3(60, 'aeolian').notes[2].midi, 63);
+eq('agility aeolian deg6', agilityRun(60, 'aeolian').notes[5].midi, 68);
 
 // scoring
 const sc = new Scorer(2);
