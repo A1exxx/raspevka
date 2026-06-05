@@ -14,7 +14,7 @@ const beat = (midi, beats = 1) => ({ midi, beats });
 export function vowelChain(rootMidi, modeKey = 'ionian') {
   const offs = degreesToSemitones([1, 2, 3, 2, 1], modeKey);
   return {
-    id: 'vowels', name: 'Цепочка гласных', syllable: 'Ми-Ме-Ма', tempo: 90, kind: 'scale', root: rootMidi, modeKey,
+    id: 'vowels', name: 'Цепочка гласных', syllable: 'Ми-Ме-Ма', tempo: 90, kind: 'scale', root: rootMidi, modeKey, grooveStyle: 'swing',
     desc: 'Выравнивание гласных и сохранение позиции при смене звука.',
     how: 'Пой по кругу гласные «Ми-Ме-Ма-Мо», широко раскрывая рот, держи единую позицию.',
     notes: offs.map((o) => beat(rootMidi + o, 1)),
@@ -25,7 +25,7 @@ export function vowelChain(rootMidi, modeKey = 'ionian') {
 export function jumpToFifth(rootMidi, modeKey = 'ionian') {
   const offs = degreesToSemitones([1, 1, 3, 2, 1, 1, 5, 1, 1, 3, 2, 1], modeKey);
   return {
-    id: 'jump5', name: 'Скачок к V ступени', syllable: 'Ям', tempo: 100, kind: 'jump', root: rootMidi, modeKey,
+    id: 'jump5', name: 'Скачок к V ступени', syllable: 'Ям', tempo: 100, kind: 'jump', root: rootMidi, modeKey, grooveStyle: 'latin',
     desc: 'Точная атака интервалов и контроль регистра при скачках.',
     how: 'Пой на «Ям». Перед скачком на квинту не зажимайся — целься точно в ноту.',
     notes: offs.map((o) => beat(rootMidi + o, 1)),
@@ -37,7 +37,7 @@ export function ladVocalise(rootMidi, modeKey = 'ionian') {
   const degrees = [1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1];
   const offs = degreesToSemitones(degrees, modeKey);
   return {
-    id: 'lad', name: 'Ладовая «ЯМ»', syllable: 'Ям', tempo: 100, kind: 'scale', root: rootMidi, modeKey, drone: true,
+    id: 'lad', name: 'Ладовая «ЯМ»', syllable: 'Ям', tempo: 100, kind: 'scale', root: rootMidi, modeKey, drone: true, grooveStyle: 'march',
     desc: 'Слух и ощущение ладовой окраски — гамма лада вверх и вниз.',
     how: 'Пой на «Ям» по ступеням лада вверх до октавы и обратно. Слушай окраску лада.',
     notes: offs.map((o) => beat(rootMidi + o, 1)),
@@ -47,7 +47,7 @@ export function ladVocalise(rootMidi, modeKey = 'ionian') {
 /** Долгая нота — удержание (sustain). */
 export function sustain(rootMidi, beats = 8) {
   return {
-    id: 'sustain', name: 'Удержание ноты', syllable: 'А', tempo: 70, kind: 'sustain', root: rootMidi,
+    id: 'sustain', name: 'Удержание ноты', syllable: 'А', tempo: 70, kind: 'sustain', root: rootMidi, grooveStyle: 'ballad',
     desc: 'Учит держать ровный стабильный звук и дыхательную опору — основа пения.',
     how: 'Слушай образец, потом тяни ноту на «А» как можно ровнее. Держи шарик в зелёной зоне без дрожи.',
     notes: [beat(rootMidi, beats)],
@@ -70,7 +70,7 @@ export function siren(rootMidi) {
 export function fiveNoteScale(rootMidi, modeKey = 'ionian') {
   const offs = degreesToSemitones([1, 2, 3, 4, 5, 4, 3, 2, 1], modeKey);
   return {
-    id: 'scale5', name: 'Гамма «Ма-Мэ»', syllable: 'Ма', tempo: 104, kind: 'scale', root: rootMidi, modeKey,
+    id: 'scale5', name: 'Гамма «Ма-Мэ»', syllable: 'Ма', tempo: 104, kind: 'scale', root: rootMidi, modeKey, grooveStyle: 'pop',
     desc: 'Тренирует точность интонации — чистое попадание в каждую ступень гаммы.',
     how: 'Пой «Ма» и попадай в каждую ноту, которая подъезжает к линии. Старайся держать зелёный.',
     notes: offs.map((o) => beat(rootMidi + o, 1)),
@@ -81,7 +81,7 @@ export function fiveNoteScale(rootMidi, modeKey = 'ionian') {
 export function agilityRun(rootMidi, modeKey = 'ionian') {
   const offs = degreesToSemitones([1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1], modeKey);
   return {
-    id: 'agility', name: 'Беглость «Ма»', syllable: 'Ма', tempo: 138, kind: 'agility', root: rootMidi, modeKey,
+    id: 'agility', name: 'Беглость «Ма»', syllable: 'Ма', tempo: 138, kind: 'agility', root: rootMidi, modeKey, grooveStyle: 'funk',
     desc: 'Развивает беглость: быстрые и точные переходы между нотами (как в Vocalista).',
     how: 'Пой «Ма» легко и быстро, попадая в каждую ноту пробегающего пассажа. Не зажимайся.',
     notes: offs.map((o) => beat(rootMidi + o, 0.5)),
@@ -91,7 +91,7 @@ export function agilityRun(rootMidi, modeKey = 'ionian') {
 /** Октавный скачок — координация регистров. */
 export function octaveJump(rootMidi) {
   return {
-    id: 'jump', name: 'Октавный скачок', syllable: 'А', tempo: 84, kind: 'jump', root: rootMidi,
+    id: 'jump', name: 'Октавный скачок', syllable: 'А', tempo: 84, kind: 'jump', root: rootMidi, grooveStyle: 'drive',
     desc: 'Учит координации между нижним и верхним регистром голоса.',
     how: 'Пой «А», точно прыгая на октаву вверх и обратно вниз. Целься в центр ноты.',
     notes: [beat(rootMidi + 12, 2), beat(rootMidi, 2), beat(rootMidi + 12, 2), beat(rootMidi, 2)],
@@ -102,7 +102,7 @@ export function octaveJump(rootMidi) {
 export function hum3(rootMidi, modeKey = 'ionian') {
   const offs = degreesToSemitones([1, 2, 3, 2, 1], modeKey);
   return {
-    id: 'hum3', name: 'Мычание по гамме', syllable: 'М', tempo: 92, kind: 'hum', root: rootMidi, modeKey,
+    id: 'hum3', name: 'Мычание по гамме', syllable: 'М', tempo: 92, kind: 'hum', root: rootMidi, modeKey, grooveStyle: 'soft',
     desc: 'Мягкая активация голоса и резонаторов на «м-м-м» — три ступеньки вверх и обратно.',
     how: 'Сомкни губы и мычи «м», идя по нотам: вверх три ступени и вниз. Звук в маску/нос.',
     notes: offs.map((o) => beat(rootMidi + o, 1)),
@@ -113,7 +113,7 @@ export function hum3(rootMidi, modeKey = 'ionian') {
 export function lipTrill(rootMidi, modeKey = 'ionian') {
   const offs = degreesToSemitones([1, 2, 3, 4, 5, 4, 3, 2, 1, 5, 1], modeKey);
   return {
-    id: 'trill', name: 'Губной тренаж «brrr»', syllable: 'brrr', tempo: 120, kind: 'trill', root: rootMidi, modeKey,
+    id: 'trill', name: 'Губной тренаж «brrr»', syllable: 'brrr', tempo: 120, kind: 'trill', root: rootMidi, modeKey, grooveStyle: 'drive',
     desc: 'Ровный воздушный поток и гибкость: пять ступеней вверх-вниз и скачок на квинту.',
     how: 'Губами «brrr» (если не выходит — на «Р»). Веди по нотам ровно, в конце — скачок на квинту и тонику.',
     notes: offs.map((o) => beat(rootMidi + o, 0.75)),

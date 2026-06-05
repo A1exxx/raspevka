@@ -6,6 +6,7 @@ import { referenceFreqs } from '../theory/exercises.js';
 import { startGroove } from '../audio/backing.js';
 import { hzToNoteInfo, centsOff } from '../theory/note-map.js';
 import * as progress from '../state/progress.js';
+import { logEvent } from '../state/analytics.js';
 
 export function renderGame(app, mic, tracker, exercise, opts = {}) {
   const { onExit, onAgain, onComplete, onResult, explain } = opts;
@@ -180,9 +181,11 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     // Гармонический фон (drone) для ладовых упражнений — тихая опора тоники (по ТЗ Игоря).
     if (ex.drone) guideHandles.push(playDrone(mic.ctx, tonic, highway.totalTime + 0.5, 0.05));
     // Грув-подложка (ритм для драйва, поднимается на полутон вместе с тоникой повтора).
-    const groove = progress.getGroove();
-    if (groove !== 'off') {
-      grooveHandle = startGroove(mic.ctx, { rootMidi: tonic, tempo: exRun.tempo, dur: highway.totalTime, style: groove, gain: 0.45 });
+    // 'auto' → своя подложка под каждую распевку (ex.grooveStyle), иначе явный выбор.
+    const grooveSet = progress.getGroove();
+    const grooveStyle = grooveSet === 'auto' ? (ex.grooveStyle || 'pop') : grooveSet;
+    if (grooveStyle && grooveStyle !== 'off') {
+      grooveHandle = startGroove(mic.ctx, { rootMidi: tonic, tempo: exRun.tempo, dur: highway.totalTime, style: grooveStyle, gain: 0.45 });
       guideHandles.push(grooveHandle);
     }
     loop();
@@ -271,8 +274,11 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
       pct: avgPct,
       stars: avgPct >= 0.85 ? 3 : avgPct >= 0.6 ? 2 : avgPct >= 0.35 ? 1 : 0,
       notesHit: res.notesHit, notesTotal: res.notesTotal, avgCents: res.avgCents, perNote: res.perNote,
+      stability: res.stability, vibrato: res.vibrato,
       repsDone: acc.length,
     };
+    // Локальная аналитика: чем закончилось упражнение (улучшать по фактам).
+    logEvent('exercise_done', { id: exercise.id, pct: Math.round(avgPct * 100), stability: Math.round(res.stability || 0), reps: acc.length });
     // Сообщаем результат вызывающему (напр. «Путь» засчитывает урок только при успехе).
     if (onResult) onResult(agg);
     if (onComplete) { onComplete(agg); return; }
@@ -298,6 +304,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
         <div class="big-pct">${pct}<span>%</span></div>
         <p class="hint">средняя точность${agg.repsDone > 1 ? ` за ${agg.repsDone} повтор${agg.repsDone < 5 ? 'а' : 'ов'}` : ''}</p>
         ${energyRow(progress.getEnergy(), progress.getMaxEnergy())}
+        ${statsRow(agg)}
         <div class="card tip-card"><p class="how"><b>Разбор.</b> ${tip}</p></div>
         ${controlsBlock()}
         <div class="row">
@@ -349,6 +356,20 @@ function energyRow(e, max) {
   return `<div class="energy-row"><span class="en-ic">${boltIcon()}</span><div class="energy-pips">${pips}</div></div>`;
 }
 
+// Глубокий разбор: ровность высоты (СКО центов) + вибрато.
+function statsRow(agg) {
+  if (agg.stability == null) return '';
+  const st = agg.stability;
+  const evenLabel = st < 15 ? 'ровно' : st < 30 ? 'почти ровно' : 'дрожит';
+  const evenColor = st < 15 ? 'var(--green)' : st < 30 ? 'var(--amber)' : 'var(--coral)';
+  const vib = agg.vibrato && agg.vibrato.present;
+  const vibTxt = vib ? `есть · ${agg.vibrato.rateHz.toFixed(1)} Гц` : 'нет';
+  return `<div class="stat-chips">
+    <span class="stat-chip">ровность: <b style="color:${evenColor}">${evenLabel}</b></span>
+    <span class="stat-chip">вибрато: <b>${vibTxt}</b></span>
+  </div>`;
+}
+
 // Экран-объяснение перед упражнением: что тренирует + как делать + как работает игра.
 function renderExplain(app, exercise, { onExit, onStart }) {
   app.innerHTML = `
@@ -396,7 +417,7 @@ function controlsBlock() {
       <div class="seg-label">Звук подсказки</div>
       <div class="seg">${tbtn('piano', 'Пиано')}${tbtn('guitar', 'Гитара')}${tbtn('soft', 'Мягкий')}</div>
       <div class="seg-label">Грув (ритм-подложка · лучше в наушниках)</div>
-      <div class="seg">${gbtn('off', 'Выкл')}${gbtn('pop', 'Поп')}${gbtn('funk', 'Фанк')}${gbtn('soft', 'Мягкий')}</div>
+      <div class="seg">${gbtn('off', 'Выкл')}${gbtn('auto', 'Авто')}${gbtn('pop', 'Поп')}${gbtn('funk', 'Фанк')}${gbtn('soft', 'Мягкий')}</div>
       <div class="toggle-row">
         <button class="toggle ${guideOn ? 'on' : ''}" data-guidetoggle="1">Подсказка тоном: ${guideOn ? 'вкл' : 'выкл'}</button>
         <button class="toggle ${hp ? 'on' : ''}" data-hptoggle="1">Наушники: ${hp ? 'да' : 'нет'}</button>

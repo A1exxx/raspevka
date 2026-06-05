@@ -123,6 +123,18 @@ eq('reduce median', reduceDelays([0.08, 0.09, 0.10]), 0.09, 1e-9);
 eq('reduce too few', reduceDelays([0.09]), null);
 eq('reduce drops outliers', reduceDelays([0.9, 0.08, 0.09, 0.5]), 0.08, 0.011);
 
+// глубокий скоринг: ровность + вибрато
+const steady = new Scorer(1);
+for (let i = 0; i < 60; i++) steady.record(0, 'green', 16, true, 4);
+const rSteady = steady.result();
+eq('steady stability low', rSteady.stability < 8, true);
+eq('steady no vibrato', rSteady.vibrato.present, false);
+const vib = new Scorer(1);
+for (let i = 0; i < 120; i++) vib.record(0, 'green', 16, true, 45 * Math.sin(2 * Math.PI * 6 * (i * 0.016)));
+const rVib = vib.result();
+eq('vibrato detected', rVib.vibrato.present, true);
+eq('vibrato rate ~6Hz', rVib.vibrato.rateHz, 6, 2);
+
 let pass = 0;
 for (const [ok, name, info] of checks) {
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}  ${ok ? '' : '<< ' + info}`);

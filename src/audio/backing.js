@@ -14,10 +14,18 @@ function noiseBuf(ctx) {
 }
 
 // 8 восьмых на такт (4/4). Сильные доли: 0,2,4,6. Слабые (off-beat): 1,3,5,7.
+// Басовые ноты = смещения в полутонах от баса (root-12). Берём только консонансы,
+// безопасные в любом ладу: 0 (тоника), 5 (кварта), 7 (квинта), 12 (октава) — басовый
+// риф звучит «своей мелодией», но не конфликтует с минором/ладами распевки.
 const STYLES = {
-  pop:  { kick: [0, 4], snare: [2, 6], hatOpen: [7], bass: [[0, 0], [3, 0], [4, 7]], stab: [3, 7], swing: 0 },
-  funk: { kick: [0, 3, 6], snare: [2, 6], hatOpen: [3, 7], bass: [[0, 0], [1, 7], [4, 0], [6, 7]], stab: [1, 3, 5, 7], swing: 0.18 },
-  soft: { kick: [0, 4], snare: [6], hatOpen: [], bass: [[0, 0], [4, 7]], stab: [3], swing: 0 },
+  pop:    { kick: [0, 4], snare: [2, 6], hatOpen: [7], bass: [[0, 0], [3, 0], [4, 7]], stab: [3, 7], swing: 0 },
+  funk:   { kick: [0, 3, 6], snare: [2, 6], hatOpen: [3, 7], bass: [[0, 0], [1, 7], [4, 0], [6, 7]], stab: [1, 3, 5, 7], swing: 0.18 },
+  soft:   { kick: [0, 4], snare: [6], hatOpen: [], bass: [[0, 0], [4, 7]], stab: [3], swing: 0 },
+  drive:  { kick: [0, 2, 4, 6], snare: [2, 6], hatOpen: [], bass: [[0, 0], [2, 0], [4, 7], [6, 7]], stab: [4], swing: 0 },
+  march:  { kick: [0, 2, 4, 6], snare: [4], hatOpen: [0, 4], bass: [[0, 0], [2, 7], [4, 0], [6, 7]], stab: [], swing: 0 },
+  swing:  { kick: [0, 4], snare: [2, 6], hatOpen: [3, 7], bass: [[0, 0], [3, 5], [4, 7], [6, 12]], stab: [3, 7], swing: 0.34 },
+  ballad: { kick: [0], snare: [4], hatOpen: [], bass: [[0, 0], [4, 7]], stab: [2, 6], swing: 0 },
+  latin:  { kick: [0, 3, 6], snare: [2, 7], hatOpen: [5], bass: [[0, 0], [3, 7], [6, 5]], stab: [2, 5], swing: 0 },
 };
 
 export function startGroove(ctx, { rootMidi = 60, tempo = 100, dur = 16, style = 'pop', gain = 0.5, when = 0 } = {}) {

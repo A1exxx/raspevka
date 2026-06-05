@@ -3,6 +3,7 @@
 import * as progress from '../state/progress.js';
 import { setOutputVolume, playTone } from '../audio/reference-tone.js';
 import { getVoiceType } from '../theory/voice-types.js';
+import { summary as analyticsSummary, clearEvents } from '../state/analytics.js';
 
 export function renderSettings(app, mic, { onExit, onVoice, onCalibrate }) {
   let confirmReset = false;
@@ -10,6 +11,18 @@ export function renderSettings(app, mic, { onExit, onVoice, onCalibrate }) {
   function seg(items, current, attr) {
     return `<div class="seg">${items.map(([k, l]) =>
       `<button data-${attr}="${k}" class="${current === k ? 'on' : ''}">${l}</button>`).join('')}</div>`;
+  }
+
+  // Локальная аналитика — свод по упражнениям (без сети, только на этом устройстве).
+  function analyticsCard() {
+    const s = analyticsSummary();
+    if (!s.sessions) return '';
+    const rows = s.perEx.slice(0, 6).map((e) => `<div class="an-row"><span>${e.id}</span><span>${e.runs}× · ${e.avgPct}%</span></div>`).join('');
+    return `
+      <div class="card">
+        <div class="seg-label">Аналитика (локально) <span class="set-hint">${s.sessions} прохождений</span></div>
+        <div class="an-list">${rows}</div>
+      </div>`;
   }
 
   function render() {
@@ -40,8 +53,8 @@ export function renderSettings(app, mic, { onExit, onVoice, onCalibrate }) {
           <div class="seg-label">Звук подсказки</div>
           ${seg([['piano', 'Пиано'], ['guitar', 'Гитара'], ['soft', 'Мягкий']], progress.getTimbre(), 'timbre')}
 
-          <div class="seg-label">Грув (ритм-подложка)</div>
-          ${seg([['off', 'Выкл'], ['pop', 'Поп'], ['funk', 'Фанк'], ['soft', 'Мягкий']], progress.getGroove(), 'groove')}
+          <div class="seg-label">Грув (ритм-подложка) <span class="set-hint">Авто — своя под каждую распевку</span></div>
+          ${seg([['off', 'Выкл'], ['auto', 'Авто'], ['pop', 'Поп'], ['funk', 'Фанк'], ['soft', 'Мягкий']], progress.getGroove(), 'groove')}
 
           <div class="toggle-row" style="margin-top:10px">
             <button class="toggle ${progress.getGuide() ? 'on' : ''}" id="guide">Подсказка тоном: ${progress.getGuide() ? 'вкл' : 'выкл'}</button>
@@ -49,6 +62,8 @@ export function renderSettings(app, mic, { onExit, onVoice, onCalibrate }) {
           </div>
           <button class="toggle ${progress.getMicAGC() ? 'on' : ''}" id="agc" style="width:100%;margin-top:8px">Авто-громкость микро (AGC): ${progress.getMicAGC() ? 'вкл' : 'выкл'} <span class="set-hint">${progress.getMicAGC() ? 'громче на телефоне' : 'ровнее долгие ноты'}</span></button>
         </div>
+
+        ${analyticsCard()}
 
         <div class="card">
           <div class="seg-label">Сброс данных</div>
@@ -90,6 +105,7 @@ export function renderSettings(app, mic, { onExit, onVoice, onCalibrate }) {
     document.getElementById('reset').addEventListener('click', () => {
       if (!confirmReset) { confirmReset = true; render(); return; }
       progress.resetAll();
+      clearEvents();
       onExit();
     });
   }
