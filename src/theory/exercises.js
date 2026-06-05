@@ -37,7 +37,7 @@ export function ladVocalise(rootMidi, modeKey = 'ionian') {
   const degrees = [1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1];
   const offs = degreesToSemitones(degrees, modeKey);
   return {
-    id: 'lad', name: 'Ладовая «ЯМ»', syllable: 'Ям', tempo: 100, kind: 'scale', root: rootMidi, modeKey,
+    id: 'lad', name: 'Ладовая «ЯМ»', syllable: 'Ям', tempo: 100, kind: 'scale', root: rootMidi, modeKey, drone: true,
     desc: 'Слух и ощущение ладовой окраски — гамма лада вверх и вниз.',
     how: 'Пой на «Ям» по ступеням лада вверх до октавы и обратно. Слушай окраску лада.',
     notes: offs.map((o) => beat(rootMidi + o, 1)),

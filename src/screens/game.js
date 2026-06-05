@@ -1,7 +1,7 @@
 // game.js — экран упражнения: слушаем эталон → отсчёт → проход по хайвею → итог.
 import { Scorer } from '../game/scoring.js';
 import { NoteHighway } from '../game/note-highway.js';
-import { playSequence, playClick, playTone, playChord } from '../audio/reference-tone.js';
+import { playSequence, playClick, playTone, playChord, playDrone } from '../audio/reference-tone.js';
 import { referenceFreqs } from '../theory/exercises.js';
 import { hzToNoteInfo, centsOff } from '../theory/note-map.js';
 import * as progress from '../state/progress.js';
@@ -172,6 +172,8 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
         guideHandles.push(playTone(mic.ctx, seg.hz, cue, Math.max(0, seg.start - cue), 0.18, timbre));
       });
     }
+    // Гармонический фон (drone) для ладовых упражнений — тихая опора тоники (по ТЗ Игоря).
+    if (ex.drone) guideHandles.push(playDrone(mic.ctx, tonic, highway.totalTime + 0.5, 0.05));
     loop();
   }
 
