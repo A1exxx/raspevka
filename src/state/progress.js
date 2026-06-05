@@ -86,6 +86,16 @@ export function addEnergy(delta) { return setEnergy(getEnergy() + delta); }
 export function getGroove() { return load().groove || 'off'; }
 export function setGroove(g) { const p = load(); p.groove = g; save(p); return g; }
 
+/** Избранные настройки (темп+лад) на упражнение — быстрый переход к привычной разминке. */
+export function getFavorite(exId) { return (load().favorites || {})[exId] || null; }
+export function setFavorite(exId, fav) {
+  const p = load();
+  p.favorites = p.favorites || {};
+  p.favorites[exId] = fav;
+  save(p);
+  return fav;
+}
+
 /**
  * Записать уверенно взятую ноту (MIDI). Если она расширяет диапазон голоса —
  * обновляет диапазон, добавляет точку в историю и возвращает {extended:'high'|'low', midi}.

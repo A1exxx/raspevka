@@ -345,12 +345,17 @@ function renderExplain(app, exercise, { onExit, onStart }) {
         <p class="how mech"><b>Как устроена игра.</b> Ноты едут к вертикальной линии слева. Пой так, чтобы твой светящийся шарик совпал с нотой по высоте: <b style="color:var(--green)">зелёный</b> — точно, <b style="color:var(--amber)">жёлтый</b> — почти, <b style="color:var(--coral)">красный</b> — мимо. Сначала прозвучит <b>аккорд тоники</b> и образец мелодии — это твоя опора, чтобы попасть. «Подсказка тоном» подыгрывает нужную ноту (без наушников — коротко перед тем, как её петь).</p>
       </div>
       ${controlsBlock()}
+      <button class="toggle" id="fav" style="width:100%;margin-bottom:2px">${progress.getFavorite(exercise.id) ? '★ Избранное сохранено · обновить' : '☆ Запомнить темп и лад'}</button>
       <button class="btn btn-primary" id="go" style="width:100%">Начать</button>
     </div>
   `;
   document.getElementById('back').addEventListener('click', onExit);
   document.getElementById('go').addEventListener('click', onStart);
   wireControls(app, () => renderExplain(app, exercise, { onExit, onStart }));
+  document.getElementById('fav').addEventListener('click', () => {
+    progress.setFavorite(exercise.id, { difficulty: progress.getDifficulty(), mode: progress.getModeKey() });
+    renderExplain(app, exercise, { onExit, onStart });
+  });
 }
 
 // Динамические настройки темпа и поводыря (на экранах объяснения и итога).

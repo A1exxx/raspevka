@@ -265,6 +265,11 @@ function renderMenu() {
 
 function startExercise(i, explain = true) {
   applyTrackerRange();
+  // Избранное (темп+лад) — применяем при входе в упражнение, чтобы быстро вернуться к привычной разминке.
+  if (explain) {
+    const fav = progress.getFavorite(EXERCISES[i].make(60).id);
+    if (fav) { if (fav.difficulty) progress.setDifficulty(fav.difficulty); if (fav.mode) progress.setModeKey(fav.mode); }
+  }
   const exercise = EXERCISES[i].make(voiceRoot());
   const r = voiceRange();
   const reps = transposePlan(exercise, r.low, r.high, 4); // вверх до верха и вниз
