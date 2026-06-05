@@ -137,8 +137,8 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
       if (trail[i] == null) continue;
       const x = bx - (trail.length - 1 - i) * 2.4;
       const last = i === trail.length - 1;
-      ctx.fillStyle = last ? '#12a36b' : 'rgba(18,163,107,.35)';
-      if (last) { ctx.shadowColor = '#12a36b'; ctx.shadowBlur = 16; }
+      ctx.fillStyle = last ? '#2fab84' : 'rgba(47,171,132,.35)';
+      if (last) { ctx.shadowColor = '#2fab84'; ctx.shadowBlur = 16; }
       ctx.beginPath(); ctx.arc(x, trail[i], last ? 8 : 2.5, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur = 0;
     }

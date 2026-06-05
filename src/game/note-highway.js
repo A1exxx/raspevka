@@ -123,7 +123,7 @@ export class NoteHighway {
       curY = this.yFor(sungHz, h);
       if (active) {
         const z = centsZone(Math.abs(centsOff(sungHz, active.seg.hz)));
-        color = z === 'green' ? '#12a36b' : z === 'yellow' ? '#d98a00' : '#e0544b';
+        color = z === 'green' ? '#2fab84' : z === 'yellow' ? '#e0a64a' : '#e0544b';
       } else {
         color = '#0e8d7f';
       }

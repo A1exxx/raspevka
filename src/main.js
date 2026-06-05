@@ -430,7 +430,7 @@ function drawTrace(ctx, canvas, history, noteLines) {
     ctx.fillStyle = 'rgba(27,36,48,.4)';
     ctx.fillText(ln.name, 6, y - 4);
   });
-  const zoneColor = { green: '#12a36b', yellow: '#d98a00', red: '#e0544b' };
+  const zoneColor = { green: '#2fab84', yellow: '#e0a64a', red: '#e0544b' };
   for (let i = 0; i < history.length; i++) {
     const p = history[i];
     if (!p.voiced || p.y == null) continue;
