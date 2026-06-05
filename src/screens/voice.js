@@ -15,12 +15,8 @@ export function renderVoice(app, mic, tracker, { onDone, onExit, canSkip = false
     stop();
     tracker.reset();
     const cur = progress.getVoice();
-    const cards = VOICE_TYPES.map((v) => `
-      <button class="list-item voice-card" data-pick="${v.key}">
-        <span class="li-main">${v.name}${cur && cur.key === v.key ? ' ·  выбран' : ''}</span>
-        <span class="li-sub">${v.group === 'муж' ? 'мужской' : 'женский'} · ${rangeLabel(v)}</span>
-      </button>
-    `).join('');
+    const curType = cur && getVoiceType(cur.key);
+    let gender = curType ? curType.group : 'муж';
     app.innerHTML = `
       <div class="screen">
         <div class="game-top">
@@ -29,18 +25,42 @@ export function renderVoice(app, mic, tracker, { onDone, onExit, canSkip = false
         <div class="brand"><h1>Твой голос</h1>
           <p>Знаешь свой тип — выбери. Не знаешь — определим за минуту.</p></div>
         <button class="btn btn-primary" id="detect" style="width:100%">Определить мой голос</button>
+        <div class="settings">
+          <div class="seg-label">Тип голоса</div>
+          <div class="seg" id="genderSeg">
+            <button data-gender="муж" class="${gender === 'муж' ? 'on' : ''}">Мужские</button>
+            <button data-gender="жен" class="${gender === 'жен' ? 'on' : ''}">Женские</button>
+          </div>
+        </div>
         <div class="card list">
           <div class="list-sep">Или выбери сам</div>
-          ${cards}
+          <div id="voiceCards"></div>
         </div>
       </div>
     `;
     document.getElementById('back').addEventListener('click', onExit);
     document.getElementById('detect').addEventListener('click', explainTest);
-    app.querySelectorAll('[data-pick]').forEach((b) => b.addEventListener('click', () => {
-      progress.setVoice(b.dataset.pick);
-      onDone(progress.getVoice());
+
+    function renderCards() {
+      const curV = progress.getVoice();
+      document.getElementById('voiceCards').innerHTML = VOICE_TYPES
+        .filter((v) => v.group === gender)
+        .map((v) => `
+          <button class="list-item voice-card" data-pick="${v.key}">
+            <span class="li-main">${v.name}${curV && curV.key === v.key ? ' ·  выбран' : ''}</span>
+            <span class="li-sub">${v.group === 'муж' ? 'мужской' : 'женский'} · ${rangeLabel(v)}</span>
+          </button>`).join('');
+      document.querySelectorAll('[data-pick]').forEach((b) => b.addEventListener('click', () => {
+        progress.setVoice(b.dataset.pick);
+        onDone(progress.getVoice());
+      }));
+    }
+    document.querySelectorAll('[data-gender]').forEach((b) => b.addEventListener('click', () => {
+      gender = b.dataset.gender;
+      document.querySelectorAll('[data-gender]').forEach((x) => x.classList.toggle('on', x.dataset.gender === gender));
+      renderCards();
     }));
+    renderCards();
   }
 
   // ---------- Объяснение теста ----------
