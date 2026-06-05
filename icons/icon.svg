@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a1d33"/>
+      <stop offset="1" stop-color="#14101a"/>
+    </linearGradient>
+    <linearGradient id="coral" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#ff6b5e"/>
+      <stop offset="1" stop-color="#ff8a6b"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- линии-ориентиры -->
+  <g stroke="#ffffff" stroke-opacity="0.06" stroke-width="3">
+    <line x1="96" y1="180" x2="416" y2="180"/>
+    <line x1="96" y1="256" x2="416" y2="256"/>
+    <line x1="96" y1="332" x2="416" y2="332"/>
+  </g>
+  <!-- "след тона" — растущая дуга -->
+  <path d="M104 360 C 180 360, 210 150, 290 150 S 400 300, 408 300"
+        fill="none" stroke="url(#coral)" stroke-width="22" stroke-linecap="round"/>
+  <!-- шарик голоса -->
+  <circle cx="290" cy="150" r="30" fill="#f3c969"/>
+  <circle cx="290" cy="150" r="30" fill="none" stroke="#14101a" stroke-width="6"/>
+</svg>
