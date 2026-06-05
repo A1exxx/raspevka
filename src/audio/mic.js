@@ -64,6 +64,9 @@ export class MicEngine {
   /** Возвращает текущий буфер временной области (Float32Array) или null. */
   read() {
     if (!this.ready || !this.analyser) return null;
+    // Само-восстановление: на iOS контекст может «засыпать» после прерывания/блокировки
+    // экрана/звонка. Тогда и детекция, и подсказка-тон молча умирают. Резюмим на лету.
+    if (this.ctx && this.ctx.state === 'suspended') { this.ctx.resume().catch(() => {}); }
     this.analyser.getFloatTimeDomainData(this.buf);
     return this.buf;
   }
