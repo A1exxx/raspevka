@@ -69,48 +69,134 @@ function applyTrackerRange() {
   else tracker.setRange(60, 1200);
 }
 
-// ---------- Экран 1: приветствие + запрос микрофона ----------
-function renderWelcome() {
+// ---------- Экран загрузки: приободряющие фразы (как в играх) ----------
+const SPLASH_TIPS = [
+  'Голос — это мышца. Сегодня сделаем её сильнее.',
+  'Дыши животом — и звук польётся сам.',
+  'Чисто — не значит громко. Решает точность.',
+  'Каждая распевка чуть-чуть расширяет диапазон.',
+  'Расслабь челюсть и плечи — голос любит свободу.',
+  'Лучшие певцы тоже начинали с простого «мычания».',
+  'Тёплый голос начинается с тёплого дыхания.',
+  'Не тянись за верхней нотой горлом — она придёт сама.',
+  '5 минут каждый день дают больше, чем час раз в неделю.',
+  'Улыбнись — и тембр станет светлее.',
+  'Зевни перед распевкой — гортань скажет спасибо.',
+  'Пой так, будто тебя уже любят слушать.',
+];
+
+function shuffled(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Приложение открывается СРАЗУ — без гейта микрофона. Микрофон включается внутри
+// яркой плавающей кнопкой (или автоматически при входе в поющий экран — это жест).
+function renderSplash() {
+  stopRaf();
+  const tips = shuffled(SPLASH_TIPS);
+  app.innerHTML = `
+    <div class="screen splash">
+      <div class="splash-core">
+        <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <h1 class="splash-title">Распевка</h1>
+        <p class="splash-tip" id="tip">${tips[0]}</p>
+      </div>
+      <div class="splash-bar"><i></i></div>
+    </div>
+  `;
+  const tipEl = document.getElementById('tip');
+  let k = 0;
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const rot = setInterval(() => {
+    k = (k + 1) % tips.length;
+    if (reduced) { tipEl.textContent = tips[k]; return; }
+    tipEl.style.opacity = '0';
+    setTimeout(() => { tipEl.textContent = tips[k]; tipEl.style.opacity = '1'; }, 220);
+  }, 1150);
+  setTimeout(() => { clearInterval(rot); bootToMenu(); }, reduced ? 1500 : 2600);
+}
+
+function bootToMenu() {
+  setupMicFab();
+  renderMenu();
+}
+
+// ---------- Микрофон: ленивое включение + постоянная кнопка ----------
+let micState = 'off'; // 'off' | 'listening' | 'denied'
+
+async function ensureMic() {
+  try {
+    if (!mic.ready) {
+      const { sampleRate } = await mic.start();
+      if (!tracker) tracker = new PitchTracker(sampleRate, { fftSize: 2048, minClarity: 0.85 });
+      mic.setSensitivity(progress.getSensitivity());
+      setOutputVolume(progress.getVolumeMult());
+      applyTrackerRange();
+    }
+    micState = 'listening';
+    setMicFab();
+    return true;
+  } catch (e) {
+    micState = 'denied';
+    setMicFab();
+    return false;
+  }
+}
+
+async function toggleMic() {
+  if (micState === 'listening') {
+    try { await mic.suspend(); } catch (e) { /* ok */ }
+    micState = 'off';
+    setMicFab();
+  } else {
+    await ensureMic();
+  }
+}
+
+function setupMicFab() {
+  const fab = document.getElementById('mic-fab');
+  if (!fab) return;
+  fab.hidden = false;
+  if (!fab.__wired) { fab.addEventListener('click', toggleMic); fab.__wired = true; }
+  setMicFab();
+}
+
+function setMicFab() {
+  const fab = document.getElementById('mic-fab');
+  if (!fab) return;
+  fab.className = 'mic-fab ' + micState;
+  const txt = fab.querySelector('.mic-fab-txt');
+  if (txt) txt.textContent = micState === 'listening' ? 'Слушаю' : micState === 'denied' ? 'Нет доступа · нажми' : 'Включить микрофон';
+  fab.setAttribute('aria-pressed', micState === 'listening' ? 'true' : 'false');
+}
+
+// Войти в «поющий» экран: гарантируем микрофон (клик — это жест), иначе мягкий экран-подсказка.
+async function enterMic(fn) {
+  const ok = await ensureMic();
+  if (!ok) { renderMicGate(fn); return; }
+  fn();
+}
+
+function renderMicGate(retry) {
   stopRaf();
   app.innerHTML = `
     <div class="screen">
-      <div class="brand">
-        <h1>Распевка</h1>
-        <p>Игровой вокальный тренажёр. Пой в микрофон — приложение слышит высоту твоего голоса в реальном времени.</p>
-      </div>
+      <div class="game-top"><button class="icon-btn" id="back">‹ Меню</button></div>
+      <div class="brand"><h1>Нужен микрофон</h1>
+        <p>Чтобы слышать твой голос, разреши доступ к микрофону. На телефоне нужен HTTPS, в браузере — «Разрешить».</p></div>
       <div class="card">
-        <p class="hint" style="margin-bottom:18px">
-          Разреши доступ к микрофону. Лучше в тихой комнате, без наушников с шумоподавлением.
-        </p>
-        <button class="btn btn-primary" id="start" style="width:100%"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>Разрешить микрофон</button>
+        <p class="hint" style="margin-bottom:16px">Нажми кнопку и выбери «Разрешить». Микрофон можно выключить в любой момент кнопкой внизу экрана.</p>
+        <button class="btn btn-primary" id="grant" style="width:100%">Разрешить микрофон</button>
       </div>
-      <p class="hint" id="err"></p>
     </div>
   `;
-  document.getElementById('start').addEventListener('click', async () => {
-    const err = document.getElementById('err');
-    err.textContent = '';
-    try {
-      const { sampleRate } = await mic.start();
-      tracker = new PitchTracker(sampleRate, { fftSize: 2048, minClarity: 0.85 });
-      mic.setSensitivity(progress.getSensitivity());
-      setOutputVolume(progress.getVolumeMult()); // громкость подсказки по устройству/настройке
-      // Первый запуск без типа голоса — предложим определить (можно пропустить).
-      if (progress.getVoice()) {
-        applyTrackerRange();
-        renderMenu();
-      } else {
-        renderVoice(app, mic, tracker, {
-          onDone: () => { applyTrackerRange(); renderMenu(); },
-          onExit: renderMenu,
-          canSkip: true,
-        });
-      }
-    } catch (e) {
-      err.textContent = 'Не удалось получить доступ к микрофону: ' + (e?.message || e) +
-        '. Проверь разрешения браузера. На телефоне нужен HTTPS.';
-    }
-  });
+  document.getElementById('back').addEventListener('click', renderMenu);
+  document.getElementById('grant').addEventListener('click', () => enterMic(retry));
 }
 
 // Маленькие линейные иконки (наследуют currentColor).
@@ -226,32 +312,33 @@ function renderMenu() {
     </div>
   `;
   document.getElementById('session').addEventListener('click', () => {
-    applyTrackerRange();
-    const go = () => renderSession(app, mic, tracker, { onExit: renderMenu });
+    const go = () => enterMic(() => { applyTrackerRange(); renderSession(app, mic, tracker, { onExit: renderMenu }); });
     if (progress.load().safetyAccepted) go();
     else renderSafety(go);
   });
   const focusBtn = app.querySelector('[data-focus]');
   if (focusBtn) focusBtn.addEventListener('click', () => startExercise(focusIdx));
   app.querySelector('[data-voice]').addEventListener('click', () => {
-    renderVoice(app, mic, tracker, {
+    enterMic(() => renderVoice(app, mic, tracker, {
       onDone: () => { applyTrackerRange(); renderMenu(); },
       onExit: renderMenu,
-    });
+    }));
   });
   app.querySelector('[data-dash]').addEventListener('click', () => renderDashboard(app, { onExit: renderMenu }));
   app.querySelector('[data-freesing]').addEventListener('click', () => {
-    const r = voiceRange();
-    renderFreesing(app, mic, tracker, {
-      onExit: () => { applyTrackerRange(); renderMenu(); },
-      lowMidi: r.low, highMidi: r.high,
+    enterMic(() => {
+      const r = voiceRange();
+      renderFreesing(app, mic, tracker, {
+        onExit: () => { applyTrackerRange(); renderMenu(); },
+        lowMidi: r.low, highMidi: r.high,
+      });
     });
   });
   app.querySelectorAll('[data-ex]').forEach((btn) => {
     btn.addEventListener('click', () => startExercise(Number(btn.dataset.ex)));
   });
   app.querySelectorAll('[data-breath]').forEach((btn) => {
-    btn.addEventListener('click', () => renderBreathing(app, mic, btn.dataset.breath, { onExit: renderMenu }));
+    btn.addEventListener('click', () => enterMic(() => renderBreathing(app, mic, btn.dataset.breath, { onExit: renderMenu })));
   });
   app.querySelectorAll('[data-rhythm]').forEach((btn) => {
     btn.addEventListener('click', () => renderRhythm(app, mic, voiceRoot(), RHYTHM[btn.dataset.rhythm], { onExit: renderMenu }));
@@ -259,7 +346,7 @@ function renderMenu() {
   const pathBtn = app.querySelector('[data-path]');
   if (pathBtn) pathBtn.addEventListener('click', renderPathScreen);
   const earBtn = app.querySelector('[data-ear]');
-  if (earBtn) earBtn.addEventListener('click', () => { applyTrackerRange(); renderEar(app, mic, tracker, { onExit: renderMenu, root: voiceRoot() }); });
+  if (earBtn) earBtn.addEventListener('click', () => enterMic(() => { applyTrackerRange(); renderEar(app, mic, tracker, { onExit: renderMenu, root: voiceRoot() }); }));
   const theoryBtn = app.querySelector('[data-theory]');
   if (theoryBtn) theoryBtn.addEventListener('click', () => renderTheory(app, { onExit: renderMenu }));
   const modesBtn = app.querySelector('[data-modes]');
@@ -272,29 +359,32 @@ function renderMenu() {
 }
 
 function startExercise(i, explain = true) {
-  applyTrackerRange();
-  // Избранное (темп+лад) — применяем при входе в упражнение, чтобы быстро вернуться к привычной разминке.
-  if (explain) {
-    const fav = progress.getFavorite(EXERCISES[i].make(60).id);
-    if (fav) { if (fav.difficulty) progress.setDifficulty(fav.difficulty); if (fav.mode) progress.setModeKey(fav.mode); }
-  }
-  const exercise = EXERCISES[i].make(voiceRoot());
-  const r = voiceRange();
-  const reps = transposePlan(exercise, r.low, r.high, 4); // вверх до верха и вниз
-  // Темп применяется внутри renderGame по текущей сложности (динамично).
-  renderGame(app, mic, tracker, exercise, {
-    explain,
-    reps,
-    onExit: renderMenu,
-    onAgain: () => startExercise(i, false),
+  enterMic(() => {
+    applyTrackerRange();
+    // Избранное (темп+лад) — применяем при входе в упражнение, чтобы быстро вернуться к привычной разминке.
+    if (explain) {
+      const fav = progress.getFavorite(EXERCISES[i].make(60).id);
+      if (fav) { if (fav.difficulty) progress.setDifficulty(fav.difficulty); if (fav.mode) progress.setModeKey(fav.mode); }
+    }
+    const exercise = EXERCISES[i].make(voiceRoot());
+    const r = voiceRange();
+    const reps = transposePlan(exercise, r.low, r.high, 4); // вверх до верха и вниз
+    // Темп применяется внутри renderGame по текущей сложности (динамично).
+    renderGame(app, mic, tracker, exercise, {
+      explain,
+      reps,
+      onExit: renderMenu,
+      onAgain: () => startExercise(i, false),
+    });
   });
 }
 
 function startSong(i, explain = true) {
-  applyTrackerRange();
-  const ex = SONGS[i].make(voiceRoot());
-  renderGame(app, mic, tracker, ex, {
-    explain, reps: [0], onExit: renderMenu, onAgain: () => startSong(i, false),
+  enterMic(() => {
+    const ex = SONGS[i].make(voiceRoot());
+    renderGame(app, mic, tracker, ex, {
+      explain, reps: [0], onExit: renderMenu, onAgain: () => startSong(i, false),
+    });
   });
 }
 
@@ -307,10 +397,10 @@ function renderSettingsScreen() {
   stopRaf();
   renderSettings(app, mic, {
     onExit: renderMenu,
-    onVoice: () => renderVoice(app, mic, tracker, {
+    onVoice: () => enterMic(() => renderVoice(app, mic, tracker, {
       onDone: () => { applyTrackerRange(); renderSettingsScreen(); },
       onExit: renderSettingsScreen,
-    }),
+    })),
   });
 }
 
@@ -324,6 +414,9 @@ function renderPathScreen() {
 }
 
 function launchLesson(lesson) {
+  enterMic(() => _launchLesson(lesson));
+}
+function _launchLesson(lesson) {
   applyTrackerRange();
   // Урок засчитывается только при реальном прохождении (≥50% точности), а не на любом выходе.
   const PASS = 0.5;
@@ -474,4 +567,4 @@ function stopRaf() {
   rafId = null;
 }
 
-renderWelcome();
+renderSplash();
