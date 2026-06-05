@@ -15,6 +15,8 @@ import { renderTheory } from './screens/theory.js';
 import { renderEar } from './screens/ear-training.js';
 import { renderPath } from './screens/path.js';
 import { SONGS, songMidis } from './theory/songs.js';
+import { renderModesPicker } from './screens/modes-picker.js';
+import { getMode } from './theory/modes.js';
 import { contourGlyph } from './ui/illustrations.js';
 import * as progress from './state/progress.js';
 
@@ -162,6 +164,7 @@ function renderMenu() {
   const _d = new Date();
   const focusIdx = (_d.getDate() + _d.getMonth()) % EXERCISES.length;
   const focus = EXERCISES[focusIdx];
+  const modeName = getMode(progress.getModeKey()).name;
   app.innerHTML = `
     <div class="screen home">
       <header class="home-head">
@@ -201,6 +204,7 @@ function renderMenu() {
           <button class="thin-item" data-path><span>Путь обучения</span><span class="thin-sub">по шагам</span></button>
           <button class="thin-item" data-ear><span>Спой за мной</span><span class="thin-sub">тренировка слуха</span></button>
           <button class="thin-item" data-theory><span>Теория голоса</span><span class="thin-sub">карточки</span></button>
+          <button class="thin-item" data-modes><span>Лад распевок</span><span class="thin-sub">${modeName}</span></button>
         </div>
       </section>
       <section class="home-sec">
@@ -247,6 +251,8 @@ function renderMenu() {
   if (earBtn) earBtn.addEventListener('click', () => { applyTrackerRange(); renderEar(app, mic, tracker, { onExit: renderMenu, root: voiceRoot() }); });
   const theoryBtn = app.querySelector('[data-theory]');
   if (theoryBtn) theoryBtn.addEventListener('click', () => renderTheory(app, { onExit: renderMenu }));
+  const modesBtn = app.querySelector('[data-modes]');
+  if (modesBtn) modesBtn.addEventListener('click', renderModesScreen);
   app.querySelectorAll('[data-song]').forEach((btn) => {
     btn.addEventListener('click', () => startSong(Number(btn.dataset.song)));
   });
@@ -272,6 +278,11 @@ function startSong(i, explain = true) {
   renderGame(app, mic, tracker, ex, {
     explain, reps: [0], onExit: renderMenu, onAgain: () => startSong(i, false),
   });
+}
+
+function renderModesScreen() {
+  stopRaf();
+  renderModesPicker(app, { onExit: renderMenu });
 }
 
 function renderPathScreen() {
