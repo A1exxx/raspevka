@@ -4,6 +4,7 @@ import { Scorer } from '../src/game/scoring.js';
 import { classifyVoice, getVoiceType, VOICE_TYPES } from '../src/theory/voice-types.js';
 import { RHYTHM } from '../src/screens/rhythm.js';
 import { miniKeyboard } from '../src/ui/illustrations.js';
+import { getMode, modeUnlocked, degreeToSemitone, degreesToSemitones } from '../src/theory/modes.js';
 
 const checks = [];
 const eq = (name, got, want, tol = 0) => {
@@ -93,6 +94,17 @@ eq('transposePlan peak +4', Math.max(...plan), 4);
 eq('transposePlan ends -4', plan[plan.length - 1], -4);
 eq('transposePlan narrow=[0]', transposePlan(hum3(60), 60, 64, 4).length, 1);
 eq('transposePlan no range=[0]', transposePlan(hum3(60), NaN, NaN).length, 1);
+
+// modes (лады)
+eq('ionian deg3=4', degreeToSemitone(3, getMode('ionian')), 4);
+eq('aeolian deg3=3', degreeToSemitone(3, getMode('aeolian')), 3);
+eq('ionian deg8=octave', degreeToSemitone(8, getMode('ionian')), 12);
+eq('ionian scale', degreesToSemitones([1, 2, 3, 4, 5], 'ionian').join(','), '0,2,4,5,7');
+eq('aeolian scale', degreesToSemitones([1, 2, 3, 4, 5], 'aeolian').join(','), '0,2,3,5,7');
+eq('free locks dorian', modeUnlocked('dorian', 'free'), false);
+eq('free allows major', modeUnlocked('ionian', 'free'), true);
+eq('standard allows minor', modeUnlocked('aeolian', 'standard'), true);
+eq('pro allows all', modeUnlocked('locrian', 'pro'), true);
 
 let pass = 0;
 for (const [ok, name, info] of checks) {

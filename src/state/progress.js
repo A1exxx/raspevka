@@ -62,6 +62,14 @@ export function markLessonDone(id) {
   return p.lessons;
 }
 
+/** Выбранный лад (по умолчанию ионийский/мажор). */
+export function getModeKey() { return load().modeKey || 'ionian'; }
+export function setModeKey(k) { const p = load(); p.modeKey = k; save(p); return k; }
+
+/** Тариф пользователя: 'free' | 'standard' | 'pro'. По умолчанию free. */
+export function getTier() { return load().tier || 'free'; }
+export function setTier(t) { const p = load(); p.tier = t; save(p); return t; }
+
 /**
  * Записать уверенно взятую ноту (MIDI). Если она расширяет диапазон голоса —
  * обновляет диапазон, добавляет точку в историю и возвращает {extended:'high'|'low', midi}.
