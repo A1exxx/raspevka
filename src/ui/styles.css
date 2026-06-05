@@ -424,7 +424,7 @@ canvas.trace { height: 300px; }
 .tile-hl svg { color: var(--accent); }
 
 .home-sec { width: 100%; }
-.sec-title { color: var(--text-dim); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; margin: 2px 2px 9px; }
+.sec-title { color: var(--text); font-size: 17px; font-weight: 800; letter-spacing: -.01em; margin: 4px 2px 11px; }
 .sec-list { display: flex; flex-direction: column; gap: 8px; }
 
 /* Распевки — крупные карточки (главное) */

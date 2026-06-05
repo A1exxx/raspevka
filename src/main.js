@@ -191,14 +191,6 @@ function renderMenu() {
       </div>
 
       <section class="home-sec">
-        <div class="sec-title">Распевки</div>
-        <div class="ex-grid">${exCards}</div>
-      </section>
-      <section class="home-sec">
-        <div class="sec-title">Дыхание и артикуляция</div>
-        <div class="thin-list">${rhythmThin}${breathThin}</div>
-      </section>
-      <section class="home-sec">
         <div class="sec-title">Курс и развитие</div>
         <div class="thin-list">
           <button class="thin-item" data-path><span>Путь обучения</span><span class="thin-sub">по шагам</span></button>
@@ -206,6 +198,14 @@ function renderMenu() {
           <button class="thin-item" data-theory><span>Теория голоса</span><span class="thin-sub">карточки</span></button>
           <button class="thin-item" data-modes><span>Лад распевок</span><span class="thin-sub">${modeName}</span></button>
         </div>
+      </section>
+      <section class="home-sec">
+        <div class="sec-title">Распевки</div>
+        <div class="ex-grid">${exCards}</div>
+      </section>
+      <section class="home-sec">
+        <div class="sec-title">Дыхание и артикуляция</div>
+        <div class="thin-list">${rhythmThin}${breathThin}</div>
       </section>
       <section class="home-sec">
         <div class="sec-title">Песни</div>
