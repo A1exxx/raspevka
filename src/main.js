@@ -3,7 +3,7 @@ import { MicEngine } from './audio/mic.js';
 import { PitchTracker } from './audio/pitch-detector.js';
 import { hzToNoteInfo, hzToY, centsZone, midiToHz } from './theory/note-map.js';
 import { renderGame } from './screens/game.js';
-import { fiveNoteScale, agilityRun, sustain, octaveJump, hum3, lipTrill, transposePlan } from './theory/exercises.js';
+import { fiveNoteScale, agilityRun, sustain, octaveJump, hum3, lipTrill, transposePlan, vowelChain, jumpToFifth, ladVocalise } from './theory/exercises.js';
 import { renderSession } from './screens/session.js';
 import { renderVoice } from './screens/voice.js';
 import { renderDashboard } from './screens/progress-dash.js';
@@ -33,6 +33,9 @@ const EXERCISES = [
   { label: 'Гамма «Ма-Мэ»', sub: 'попадать в ноты гаммы', ic: 'stairs', make: (r) => fiveNoteScale(r) },
   { label: 'Беглость «Ма»', sub: 'быстрые ноты — как в рекламе', ic: 'bolt', make: (r) => agilityRun(r) },
   { label: 'Октавный скачок', sub: 'прыжок на октаву и назад', ic: 'arrows', make: (r) => octaveJump(r) },
+  { label: 'Цепочка гласных', sub: 'Ми-Ме-Ма · выравнивание', ic: 'lips', make: (r) => vowelChain(r) },
+  { label: 'Скачок к V ступени', sub: 'Ям · атака интервала', ic: 'arrows', make: (r) => jumpToFifth(r) },
+  { label: 'Ладовая «ЯМ»', sub: 'гамма лада вверх-вниз', ic: 'stairs', make: (r) => ladVocalise(r, progress.getModeKey()) },
 ];
 
 // Корень упражнений из центра типа голоса (иначе C4).

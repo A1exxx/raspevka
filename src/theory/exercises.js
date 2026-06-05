@@ -6,8 +6,43 @@
 // kind: 'sustain' | 'glide' | 'scale' | 'agility' | 'jump' | 'hum' | 'trill'
 
 import { midiToHz } from './note-map.js';
+import { degreesToSemitones } from './modes.js';
 
 const beat = (midi, beats = 1) => ({ midi, beats });
+
+/** Цепочка гласных (трихорд) I-II-III-II-I — выравнивание гласных (по ТЗ Игоря). */
+export function vowelChain(rootMidi) {
+  const offs = [0, 2, 4, 2, 0];
+  return {
+    id: 'vowels', name: 'Цепочка гласных', syllable: 'Ми-Ме-Ма', tempo: 90, kind: 'scale', root: rootMidi,
+    desc: 'Выравнивание гласных и сохранение позиции при смене звука.',
+    how: 'Пой по кругу гласные «Ми-Ме-Ма-Мо», широко раскрывая рот, держи единую позицию.',
+    notes: offs.map((o) => beat(rootMidi + o, 1)),
+  };
+}
+
+/** Скачок к V ступени I-I-III-II-I-I-V-I-I-III-II-I — точная атака интервала (по ТЗ Игоря). */
+export function jumpToFifth(rootMidi) {
+  const offs = [0, 0, 4, 2, 0, 0, 7, 0, 0, 4, 2, 0];
+  return {
+    id: 'jump5', name: 'Скачок к V ступени', syllable: 'Ям', tempo: 100, kind: 'jump', root: rootMidi,
+    desc: 'Точная атака интервалов и контроль регистра при скачках.',
+    how: 'Пой на «Ям». Перед скачком на квинту не зажимайся — целься точно в ноту.',
+    notes: offs.map((o) => beat(rootMidi + o, 1)),
+  };
+}
+
+/** Ладовая вокализация «ЯМ» (7 ступеней вверх-вниз) в выбранном ЛАДУ (по ТЗ Игоря). */
+export function ladVocalise(rootMidi, modeKey = 'ionian') {
+  const degrees = [1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1];
+  const offs = degreesToSemitones(degrees, modeKey);
+  return {
+    id: 'lad', name: 'Ладовая «ЯМ»', syllable: 'Ям', tempo: 100, kind: 'scale', root: rootMidi, modeKey,
+    desc: 'Слух и ощущение ладовой окраски — гамма лада вверх и вниз.',
+    how: 'Пой на «Ям» по ступеням лада вверх до октавы и обратно. Слушай окраску лада.',
+    notes: offs.map((o) => beat(rootMidi + o, 1)),
+  };
+}
 
 /** Долгая нота — удержание (sustain). */
 export function sustain(rootMidi, beats = 8) {
