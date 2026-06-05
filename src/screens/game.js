@@ -258,6 +258,12 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
       repsDone: acc.length,
     };
     if (onComplete) { onComplete(agg); return; }
+    // Энергия/жизни (по ТЗ): <50% нот → упражнение заново со списанием энергии; ≥50% → пополнение.
+    if (avgPct < 0.5) {
+      if (progress.getEnergy() > 0) { progress.addEnergy(-1); renderFailRetry(agg); return; }
+    } else {
+      progress.addEnergy(avgPct >= 0.8 ? 2 : 1);
+    }
     renderSummary(agg);
   }
 
@@ -272,6 +278,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
         <div class="verdict">${verdict}</div>
         <div class="big-pct">${pct}<span>%</span></div>
         <p class="hint">средняя точность${agg.repsDone > 1 ? ` за ${agg.repsDone} повтор${agg.repsDone < 5 ? 'а' : 'ов'}` : ''}</p>
+        ${energyRow(progress.getEnergy(), progress.getMaxEnergy())}
         <div class="card tip-card"><p class="how"><b>Разбор.</b> ${tip}</p></div>
         ${controlsBlock()}
         <div class="row">
@@ -284,11 +291,39 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     document.getElementById('again').addEventListener('click', onAgain);
     document.getElementById('menu').addEventListener('click', onExit);
   }
+
+  // <50% нот → упражнение начинается заново (энергия уже списана). Авто-рестарт + кнопки.
+  function renderFailRetry(agg) {
+    const pct = Math.round(agg.pct * 100);
+    app.innerHTML = `
+      <div class="screen summary">
+        <div class="verdict" style="color:var(--coral)">Меньше половины — ещё разок!</div>
+        <div class="big-pct" style="color:var(--coral)">${pct}<span>%</span></div>
+        ${energyRow(progress.getEnergy(), progress.getMaxEnergy())}
+        <p class="hint">Упражнение начинается заново. Энергия −1. Пройди чисто — энергия вернётся.</p>
+        <div class="row">
+          <button class="btn btn-ghost" id="menu">Меню</button>
+          <button class="btn btn-primary" id="again">Заново</button>
+        </div>
+      </div>`;
+    const go = () => renderGame(app, mic, tracker, exercise, { ...opts, explain: false, repIndex: 0, _acc: undefined });
+    const t = setTimeout(go, 2000);
+    document.getElementById('menu').addEventListener('click', () => { clearTimeout(t); onExit(); });
+    document.getElementById('again').addEventListener('click', () => { clearTimeout(t); go(); });
+  }
 }
 
 function noteName(midi) {
   const info = hzToNoteInfo(440 * Math.pow(2, (midi - 69) / 12));
   return info ? info.name : '';
+}
+
+function boltIcon() {
+  return '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>';
+}
+function energyRow(e, max) {
+  const pips = Array.from({ length: max }, (_, i) => `<span class="en-pip ${i < e ? 'on' : ''}"></span>`).join('');
+  return `<div class="energy-row"><span class="en-ic">${boltIcon()}</span><div class="energy-pips">${pips}</div></div>`;
 }
 
 // Экран-объяснение перед упражнением: что тренирует + как делать + как работает игра.

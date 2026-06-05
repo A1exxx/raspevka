@@ -165,11 +165,16 @@ function renderMenu() {
   const focusIdx = (_d.getDate() + _d.getMonth()) % EXERCISES.length;
   const focus = EXERCISES[focusIdx];
   const modeName = getMode(progress.getModeKey()).name;
+  const energy = progress.getEnergy();
+  const maxE = progress.getMaxEnergy();
   app.innerHTML = `
     <div class="screen home">
       <header class="home-head">
         <h1>Распевка</h1>
-        ${streak > 0 ? `<div class="streak-chip">${flameSvg()} ${streak} ${dayWord(streak)}</div>` : ''}
+        <div class="home-chips">
+          <div class="energy-chip" title="Энергия — копится за точные распевки"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>${energy}/${maxE}</div>
+          ${streak > 0 ? `<div class="streak-chip">${flameSvg()} ${streak} ${dayWord(streak)}</div>` : ''}
+        </div>
       </header>
 
       <button class="hero-card" id="session">

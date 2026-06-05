@@ -569,6 +569,20 @@ canvas.fs-canvas { height: 320px; }
 .ear-score { font-size: 15px; font-weight: 700; color: var(--text); }
 .ear .row { width: 100%; max-width: 360px; }
 
+/* ============ Энергия / жизни ============ */
+.energy-row { display: flex; align-items: center; justify-content: center; gap: 9px; }
+.energy-row .en-ic { color: var(--gold); display: inline-flex; }
+.energy-pips { display: flex; gap: 5px; }
+.en-pip { width: 22px; height: 8px; border-radius: 999px; background: var(--line); transition: background .2s; }
+.en-pip.on { background: linear-gradient(90deg, var(--gold), var(--amber)); }
+.home-chips { display: flex; align-items: center; gap: 8px; }
+.energy-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(196,136,10,.12); border: 1px solid var(--gold); color: var(--gold);
+  padding: 6px 11px; border-radius: 999px; font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums;
+}
+.energy-chip svg { width: 14px; height: 14px; }
+
 /* ============ Пикер ладов ============ */
 .mode-item {
   appearance: none; width: 100%; text-align: left; cursor: pointer; font: inherit; color: var(--text);

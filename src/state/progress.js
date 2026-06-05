@@ -70,6 +70,18 @@ export function setModeKey(k) { const p = load(); p.modeKey = k; save(p); return
 export function getTier() { return load().tier || 'free'; }
 export function setTier(t) { const p = load(); p.tier = t; save(p); return t; }
 
+/** Энергия/жизни (по ТЗ): тратится при перезапуске неудачного упражнения, копится за чистое прохождение. */
+const MAX_ENERGY = 5;
+export function getMaxEnergy() { return MAX_ENERGY; }
+export function getEnergy() { const e = load().energy; return e == null ? MAX_ENERGY : e; }
+export function setEnergy(v) {
+  const p = load();
+  p.energy = Math.max(0, Math.min(MAX_ENERGY, Math.round(v)));
+  save(p);
+  return p.energy;
+}
+export function addEnergy(delta) { return setEnergy(getEnergy() + delta); }
+
 /**
  * Записать уверенно взятую ноту (MIDI). Если она расширяет диапазон голоса —
  * обновляет диапазон, добавляет точку в историю и возвращает {extended:'high'|'low', midi}.
