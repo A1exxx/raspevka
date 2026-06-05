@@ -252,6 +252,11 @@ export function setLatencyManual(sec) {
   return p.latencyManual;
 }
 
+/** Авто-усиление микрофона (AGC). По умолчанию ВЫКЛ — стабильнее детекция высоты
+ *  (AGC создан для голосовой связи, «пампит» амплитуду и мешает MPM). Вкл — для очень тихих микрофонов. */
+export function getMicAGC() { return load().micAGC === true; }
+export function setMicAGC(on) { const p = load(); p.micAGC = !!on; save(p); return p.micAGC; }
+
 /** Чувствительность микрофона: 'low'|'med'|'high' -> множитель усиления входа. */
 const SENS = { low: 1.5, med: 3, high: 5.5 };
 // Дефолт по устройству: у телефонов микрофон тише → начинаем с «высокой».

@@ -15,12 +15,23 @@ export class MicEngine {
     this.buf = null;
     this.ready = false;
     this._sensitivity = 3; // усиление входа (чувствительность микрофона)
+    this._agc = false;     // авто-усиление: дефолт OFF (стабильнее детекция); ON — для очень тихих микрофонов
   }
 
   /** Чувствительность микрофона — множитель усиления входного сигнала. */
   setSensitivity(mult) {
     this._sensitivity = mult;
     if (this.gainNode) this.gainNode.gain.value = mult;
+  }
+
+  /** Авто-усиление (AGC). ON — громче на телефоне; OFF — ровнее долгие ноты/удержание.
+   *  Применяется к живому треку без переподключения. */
+  setAGC(on) {
+    this._agc = !!on;
+    const tr = this.stream && this.stream.getAudioTracks && this.stream.getAudioTracks()[0];
+    if (tr && tr.applyConstraints) {
+      tr.applyConstraints({ echoCancellation: false, noiseSuppression: false, autoGainControl: this._agc }).catch(() => {});
+    }
   }
 
   /** Должен вызываться из пользовательского жеста (клик по кнопке). */
@@ -40,9 +51,9 @@ export class MicEngine {
         audio: {
           echoCancellation: false,
           noiseSuppression: false,
-          // Авто-усиление включено: помогает ловить тихий голос на телефоне.
-          // На высоту тона (MPM) не влияет — меняет только громкость.
-          autoGainControl: true,
+          // Авто-усиление: дефолт ON (тихий телефон), но переключаемо в настройках —
+          // OFF даёт более ровный сигнал для упражнения «Удержание» и долгих нот.
+          autoGainControl: this._agc,
         },
         video: false,
       });

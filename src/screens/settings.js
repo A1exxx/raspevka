@@ -4,7 +4,7 @@ import * as progress from '../state/progress.js';
 import { setOutputVolume, playTone } from '../audio/reference-tone.js';
 import { getVoiceType } from '../theory/voice-types.js';
 
-export function renderSettings(app, mic, { onExit, onVoice }) {
+export function renderSettings(app, mic, { onExit, onVoice, onCalibrate }) {
   let confirmReset = false;
 
   function seg(items, current, attr) {
@@ -29,6 +29,7 @@ export function renderSettings(app, mic, { onExit, onVoice }) {
 
           <div class="seg-label">Вывод звука <span class="set-hint">влияет на компенсацию задержки</span></div>
           ${seg([['speaker', 'Динамик'], ['wired', 'Провод'], ['bt', 'Bluetooth']], progress.getRouteKey(), 'route')}
+          ${onCalibrate ? `<div class="set-row" style="margin-top:8px"><div class="seg-label" style="margin:0">Точная калибровка</div><button class="toggle" id="calib">${Math.round(progress.getLatency() * 1000)} мс · настроить ›</button></div>` : ''}
 
           <div class="seg-label">Чувствительность микрофона</div>
           ${seg([['low', 'Низкая'], ['med', 'Средняя'], ['high', 'Высокая']], progress.getSensitivityKey(), 'sens')}
@@ -46,6 +47,7 @@ export function renderSettings(app, mic, { onExit, onVoice }) {
             <button class="toggle ${progress.getGuide() ? 'on' : ''}" id="guide">Подсказка тоном: ${progress.getGuide() ? 'вкл' : 'выкл'}</button>
             <button class="toggle ${progress.getHeadphones() ? 'on' : ''}" id="hp">Наушники: ${progress.getHeadphones() ? 'да' : 'нет'}</button>
           </div>
+          <button class="toggle ${progress.getMicAGC() ? 'on' : ''}" id="agc" style="width:100%;margin-top:8px">Авто-громкость микро (AGC): ${progress.getMicAGC() ? 'вкл' : 'выкл'} <span class="set-hint">${progress.getMicAGC() ? 'громче на телефоне' : 'ровнее долгие ноты'}</span></button>
         </div>
 
         <div class="card">
@@ -76,6 +78,14 @@ export function renderSettings(app, mic, { onExit, onVoice }) {
     app.querySelectorAll('[data-groove]').forEach((b) => b.addEventListener('click', () => { progress.setGroove(b.dataset.groove); render(); }));
     document.getElementById('guide').addEventListener('click', () => { progress.setGuide(!progress.getGuide()); render(); });
     document.getElementById('hp').addEventListener('click', () => { progress.setHeadphones(!progress.getHeadphones()); render(); });
+    document.getElementById('agc').addEventListener('click', () => {
+      const on = !progress.getMicAGC();
+      progress.setMicAGC(on);
+      if (mic && mic.setAGC) mic.setAGC(on); // применяем к живому треку сразу
+      render();
+    });
+    const calib = document.getElementById('calib');
+    if (calib && onCalibrate) calib.addEventListener('click', onCalibrate);
 
     document.getElementById('reset').addEventListener('click', () => {
       if (!confirmReset) { confirmReset = true; render(); return; }

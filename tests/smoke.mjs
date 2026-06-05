@@ -5,6 +5,7 @@ import { classifyVoice, getVoiceType, VOICE_TYPES } from '../src/theory/voice-ty
 import { RHYTHM } from '../src/screens/rhythm.js';
 import { miniKeyboard } from '../src/ui/illustrations.js';
 import { getMode, modeUnlocked, degreeToSemitone, degreesToSemitones } from '../src/theory/modes.js';
+import { findEchoDelay, reduceDelays } from '../src/audio/latency-calibrate.js';
 
 const checks = [];
 const eq = (name, got, want, tol = 0) => {
@@ -110,6 +111,17 @@ eq('free locks dorian', modeUnlocked('dorian', 'free'), false);
 eq('free allows major', modeUnlocked('ionian', 'free'), true);
 eq('standard allows minor', modeUnlocked('aeolian', 'standard'), true);
 eq('pro allows all', modeUnlocked('locrian', 'pro'), true);
+
+// калибровка задержки (acoustic loopback)
+const calSamples = [
+  { t: 0.00, rms: 0.005 }, { t: 0.05, rms: 0.004 }, { t: 0.10, rms: 0.006 }, // фон до щелчка
+  { t: 0.16, rms: 0.005 }, { t: 0.20, rms: 0.18 },  { t: 0.25, rms: 0.06 },  // эхо ~0.05с после щелчка (0.15)
+];
+eq('echo delay ~0.05', findEchoDelay(calSamples, 0.15), 0.05, 0.01);
+eq('echo none when silent', findEchoDelay([{ t: 0, rms: 0.004 }, { t: 0.2, rms: 0.005 }], 0.1), null);
+eq('reduce median', reduceDelays([0.08, 0.09, 0.10]), 0.09, 1e-9);
+eq('reduce too few', reduceDelays([0.09]), null);
+eq('reduce drops outliers', reduceDelays([0.9, 0.08, 0.09, 0.5]), 0.08, 0.011);
 
 let pass = 0;
 for (const [ok, name, info] of checks) {

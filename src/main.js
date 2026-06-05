@@ -17,6 +17,7 @@ import { renderPath } from './screens/path.js';
 import { SONGS, songMidis } from './theory/songs.js';
 import { renderModesPicker } from './screens/modes-picker.js';
 import { renderSettings } from './screens/settings.js';
+import { renderCalibrate } from './screens/calibrate.js';
 import { setOutputVolume } from './audio/reference-tone.js';
 import { getMode } from './theory/modes.js';
 import { contourGlyph } from './ui/illustrations.js';
@@ -132,6 +133,7 @@ let micState = 'off'; // 'off' | 'listening' | 'denied'
 async function ensureMic() {
   try {
     if (!mic.ready) {
+      mic.setAGC(progress.getMicAGC()); // применится в start()
       const { sampleRate } = await mic.start();
       if (!tracker) tracker = new PitchTracker(sampleRate, { fftSize: 2048, minClarity: 0.85 });
       mic.setSensitivity(progress.getSensitivity());
@@ -401,6 +403,7 @@ function renderSettingsScreen() {
       onDone: () => { applyTrackerRange(); renderSettingsScreen(); },
       onExit: renderSettingsScreen,
     })),
+    onCalibrate: () => enterMic(() => renderCalibrate(app, mic, { onExit: renderSettingsScreen })),
   });
 }
 
@@ -565,6 +568,13 @@ function drawTrace(ctx, canvas, history, noteLines) {
 function stopRaf() {
   if (rafId) cancelAnimationFrame(rafId);
   rafId = null;
+}
+
+// PWA-офлайн: регистрируем service worker только в проде (в dev/preview мешает HMR).
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(import.meta.env.BASE_URL + 'sw.js').catch(() => {});
+  });
 }
 
 renderSplash();
