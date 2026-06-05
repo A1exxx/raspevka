@@ -3,6 +3,7 @@ import { Scorer } from '../game/scoring.js';
 import { NoteHighway } from '../game/note-highway.js';
 import { playSequence, playClick, playTone, playChord, playDrone } from '../audio/reference-tone.js';
 import { referenceFreqs } from '../theory/exercises.js';
+import { startGroove } from '../audio/backing.js';
 import { hzToNoteInfo, centsOff } from '../theory/note-map.js';
 import * as progress from '../state/progress.js';
 
@@ -174,6 +175,9 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     }
     // Гармонический фон (drone) для ладовых упражнений — тихая опора тоники (по ТЗ Игоря).
     if (ex.drone) guideHandles.push(playDrone(mic.ctx, tonic, highway.totalTime + 0.5, 0.05));
+    // Грув-подложка (ритм для драйва, поднимается на полутон вместе с тоникой повтора).
+    const groove = progress.getGroove();
+    if (groove !== 'off') guideHandles.push(startGroove(mic.ctx, { rootMidi: tonic, tempo: exRun.tempo, dur: highway.totalTime, style: groove, gain: 0.45 }));
     loop();
   }
 
@@ -357,12 +361,16 @@ function controlsBlock() {
   const tb = progress.getTimbre();
   const b = (k, l) => `<button data-diff="${k}" class="${diff === k ? 'on' : ''}">${l}</button>`;
   const tbtn = (k, l) => `<button data-timbre="${k}" class="${tb === k ? 'on' : ''}">${l}</button>`;
+  const gr = progress.getGroove();
+  const gbtn = (k, l) => `<button data-groove="${k}" class="${gr === k ? 'on' : ''}">${l}</button>`;
   return `
     <div class="settings inline-settings">
       <div class="seg-label">Темп</div>
       <div class="seg">${b('easy', 'Медл.')}${b('medium', 'Средне')}${b('fast', 'Быстро')}</div>
       <div class="seg-label">Звук подсказки</div>
       <div class="seg">${tbtn('piano', 'Пиано')}${tbtn('guitar', 'Гитара')}${tbtn('soft', 'Мягкий')}</div>
+      <div class="seg-label">Грув (ритм-подложка · лучше в наушниках)</div>
+      <div class="seg">${gbtn('off', 'Выкл')}${gbtn('pop', 'Поп')}${gbtn('funk', 'Фанк')}${gbtn('soft', 'Мягкий')}</div>
       <div class="toggle-row">
         <button class="toggle ${guideOn ? 'on' : ''}" data-guidetoggle="1">Подсказка тоном: ${guideOn ? 'вкл' : 'выкл'}</button>
         <button class="toggle ${hp ? 'on' : ''}" data-hptoggle="1">Наушники: ${hp ? 'да' : 'нет'}</button>
@@ -377,6 +385,9 @@ function wireControls(root, rerender) {
   });
   root.querySelectorAll('[data-timbre]').forEach((btn) => {
     btn.addEventListener('click', () => { progress.setTimbre(btn.dataset.timbre); rerender(); });
+  });
+  root.querySelectorAll('[data-groove]').forEach((btn) => {
+    btn.addEventListener('click', () => { progress.setGroove(btn.dataset.groove); rerender(); });
   });
   const g = root.querySelector('[data-guidetoggle]');
   if (g) g.addEventListener('click', () => { progress.setGuide(!progress.getGuide()); rerender(); });

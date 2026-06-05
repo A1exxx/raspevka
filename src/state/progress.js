@@ -82,6 +82,10 @@ export function setEnergy(v) {
 }
 export function addEnergy(delta) { return setEnergy(getEnergy() + delta); }
 
+/** Грув-подложка под распевку: 'off' | 'pop' | 'funk' | 'soft'. По умолчанию выкл. */
+export function getGroove() { return load().groove || 'off'; }
+export function setGroove(g) { const p = load(); p.groove = g; save(p); return g; }
+
 /**
  * Записать уверенно взятую ноту (MIDI). Если она расширяет диапазон голоса —
  * обновляет диапазон, добавляет точку в историю и возвращает {extended:'high'|'low', midi}.
