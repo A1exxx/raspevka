@@ -129,10 +129,10 @@ export class NoteHighway {
       }
     }
     this.trail.push(curY);
-    while (this.trail.length > 28) this.trail.shift();
+    while (this.trail.length > 70) this.trail.shift(); // длинный хвост — видно вибрато/траекторию
 
     const n = this.trail.length;
-    const dx = 3.4; // история уходит влево от линии попадания
+    const dx = 2.2; // история уходит влево от линии попадания (плотнее = дольше «живёт»)
     // линия хвоста — её наклон показывает направление (вверх/вниз)
     ctx.strokeStyle = color;
     ctx.lineWidth = 3;

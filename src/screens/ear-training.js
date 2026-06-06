@@ -100,7 +100,7 @@ export function renderEar(app, mic, tracker, { onExit, root = 60 }) {
   function loop() {
     const buf = mic.read();
     let voiced = false, hz = null;
-    if (buf) { const r = tracker.process(buf); voiced = r.voiced && mic.rms() > 0.006; hz = r.smoothedHz; }
+    if (buf) { const r = tracker.process(buf); voiced = r.voiced && mic.rms() > 0.0025; hz = r.smoothedHz; }
     lvl.style.width = (voiced ? Math.min(100, mic.rms() * 350) : 0) + '%';
     if (phase === 'sing' && voiced && hz) {
       const c = Math.abs(centsOff(hz, midiToHz(target)));

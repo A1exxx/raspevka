@@ -7,6 +7,7 @@ import { startGroove } from '../audio/backing.js';
 import { hzToNoteInfo, centsOff } from '../theory/note-map.js';
 import * as progress from '../state/progress.js';
 import { logEvent } from '../state/analytics.js';
+import { MODES, modeUnlocked } from '../theory/modes.js';
 
 export function renderGame(app, mic, tracker, exercise, opts = {}) {
   const { onExit, onAgain, onComplete, onResult, explain } = opts;
@@ -17,6 +18,8 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     renderExplain(app, exercise, {
       onExit,
       onStart: () => renderGame(app, mic, tracker, exercise, { ...opts, explain: false }),
+      // смена лада прямо здесь → пересобираем упражнение с новым ладом и заново показываем объяснение
+      onModeChange: opts.rebuild ? () => renderGame(app, mic, tracker, opts.rebuild(), { ...opts, explain: true }) : null,
     });
     return;
   }
@@ -370,8 +373,23 @@ function statsRow(agg) {
   </div>`;
 }
 
+// Выпадающий выбор лада прямо перед распевкой (для ладозависимых упражнений).
+function modeSelectBlock(exercise) {
+  if (exercise.modeKey === undefined) return '';
+  const cur = progress.getModeKey();
+  const tier = progress.getTier();
+  const opts = MODES.map((m) => {
+    const locked = !modeUnlocked(m.key, tier);
+    return `<option value="${m.key}" ${m.key === cur ? 'selected' : ''} ${locked ? 'disabled' : ''}>${m.name}${locked ? ' 🔒' : ''}</option>`;
+  }).join('');
+  return `<div class="settings" style="margin-bottom:8px">
+      <div class="seg-label">Лад распевки</div>
+      <select id="modeSel" class="lad-select">${opts}</select>
+    </div>`;
+}
+
 // Экран-объяснение перед упражнением: что тренирует + как делать + как работает игра.
-function renderExplain(app, exercise, { onExit, onStart }) {
+function renderExplain(app, exercise, { onExit, onStart, onModeChange }) {
   app.innerHTML = `
     <div class="screen breathe-intro">
       <div class="game-top"><button class="icon-btn" id="back">‹ Меню</button></div>
@@ -382,17 +400,20 @@ function renderExplain(app, exercise, { onExit, onStart }) {
         ${exercise.how ? `<p class="how"><b>Как делать.</b> ${exercise.how}</p>` : ''}
         <p class="how mech"><b>Как устроена игра.</b> Ноты едут к вертикальной линии слева. Пой так, чтобы твой светящийся шарик совпал с нотой по высоте: <b style="color:var(--green)">зелёный</b> — точно, <b style="color:var(--amber)">жёлтый</b> — почти, <b style="color:var(--coral)">красный</b> — мимо. Сначала прозвучит <b>аккорд тоники</b> и образец мелодии — это твоя опора, чтобы попасть. «Подсказка тоном» подыгрывает нужную ноту (без наушников — коротко перед тем, как её петь).</p>
       </div>
+      ${modeSelectBlock(exercise)}
       ${controlsBlock()}
-      <button class="toggle" id="fav" style="width:100%;margin-bottom:2px">${progress.getFavorite(exercise.id) ? '★ Избранное сохранено · обновить' : '☆ Запомнить темп и лад'}</button>
       <button class="btn btn-primary" id="go" style="width:100%">Начать</button>
     </div>
   `;
   document.getElementById('back').addEventListener('click', onExit);
   document.getElementById('go').addEventListener('click', onStart);
-  wireControls(app, () => renderExplain(app, exercise, { onExit, onStart }));
-  document.getElementById('fav').addEventListener('click', () => {
-    progress.setFavorite(exercise.id, { difficulty: progress.getDifficulty(), mode: progress.getModeKey() });
-    renderExplain(app, exercise, { onExit, onStart });
+  wireControls(app, () => renderExplain(app, exercise, { onExit, onStart, onModeChange }));
+  const sel = document.getElementById('modeSel');
+  if (sel) sel.addEventListener('change', () => {
+    progress.setModeKey(sel.value);
+    // пересобрать упражнение с новым ладом (если можем) — иначе просто запомнить лад
+    if (onModeChange) onModeChange();
+    else renderExplain(app, exercise, { onExit, onStart, onModeChange });
   });
 }
 

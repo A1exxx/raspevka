@@ -110,16 +110,10 @@ function renderSplash() {
       <div class="splash-bar"><i></i></div>
     </div>
   `;
-  const tipEl = document.getElementById('tip');
-  let k = 0;
+  // Одна спокойная фраза на запуск (разная каждый раз) — чтобы глаз успел прочитать,
+  // без мельтешения. Сама фраза мягко появляется вместе со сплэшем.
   const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const rot = setInterval(() => {
-    k = (k + 1) % tips.length;
-    if (reduced) { tipEl.textContent = tips[k]; return; }
-    tipEl.style.opacity = '0';
-    setTimeout(() => { tipEl.textContent = tips[k]; tipEl.style.opacity = '1'; }, 220);
-  }, 1150);
-  setTimeout(() => { clearInterval(rot); bootToMenu(); }, reduced ? 1500 : 2600);
+  setTimeout(bootToMenu, reduced ? 1600 : 2800);
 }
 
 function bootToMenu() {
@@ -363,18 +357,15 @@ function renderMenu() {
 function startExercise(i, explain = true) {
   enterMic(() => {
     applyTrackerRange();
-    // Избранное (темп+лад) — применяем при входе в упражнение, чтобы быстро вернуться к привычной разминке.
-    if (explain) {
-      const fav = progress.getFavorite(EXERCISES[i].make(60).id);
-      if (fav) { if (fav.difficulty) progress.setDifficulty(fav.difficulty); if (fav.mode) progress.setModeKey(fav.mode); }
-    }
     const exercise = EXERCISES[i].make(voiceRoot());
     const r = voiceRange();
     const reps = transposePlan(exercise, r.low, r.high, 4); // вверх до верха и вниз
     // Темп применяется внутри renderGame по текущей сложности (динамично).
+    // rebuild — пересборка с актуальным ладом (выбор лада прямо на экране объяснения).
     renderGame(app, mic, tracker, exercise, {
       explain,
       reps,
+      rebuild: () => EXERCISES[i].make(voiceRoot()),
       onExit: renderMenu,
       onAgain: () => startExercise(i, false),
     });
@@ -429,7 +420,7 @@ function _launchLesson(lesson) {
     renderBreathing(app, mic, lesson.key, { onExit: () => { progress.markLessonDone(lesson.id); renderPathScreen(); } });
   } else if (lesson.type === 'ex') {
     const ex = EXERCISES[lesson.key].make(voiceRoot());
-    renderGame(app, mic, tracker, ex, { explain: true, reps: [0], onResult: markPass, onExit: renderPathScreen, onAgain: () => launchLesson(lesson) });
+    renderGame(app, mic, tracker, ex, { explain: true, reps: [0], rebuild: () => EXERCISES[lesson.key].make(voiceRoot()), onResult: markPass, onExit: renderPathScreen, onAgain: () => launchLesson(lesson) });
   } else if (lesson.type === 'song') {
     const ex = SONGS[lesson.key].make(voiceRoot());
     renderGame(app, mic, tracker, ex, { explain: true, reps: [0], onResult: markPass, onExit: renderPathScreen, onAgain: () => launchLesson(lesson) });
@@ -441,6 +432,7 @@ function renderSafety(onAccept) {
   stopRaf();
   app.innerHTML = `
     <div class="screen">
+      <div class="game-top"><button class="icon-btn" id="safety-back">‹ Меню</button></div>
       <div class="brand"><h1>Береги голос</h1></div>
       <div class="card">
         <ul class="safety-list">
@@ -462,6 +454,7 @@ function renderSafety(onAccept) {
     progress.save({ ...progress.load(), safetyAccepted: true });
     onAccept();
   });
+  document.getElementById('safety-back').addEventListener('click', renderMenu);
 }
 
 // ---------- Экран 3: живой тюнер ----------

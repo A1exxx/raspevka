@@ -101,7 +101,7 @@ export function renderFreesing(app, mic, tracker, { onExit, lowMidi = 41, highMi
 
     const buf = mic.read();
     let voiced = false, hz = null;
-    if (buf) { const r = tracker.process(buf); voiced = r.voiced && mic.rms() > 0.006; hz = r.smoothedHz; }
+    if (buf) { const r = tracker.process(buf); voiced = r.voiced && mic.rms() > 0.0025; hz = r.smoothedHz; }
 
     if (voiced && hz) {
       const info = hzToNoteInfo(hz);
