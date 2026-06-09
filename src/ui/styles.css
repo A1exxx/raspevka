@@ -23,9 +23,20 @@
   /* алиасы для обратной совместимости со старыми классами зон */
   --yellow:    var(--amber);
   --red:       var(--coral);
-  --shadow:    0 16px 40px -24px rgba(20,33,55,.30);
-  --r:         18px;
-  --font:      system-ui, -apple-system, 'Segoe UI', Roboto, 'Inter', sans-serif;
+  /* Тинтованные мягкие тени (в тон фону — холодный slate, не чёрные) — единая шкала высоты */
+  --shadow-sm: 0 2px 8px -4px rgba(20,33,55,.16);
+  --shadow:    0 14px 34px -22px rgba(20,33,55,.30);
+  --shadow-lg: 0 28px 60px -28px rgba(20,33,55,.34);
+  --shadow-accent: 0 12px 28px -14px rgba(14,141,127,.45);
+  /* Шкала радиусов */
+  --r-sm: 12px;
+  --r:    18px;
+  --r-lg: 24px;
+  /* Пружинистый easing для микро-взаимодействий */
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  /* Inter — рабочий UI-шрифт; Fraunces — характерный дисплейный для заголовков/вордмарка */
+  --font:         'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Fraunces', 'Georgia', 'Times New Roman', serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -815,3 +826,66 @@ canvas.fs-canvas { height: 320px; }
 .cal-slider { width: 100%; accent-color: var(--accent); margin: 6px 0 2px; }
 .cal-slider-row { display: flex; justify-content: space-between; color: var(--text-dim); font-size: 12px; font-variant-numeric: tabular-nums; }
 .cal-slider-row #slval { color: var(--text); font-weight: 700; }
+
+/* ============================================================
+   ВИЗУАЛЬНАЯ ПОЛИРОВКА — дизайн-система v2 (premium-friendly)
+   Дисплейный шрифт на заголовках, пружинистый тактильный отклик,
+   тинтованная глубина, мягкий каскад появления. Reduced-motion-safe.
+   ============================================================ */
+
+/* Характерный дисплейный шрифт на заголовках/крупных числах (все h1 экранов) */
+h1, .splash-title, .hero-title, .voice-result, .ear-target, .big-pct {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+/* перебиваем удельную специфичность старых правил (.home-head h1 / .brand h1 = вес 800,
+   а Fraunces загружен до 700 — иначе фейк-болд) */
+.home-head h1, .brand h1 { font-weight: 700; }
+
+/* Единый пружинистый переход на всех интерактивных поверхностях */
+.btn, .tile, .ex-tile, .thin-item, .list-item, .block-card, .block-item, .mode-item,
+.focus-chip, .gear-btn, .seg button, .toggle, .icon-btn, .hero-card, .voice-card {
+  transition: transform .18s var(--ease), box-shadow .24s var(--ease),
+    background .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease);
+}
+/* Тактильный «нажим» (scale-feedback) */
+.btn:active, .tile:active, .ex-tile:active, .thin-item:active, .list-item:active,
+.block-item:active, .focus-chip:active, .hero-card:active, .voice-card:active,
+.block-card:not(:disabled):active { transform: scale(.975); }
+
+/* Глубина поверхностей — тинтованные тени единой шкалы */
+.card, .kpi { box-shadow: var(--shadow); }
+.ex-tile, .tile, .thin-item, .block-card, .block-item, .list-item { box-shadow: var(--shadow-sm); }
+.ex-tile:hover, .tile:hover, .thin-item:hover, .block-card:not(:disabled):hover,
+.block-item:hover, .list-item:hover { box-shadow: var(--shadow); }
+.hero-card {
+  background: linear-gradient(150deg, var(--surface) 0%, var(--accent-soft) 150%);
+  box-shadow: var(--shadow-lg);
+}
+.btn-primary { box-shadow: var(--shadow-accent); }
+.btn-primary:hover { box-shadow: 0 16px 34px -16px rgba(14,141,127,.55); }
+
+/* Мягкое появление карточек/списков — лёгкий каскад снизу вверх */
+@keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.ex-grid > *, .thin-list > *, .block-list > * { animation: riseIn .5s var(--ease) both; }
+.ex-grid > *:nth-child(2) { animation-delay: .04s; }
+.ex-grid > *:nth-child(3) { animation-delay: .08s; }
+.ex-grid > *:nth-child(4) { animation-delay: .12s; }
+.ex-grid > *:nth-child(5) { animation-delay: .16s; }
+.ex-grid > *:nth-child(n+6) { animation-delay: .2s; }
+.thin-list > *:nth-child(2) { animation-delay: .05s; }
+.thin-list > *:nth-child(3) { animation-delay: .10s; }
+.thin-list > *:nth-child(4) { animation-delay: .15s; }
+.thin-list > *:nth-child(n+5) { animation-delay: .20s; }
+.block-list > *:nth-child(2) { animation-delay: .07s; }
+.block-list > *:nth-child(3) { animation-delay: .14s; }
+.block-list > *:nth-child(4) { animation-delay: .21s; }
+.block-list > *:nth-child(n+5) { animation-delay: .28s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ex-grid > *, .thin-list > *, .block-list > * { animation: none; }
+  .btn:active, .tile:active, .ex-tile:active, .thin-item:active, .list-item:active,
+  .block-item:active, .focus-chip:active, .hero-card:active, .voice-card:active,
+  .block-card:active { transform: none; }
+}
