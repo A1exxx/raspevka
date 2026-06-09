@@ -1,5 +1,5 @@
 import { hzToNoteInfo, midiToHz, centsOff, centsZone, hzToY, noteToHz } from '../src/theory/note-map.js';
-import { fiveNoteScale, agilityRun, sustain, octaveJump, referenceFreqs, hum3, lipTrill, transposePlan } from '../src/theory/exercises.js';
+import { fiveNoteScale, agilityRun, sustain, octaveJump, referenceFreqs, hum3, lipTrill, transposePlan, vowelHold, vowelScale, vowelAgility, vibratoHold } from '../src/theory/exercises.js';
 import { Scorer } from '../src/game/scoring.js';
 import { classifyVoice, getVoiceType, VOICE_TYPES } from '../src/theory/voice-types.js';
 import { RHYTHM } from '../src/screens/rhythm.js';
@@ -42,6 +42,13 @@ eq('scale5 ionian deg3', fiveNoteScale(60, 'ionian').notes[2].midi, 64);
 eq('scale5 aeolian deg3', fiveNoteScale(60, 'aeolian').notes[2].midi, 63);
 eq('hum3 aeolian deg3', hum3(60, 'aeolian').notes[2].midi, 63);
 eq('agility aeolian deg6', agilityRun(60, 'aeolian').notes[5].midi, 68);
+// гласные-распевки (из PDF-техники, нейтральные)
+eq('vowelHold one pitch', new Set(vowelHold(60).notes.map((n) => n.midi)).size, 1);
+eq('vowelHold 5 notes', vowelHold(60).notes.length, 5);
+eq('vowelScale ionian top', vowelScale(60, 'ionian').notes[4].midi, 67);
+eq('vowelScale aeolian deg3', vowelScale(60, 'aeolian').notes[2].midi, 63);
+eq('vowelAgility len', vowelAgility(60).notes.length, 9);
+eq('vibrato wide green', vibratoHold(60).greenCents, 55);
 
 // scoring
 const sc = new Scorer(2);

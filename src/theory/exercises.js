@@ -10,6 +10,39 @@ import { degreesToSemitones } from './modes.js';
 
 const beat = (midi, beats = 1) => ({ midi, beats });
 
+/** Гласные на одной ноте — унификация: держим высоту, меняем только гласную. */
+export function vowelHold(rootMidi) {
+  return {
+    id: 'vhold', name: 'Гласные на одной ноте', syllable: 'И-Э-А-О-У', tempo: 76, kind: 'vowel', root: rootMidi, grooveStyle: 'soft',
+    greenCents: 25,
+    desc: 'Унификация гласных: высота одна, меняется только гласная — позиция остаётся единой.',
+    how: 'Пой ровно на ОДНОЙ ноте, меняя «И-Э-А-О-У». Не «прыгай» голосом при смене гласной — рот шире, звук в одной точке.',
+    notes: [1, 1, 1, 1, 1].map(() => beat(rootMidi, 1)),
+  };
+}
+
+/** Гласные по гамме — пять ступеней вверх, на каждой своя гласная. Ладозависима. */
+export function vowelScale(rootMidi, modeKey = 'ionian') {
+  const offs = degreesToSemitones([1, 2, 3, 4, 5], modeKey);
+  return {
+    id: 'vscale', name: 'Гласные по гамме', syllable: 'И-Э-А-О-У', tempo: 96, kind: 'scale', root: rootMidi, modeKey, grooveStyle: 'pop',
+    desc: 'Точность высоты при смене гласной: каждая ступень — своя гласная.',
+    how: 'Поднимайся по ступеням, на каждой — новая гласная «И-Э-А-О-У». Попадай точно и держи единую позицию.',
+    notes: offs.map((o) => beat(rootMidi + o, 1)),
+  };
+}
+
+/** Гласные с возвратом — гибкость: тоника чередуется со ступенями (быстро). Ладозависима. */
+export function vowelAgility(rootMidi, modeKey = 'ionian') {
+  const offs = degreesToSemitones([1, 2, 1, 3, 1, 4, 1, 5, 1], modeKey);
+  return {
+    id: 'vagil', name: 'Гласные с возвратом', syllable: 'И-Э-И-А-И-О-И-У-И', tempo: 130, kind: 'agility', root: rootMidi, modeKey, grooveStyle: 'funk',
+    desc: 'Гибкость и точность: быстрый возврат к тонике между ступенями, на разные гласные.',
+    how: 'Лёгко и быстро: «И» — ступень — «И» — выше ступень. Не зажимайся, гласные чёткие.',
+    notes: offs.map((o) => beat(rootMidi + o, 0.5)),
+  };
+}
+
 /** Цепочка гласных (трихорд) I-II-III-II-I — выравнивание гласных (по ТЗ Игоря). Ладозависима. */
 export function vowelChain(rootMidi, modeKey = 'ionian') {
   const offs = degreesToSemitones([1, 2, 3, 2, 1], modeKey);

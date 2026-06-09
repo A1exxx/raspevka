@@ -1,12 +1,13 @@
 // curriculum.js — учебная программа: блоки → упражнения → экзамен с чек-поинтом.
 // v1 на наших собственных распевках (копирайт-чисто). Ноты музыканта добавляются позже
 // как новые exId без изменения структуры. Блок открывается, когда сдан экзамен предыдущего.
-import { hum3, lipTrill, sustain, fiveNoteScale, agilityRun, octaveJump, vowelChain, jumpToFifth, ladVocalise, vibratoHold } from './exercises.js';
+import { hum3, lipTrill, sustain, fiveNoteScale, agilityRun, octaveJump, vowelChain, jumpToFifth, ladVocalise, vibratoHold, vowelHold, vowelScale, vowelAgility } from './exercises.js';
 
 // Реестр «id упражнения → конструктор». id совпадает с тем, что возвращает make().
 export const EX_MAKERS = {
   hum3, trill: lipTrill, sustain, scale5: fiveNoteScale, agility: agilityRun,
   jump: octaveJump, vowels: vowelChain, jump5: jumpToFifth, lad: ladVocalise, vibrato: vibratoHold,
+  vhold: vowelHold, vscale: vowelScale, vagil: vowelAgility,
 };
 
 // Блоки программы. items — шаги по порядку (дыхание + распевки); exam — ключевое
@@ -22,8 +23,8 @@ export const BLOCKS = [
   },
   {
     id: 'b2', title: 'Ясность гласных', sub: 'Выравнивание гласных и точность',
-    items: [ex('vowels', 'Цепочка гласных'), ex('scale5', 'Гамма «Ма-Мэ»')],
-    exam: { exId: 'scale5', pass: 0.6 },
+    items: [ex('vhold', 'Гласные на одной ноте'), ex('vscale', 'Гласные по гамме'), ex('vagil', 'Гласные с возвратом'), ex('vowels', 'Цепочка гласных')],
+    exam: { exId: 'vscale', pass: 0.6 },
   },
   {
     id: 'b3', title: 'Интонация и гибкость', sub: 'Гаммы, беглость, скачки',

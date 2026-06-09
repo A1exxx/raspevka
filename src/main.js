@@ -3,7 +3,7 @@ import { MicEngine } from './audio/mic.js';
 import { PitchTracker } from './audio/pitch-detector.js';
 import { hzToNoteInfo, hzToY, centsZone, midiToHz } from './theory/note-map.js';
 import { renderGame } from './screens/game.js';
-import { fiveNoteScale, agilityRun, sustain, octaveJump, hum3, lipTrill, transposePlan, vowelChain, jumpToFifth, ladVocalise, vibratoHold } from './theory/exercises.js';
+import { fiveNoteScale, agilityRun, sustain, octaveJump, hum3, lipTrill, transposePlan, vowelChain, jumpToFifth, ladVocalise, vibratoHold, vowelHold, vowelScale, vowelAgility } from './theory/exercises.js';
 import { renderSession } from './screens/session.js';
 import { renderVoice } from './screens/voice.js';
 import { renderDashboard } from './screens/progress-dash.js';
@@ -44,6 +44,9 @@ const EXERCISES = [
   { label: 'Беглость «Ма»', sub: 'быстрые ноты — как в рекламе', ic: 'bolt', make: (r) => agilityRun(r, progress.getModeKey()) },
   { label: 'Октавный скачок', sub: 'прыжок на октаву и назад', ic: 'arrows', make: (r) => octaveJump(r) },
   { label: 'Цепочка гласных', sub: 'Ми-Ме-Ма · выравнивание', ic: 'lips', make: (r) => vowelChain(r, progress.getModeKey()) },
+  { label: 'Гласные на одной ноте', sub: 'И-Э-А-О-У · позиция', ic: 'lips', make: (r) => vowelHold(r) },
+  { label: 'Гласные по гамме', sub: 'И-Э-А-О-У вверх', ic: 'stairs', make: (r) => vowelScale(r, progress.getModeKey()) },
+  { label: 'Гласные с возвратом', sub: 'гибкость на гласных', ic: 'bolt', make: (r) => vowelAgility(r, progress.getModeKey()) },
   { label: 'Скачок к V ступени', sub: 'Ям · атака интервала', ic: 'arrows', make: (r) => jumpToFifth(r, progress.getModeKey()) },
   { label: 'Ладовая «ЯМ»', sub: 'гамма лада вверх-вниз', ic: 'stairs', make: (r) => ladVocalise(r, progress.getModeKey()) },
   { label: 'Вибрато', sub: 'ровная волна голосом', ic: 'wave', make: (r) => vibratoHold(r) },
