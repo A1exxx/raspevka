@@ -1,5 +1,5 @@
 import { hzToNoteInfo, midiToHz, centsOff, centsZone, hzToY, noteToHz } from '../src/theory/note-map.js';
-import { fiveNoteScale, agilityRun, sustain, octaveJump, referenceFreqs, hum3, lipTrill, transposePlan, vowelHold, vowelScale, vowelAgility, vibratoHold } from '../src/theory/exercises.js';
+import { fiveNoteScale, agilityRun, sustain, octaveJump, referenceFreqs, hum3, lipTrill, transposePlan, vowelHold, vowelScale, vowelAgility, vowelClimb, vibratoHold } from '../src/theory/exercises.js';
 import { Scorer } from '../src/game/scoring.js';
 import { classifyVoice, getVoiceType, VOICE_TYPES } from '../src/theory/voice-types.js';
 import { RHYTHM } from '../src/screens/rhythm.js';
@@ -47,7 +47,10 @@ eq('vowelHold one pitch', new Set(vowelHold(60).notes.map((n) => n.midi)).size, 
 eq('vowelHold 5 notes', vowelHold(60).notes.length, 5);
 eq('vowelScale ionian top', vowelScale(60, 'ionian').notes[4].midi, 67);
 eq('vowelScale aeolian deg3', vowelScale(60, 'aeolian').notes[2].midi, 63);
-eq('vowelAgility len', vowelAgility(60).notes.length, 9);
+eq('vowelAgility len (PDF #5)', vowelAgility(60).notes.length, 13);
+eq('vowelAgility alternates tonic', vowelAgility(60).notes[2].midi, 60);
+eq('vowelClimb len', vowelClimb(60).notes.length, 6);
+eq('vowelClimb holds top', vowelClimb(60).notes[5].beats, 2);
 eq('vibrato wide green', vibratoHold(60).greenCents, 55);
 
 // scoring

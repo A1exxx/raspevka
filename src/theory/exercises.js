@@ -32,14 +32,27 @@ export function vowelScale(rootMidi, modeKey = 'ionian') {
   };
 }
 
-/** Гласные с возвратом — гибкость: тоника чередуется со ступенями (быстро). Ладозависима. */
+/** Гласные с возвратом — гибкость: тоника чередуется со ступенями, затем гамма вверх
+ *  (рисунок из урока «vowel placement, pitch precision and vocal agility»). Ладозависима. */
 export function vowelAgility(rootMidi, modeKey = 'ionian') {
-  const offs = degreesToSemitones([1, 2, 1, 3, 1, 4, 1, 5, 1], modeKey);
+  const offs = degreesToSemitones([1, 2, 1, 3, 1, 4, 1, 5, 1, 2, 3, 4, 5], modeKey);
   return {
-    id: 'vagil', name: 'Гласные с возвратом', syllable: 'И-Э-И-А-И-О-И-У-И', tempo: 130, kind: 'agility', root: rootMidi, modeKey, grooveStyle: 'funk',
-    desc: 'Гибкость и точность: быстрый возврат к тонике между ступенями, на разные гласные.',
-    how: 'Лёгко и быстро: «И» — ступень — «И» — выше ступень. Не зажимайся, гласные чёткие.',
+    id: 'vagil', name: 'Гласные с возвратом', syllable: 'И-Э-И-А-И-О-И-У-И-Э-А-О-У', tempo: 120, kind: 'agility', root: rootMidi, modeKey, grooveStyle: 'funk',
+    desc: 'Гибкость и точность: быстрый возврат к тонике между ступенями, затем гамма вверх.',
+    how: 'Лёгко и быстро: «И» — ступень — «И» — выше ступень, в конце ровная гамма вверх. Не зажимайся, гласные чёткие.',
     notes: offs.map((o) => beat(rootMidi + o, 0.5)),
+  };
+}
+
+/** Гласные ввысь — гибкость и опора: гласные ведут голос вверх к удержанной вершине
+ *  (рисунок из «vowel flexibility and placement»). Ладозависима. */
+export function vowelClimb(rootMidi, modeKey = 'ionian') {
+  const offs = degreesToSemitones([1, 2, 3, 4, 5, 5], modeKey);
+  return {
+    id: 'vclimb', name: 'Гласные ввысь', syllable: 'И-Э-А-О-У', tempo: 88, kind: 'scale', root: rootMidi, modeKey, grooveStyle: 'soft',
+    desc: 'Гибкость и опора при подъёме: гласные ведут голос вверх к удержанной вершине.',
+    how: 'Веди «И-Э-А-О-У» вверх плавными бросками, на верхней «У» задержись и держи ровно. Не дави — поддержи дыханием.',
+    notes: offs.map((o, i) => beat(rootMidi + o, i >= 5 ? 2 : 1)),
   };
 }
 
