@@ -1,13 +1,13 @@
 // curriculum.js — учебная программа: блоки → упражнения → экзамен с чек-поинтом.
 // v1 на наших собственных распевках (копирайт-чисто). Ноты музыканта добавляются позже
 // как новые exId без изменения структуры. Блок открывается, когда сдан экзамен предыдущего.
-import { hum3, lipTrill, sustain, fiveNoteScale, agilityRun, octaveJump, vowelChain, jumpToFifth, ladVocalise, vibratoHold, vowelHold, vowelScale, vowelAgility, vowelClimb } from './exercises.js';
+import { hum3, lipTrill, sustain, fiveNoteScale, agilityRun, octaveJump, vowelChain, jumpToFifth, ladVocalise, vibratoHold, vowelHold, vowelScale, vowelAgility, vowelClimb, jamesCharles } from './exercises.js';
 
 // Реестр «id упражнения → конструктор». id совпадает с тем, что возвращает make().
 export const EX_MAKERS = {
   hum3, trill: lipTrill, sustain, scale5: fiveNoteScale, agility: agilityRun,
   jump: octaveJump, vowels: vowelChain, jump5: jumpToFifth, lad: ladVocalise, vibrato: vibratoHold,
-  vhold: vowelHold, vscale: vowelScale, vagil: vowelAgility, vclimb: vowelClimb,
+  vhold: vowelHold, vscale: vowelScale, vagil: vowelAgility, vclimb: vowelClimb, jcharles: jamesCharles,
 };
 
 // Блоки программы. items — шаги по порядку (дыхание + распевки); exam — ключевое
@@ -23,7 +23,7 @@ export const BLOCKS = [
   },
   {
     id: 'b2', title: 'Ясность гласных', sub: 'Выравнивание гласных и точность',
-    items: [ex('vhold', 'Гласные на одной ноте'), ex('vscale', 'Гласные по гамме'), ex('vclimb', 'Гласные ввысь'), ex('vagil', 'Гласные с возвратом')],
+    items: [ex('vhold', 'Calm Down Vowels'), ex('vscale', 'Disco Vowels'), ex('jcharles', 'James Charles Warm Up'), ex('vclimb', 'High Five'), ex('vagil', 'No Bubble Gum')],
     exam: { exId: 'vscale', pass: 0.6 },
   },
   {

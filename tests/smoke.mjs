@@ -1,5 +1,5 @@
 import { hzToNoteInfo, midiToHz, centsOff, centsZone, hzToY, noteToHz } from '../src/theory/note-map.js';
-import { fiveNoteScale, agilityRun, sustain, octaveJump, referenceFreqs, hum3, lipTrill, transposePlan, vowelHold, vowelScale, vowelAgility, vowelClimb, vibratoHold } from '../src/theory/exercises.js';
+import { fiveNoteScale, agilityRun, sustain, octaveJump, referenceFreqs, hum3, lipTrill, transposePlan, vowelHold, vowelScale, vowelAgility, vowelClimb, jamesCharles, vibratoHold } from '../src/theory/exercises.js';
 import { Scorer } from '../src/game/scoring.js';
 import { classifyVoice, getVoiceType, VOICE_TYPES } from '../src/theory/voice-types.js';
 import { RHYTHM } from '../src/screens/rhythm.js';
@@ -51,6 +51,8 @@ eq('vowelAgility len (PDF #5)', vowelAgility(60).notes.length, 13);
 eq('vowelAgility alternates tonic', vowelAgility(60).notes[2].midi, 60);
 eq('vowelClimb len', vowelClimb(60).notes.length, 6);
 eq('vowelClimb holds top', vowelClimb(60).notes[5].beats, 2);
+eq('jamesCharles len', jamesCharles(60).notes.length, 10);
+eq('jamesCharles peak', jamesCharles(60, 'ionian').notes[4].midi, 67);
 eq('vibrato wide green', vibratoHold(60).greenCents, 55);
 
 // scoring
