@@ -10,60 +10,61 @@ import { degreesToSemitones } from './modes.js';
 
 const beat = (midi, beats = 1) => ({ midi, beats });
 
-/** Гласные на одной ноте — унификация: держим высоту, меняем только гласную. */
+// === Распевки на гласных из урока L02 (точная транскрипция нот по PDF, не ладозависимы) ===
+// Смещения — полутоны от тоники (первая нота = 0). Движок транспонирует тонику под голос.
+
+/** Calm Down Vowels (L02 #1) — унификация: гласные на E, затем выше на G (полная строка, 4 такта). */
 export function vowelHold(rootMidi) {
+  const offs = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3];
   return {
-    id: 'vhold', name: 'Calm Down Vowels', syllable: 'И-Э-А-О-У', tempo: 76, kind: 'vowel', root: rootMidi, grooveStyle: 'soft',
+    id: 'vhold', name: 'Calm Down Vowels', syllable: 'И-Э-А-О-У', tempo: 78, kind: 'vowel', root: rootMidi, grooveStyle: 'soft',
     greenCents: 25,
-    desc: 'Унификация гласных: высота одна, меняется только гласная — позиция остаётся единой.',
-    how: 'Пой ровно на ОДНОЙ ноте, меняя «И-Э-А-О-У». Не «прыгай» голосом при смене гласной — рот шире, звук в одной точке.',
-    notes: [1, 1, 1, 1, 1].map(() => beat(rootMidi, 1)),
+    desc: 'Унификация гласных: держим позицию, меняем только гласную «И-Э-А-О-У».',
+    how: 'Пой «И-Э-А-О-У» ровно, без «прыжков» голосом при смене гласной. Сначала ниже, потом строка повторяется выше — позиция единая.',
+    notes: offs.map((o, i) => beat(rootMidi + o, i < 10 ? 0.5 : 0.25)),
   };
 }
 
-/** Гласные по гамме — пять ступеней вверх, на каждой своя гласная. Ладозависима. */
-export function vowelScale(rootMidi, modeKey = 'ionian') {
-  const offs = degreesToSemitones([1, 2, 3, 4, 5], modeKey);
+/** Disco Vowels (L02 #2) — точность высоты: на каждой гласной слиг из двух нот. */
+export function vowelScale(rootMidi) {
+  const offs = [0, 1, 5, 7, 8, 7, 5, 1, 7, 5];
   return {
-    id: 'vscale', name: 'Disco Vowels', syllable: 'И-Э-А-О-У', tempo: 96, kind: 'scale', root: rootMidi, modeKey, grooveStyle: 'pop',
-    desc: 'Точность высоты при смене гласной: каждая ступень — своя гласная.',
-    how: 'Поднимайся по ступеням, на каждой — новая гласная «И-Э-А-О-У». Попадай точно и держи единую позицию.',
-    notes: offs.map((o) => beat(rootMidi + o, 1)),
+    id: 'vscale', name: 'Disco Vowels', syllable: 'И-Э-А-О-У', tempo: 124, kind: 'scale', root: rootMidi, grooveStyle: 'pop',
+    desc: 'Точность высоты при смене гласной — каждая гласная ведёт по двум нотам.',
+    how: 'Пой «И-Э-А-О-У» легко и точно, попадая в каждую ноту слига. Не зажимайся.',
+    notes: offs.map((o) => beat(rootMidi + o, 0.75)),
   };
 }
 
-/** Гласные с возвратом — гибкость: тоника чередуется со ступенями, затем гамма вверх
- *  (рисунок из урока «vowel placement, pitch precision and vocal agility»). Ладозависима. */
-export function vowelAgility(rootMidi, modeKey = 'ionian') {
-  const offs = degreesToSemitones([1, 2, 1, 3, 1, 4, 1, 5, 1, 2, 3, 4, 5], modeKey);
+/** No Bubble Gum (L02 #5) — беглость: зигзаг-гамма вверх (точная транскрипция). */
+export function vowelAgility(rootMidi) {
+  const offs = [0, 3, 1, 5, 3, 7, 5, 8, 7, 3, 5, 1, 0];
   return {
-    id: 'vagil', name: 'No Bubble Gum', syllable: 'И-Э-И-А-И-О-И-У-И-Э-А-О-У', tempo: 120, kind: 'agility', root: rootMidi, modeKey, grooveStyle: 'funk',
-    desc: 'Гибкость и точность: быстрый возврат к тонике между ступенями, затем гамма вверх.',
-    how: 'Лёгко и быстро: «И» — ступень — «И» — выше ступень, в конце ровная гамма вверх. Не зажимайся, гласные чёткие.',
+    id: 'vagil', name: 'No Bubble Gum', syllable: 'И-Э-И-А-И-О-И-У', tempo: 100, kind: 'agility', root: rootMidi, grooveStyle: 'funk',
+    desc: 'Беглость и точность: зигзаг по ступеням вверх и обратно.',
+    how: 'Лёгко и быстро веди голос по нотам зигзагом вверх, не зажимаясь. Гласные чёткие.',
     notes: offs.map((o) => beat(rootMidi + o, 0.5)),
   };
 }
 
-/** Гласные ввысь — гибкость и опора: гласные ведут голос вверх к удержанной вершине
- *  (рисунок из «vowel flexibility and placement»). Ладозависима. */
-export function vowelClimb(rootMidi, modeKey = 'ionian') {
-  const offs = degreesToSemitones([1, 2, 3, 4, 5, 5], modeKey);
+/** High Five (L02 #4) — гибкость: скачки на квинту (E↔B) ×5, затем гамма вверх. */
+export function vowelClimb(rootMidi) {
+  const offs = [0, 7, 0, 7, 0, 7, 0, 7, 0, 7, 0, 1, 3, 5, 7];
   return {
-    id: 'vclimb', name: 'High Five', syllable: 'И-Э-А-О-У', tempo: 88, kind: 'scale', root: rootMidi, modeKey, grooveStyle: 'soft',
-    desc: 'Гибкость и опора при подъёме: гласные ведут голос вверх к удержанной вершине.',
-    how: 'Веди «И-Э-А-О-У» вверх плавными бросками, на верхней «У» задержись и держи ровно. Не дави — поддержи дыханием.',
-    notes: offs.map((o, i) => beat(rootMidi + o, i >= 5 ? 2 : 1)),
+    id: 'vclimb', name: 'High Five', syllable: 'И-Э-А-О-У', tempo: 82, kind: 'jump', root: rootMidi, grooveStyle: 'soft',
+    desc: 'Гибкость и точность интервала: чистые скачки на квинту, затем ровная гамма.',
+    how: 'Чисто бери скачок на квинту вверх и обратно (без зажима), в конце — ровная гамма вверх. Опора дыханием.',
+    notes: offs.map((o) => beat(rootMidi + o, 0.5)),
   };
 }
 
-/** James Charles Warm Up — гибкость: гласные вверх к вершине, затем «Ми-Ме-Ма-Мо-Му» вниз
- *  (рисунок из урока «vowel placement and flexibility»). Ладозависим. */
-export function jamesCharles(rootMidi, modeKey = 'ionian') {
-  const offs = degreesToSemitones([1, 2, 3, 4, 5, 5, 4, 3, 2, 1], modeKey);
+/** James Charles Warm Up (L02 #3) — гибкость: (И-Э-А)×3, затем спуск (точная транскрипция). */
+export function jamesCharles(rootMidi) {
+  const offs = [0, 1, 5, 0, 1, 5, 0, 1, 5, 8, 8, 7, 5, 1];
   return {
-    id: 'jcharles', name: 'James Charles Warm Up', syllable: 'И-Э-А-О-У · Ми-Ме-Ма-Мо-Му', tempo: 128, kind: 'agility', root: rootMidi, modeKey, grooveStyle: 'swing',
-    desc: 'Гибкость и позиция: гласные ведут вверх, затем «Ми-Ме-Ма-Мо-Му» спускают обратно.',
-    how: 'Вверх на гласных «И-Э-А-О-У» к вершине, затем мягко вниз на «Ми-Ме-Ма-Мо-Му». Лёгко, без зажима.',
+    id: 'jcharles', name: 'James Charles Warm Up', syllable: 'И-Э-А-О-У', tempo: 130, kind: 'agility', root: rootMidi, grooveStyle: 'swing',
+    desc: 'Гибкость и позиция гласных: повторяющийся мотив, затем плавный спуск.',
+    how: 'Лёгко веди гласные по мотиву, в конце мягко спустись. Без зажима, позиция единая.',
     notes: offs.map((o) => beat(rootMidi + o, 0.5)),
   };
 }
@@ -79,9 +80,10 @@ export function vowelChain(rootMidi, modeKey = 'ionian') {
   };
 }
 
-/** Скачок к V ступени I-I-III-II-I-I-V-I-I-III-II-I — точная атака интервала (по ТЗ Игоря). Ладозависим. */
+/** Скачок к V ступени (ВНИЗ) I-I-III-II-I-I-V(низ)-I-I-III-II-I — атака интервала вниз (по правке музыканта). Ладозависим. */
 export function jumpToFifth(rootMidi, modeKey = 'ionian') {
-  const offs = degreesToSemitones([1, 1, 3, 2, 1, 1, 5, 1, 1, 3, 2, 1], modeKey);
+  // -2 ступень = V снизу (нижняя квинта/доминанта под тоникой) — скачок ВНИЗ, не вверх
+  const offs = degreesToSemitones([1, 1, 3, 2, 1, 1, -2, 1, 1, 3, 2, 1], modeKey);
   return {
     id: 'jump5', name: 'Скачок к V ступени', syllable: 'Ям', tempo: 100, kind: 'jump', root: rootMidi, modeKey, grooveStyle: 'latin',
     desc: 'Точная атака интервалов и контроль регистра при скачках.',

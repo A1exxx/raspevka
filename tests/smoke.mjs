@@ -1,5 +1,5 @@
 import { hzToNoteInfo, midiToHz, centsOff, centsZone, hzToY, noteToHz } from '../src/theory/note-map.js';
-import { fiveNoteScale, agilityRun, sustain, octaveJump, referenceFreqs, hum3, lipTrill, transposePlan, vowelHold, vowelScale, vowelAgility, vowelClimb, jamesCharles, vibratoHold } from '../src/theory/exercises.js';
+import { fiveNoteScale, agilityRun, sustain, octaveJump, referenceFreqs, hum3, lipTrill, transposePlan, vowelHold, vowelScale, vowelAgility, vowelClimb, jamesCharles, jumpToFifth, vibratoHold } from '../src/theory/exercises.js';
 import { Scorer } from '../src/game/scoring.js';
 import { classifyVoice, getVoiceType, VOICE_TYPES } from '../src/theory/voice-types.js';
 import { RHYTHM } from '../src/screens/rhythm.js';
@@ -43,16 +43,18 @@ eq('scale5 aeolian deg3', fiveNoteScale(60, 'aeolian').notes[2].midi, 63);
 eq('hum3 aeolian deg3', hum3(60, 'aeolian').notes[2].midi, 63);
 eq('agility aeolian deg6', agilityRun(60, 'aeolian').notes[5].midi, 68);
 // гласные-распевки (из PDF-техники, нейтральные)
-eq('vowelHold one pitch', new Set(vowelHold(60).notes.map((n) => n.midi)).size, 1);
-eq('vowelHold 5 notes', vowelHold(60).notes.length, 5);
-eq('vowelScale ionian top', vowelScale(60, 'ionian').notes[4].midi, 67);
-eq('vowelScale aeolian deg3', vowelScale(60, 'aeolian').notes[2].midi, 63);
-eq('vowelAgility len (PDF #5)', vowelAgility(60).notes.length, 13);
-eq('vowelAgility alternates tonic', vowelAgility(60).notes[2].midi, 60);
-eq('vowelClimb len', vowelClimb(60).notes.length, 6);
-eq('vowelClimb holds top', vowelClimb(60).notes[5].beats, 2);
-eq('jamesCharles len', jamesCharles(60).notes.length, 10);
-eq('jamesCharles peak', jamesCharles(60, 'ionian').notes[4].midi, 67);
+// гласные-распевки — точная транскрипция L02 (фикс. смещения от тоники)
+eq('vowelHold full 20 notes', vowelHold(60).notes.length, 20);
+eq('vowelHold rises E->G', vowelHold(60).notes[10].midi, 63);
+eq('vowelScale Disco len', vowelScale(60).notes.length, 10);
+eq('vowelScale Disco peak C', vowelScale(60).notes[4].midi, 68);
+eq('vowelAgility NoBubble len', vowelAgility(60).notes.length, 13);
+eq('vowelAgility 2nd note +3', vowelAgility(60).notes[1].midi, 63);
+eq('vowelClimb HighFive len', vowelClimb(60).notes.length, 15);
+eq('vowelClimb fifth jump', vowelClimb(60).notes[1].midi, 67);
+eq('jamesCharles len', jamesCharles(60).notes.length, 14);
+eq('jamesCharles A note', jamesCharles(60).notes[2].midi, 65);
+eq('jumpToFifth jumps DOWN', jumpToFifth(60, 'ionian').notes[6].midi, 55);
 eq('vibrato wide green', vibratoHold(60).greenCents, 55);
 
 // scoring
