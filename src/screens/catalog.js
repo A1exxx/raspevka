@@ -11,6 +11,7 @@ function teacherCTA() {
 }
 
 export function renderCatalog(app, { blocks, examsPassed, onExit, onOpenBlock, onSchool }) {
+  const done = blocks.filter((b) => examsPassed.includes(b.id)).length;
   const cards = blocks.map((b, i) => {
     const passed = examsPassed.includes(b.id);
     const unlocked = blockUnlocked(i, examsPassed);
@@ -27,6 +28,7 @@ export function renderCatalog(app, { blocks, examsPassed, onExit, onOpenBlock, o
     <div class="screen catalog">
       <div class="game-top"><button class="icon-btn" id="back">‹ Меню</button></div>
       <div class="brand"><h1>Программа обучения</h1><p>Блоки открываются по мере прохождения. Каждый блок завершается экзаменом.</p></div>
+      <div class="prog-wrap"><div class="prog-bar"><i style="width:${Math.round((done / blocks.length) * 100)}%"></i></div><span class="prog-txt">${done} / ${blocks.length} блоков пройдено</span></div>
       <div class="block-list">${cards}</div>
       ${teacherCTA()}
       <p class="hint">Это самостоятельная практика. Полноценный разбор и постановку голоса даёт педагог.</p>

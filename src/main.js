@@ -3,7 +3,7 @@ import { MicEngine } from './audio/mic.js';
 import { PitchTracker } from './audio/pitch-detector.js';
 import { hzToNoteInfo, hzToY, centsZone, midiToHz } from './theory/note-map.js';
 import { renderGame } from './screens/game.js';
-import { fiveNoteScale, agilityRun, sustain, octaveJump, hum3, lipTrill, transposePlan, vowelChain, jumpToFifth, ladVocalise } from './theory/exercises.js';
+import { fiveNoteScale, agilityRun, sustain, octaveJump, hum3, lipTrill, transposePlan, vowelChain, jumpToFifth, ladVocalise, vibratoHold } from './theory/exercises.js';
 import { renderSession } from './screens/session.js';
 import { renderVoice } from './screens/voice.js';
 import { renderDashboard } from './screens/progress-dash.js';
@@ -17,6 +17,7 @@ import { renderPath } from './screens/path.js';
 import { SONGS, songMidis } from './theory/songs.js';
 import { renderModesPicker } from './screens/modes-picker.js';
 import { renderCatalog, renderBlockDetail } from './screens/catalog.js';
+import { renderRecorder } from './screens/recorder.js';
 import { BLOCKS, EX_MAKERS } from './theory/curriculum.js';
 import { renderSettings } from './screens/settings.js';
 import { renderCalibrate } from './screens/calibrate.js';
@@ -45,6 +46,7 @@ const EXERCISES = [
   { label: 'Цепочка гласных', sub: 'Ми-Ме-Ма · выравнивание', ic: 'lips', make: (r) => vowelChain(r, progress.getModeKey()) },
   { label: 'Скачок к V ступени', sub: 'Ям · атака интервала', ic: 'arrows', make: (r) => jumpToFifth(r, progress.getModeKey()) },
   { label: 'Ладовая «ЯМ»', sub: 'гамма лада вверх-вниз', ic: 'stairs', make: (r) => ladVocalise(r, progress.getModeKey()) },
+  { label: 'Вибрато', sub: 'ровная волна голосом', ic: 'wave', make: (r) => vibratoHold(r) },
 ];
 
 // Корень упражнений из центра типа голоса (иначе C4).
@@ -288,9 +290,10 @@ function renderMenu() {
       <section class="home-sec">
         <div class="sec-title">Курс и развитие</div>
         <div class="thin-list">
-          <button class="thin-item" data-path><span>Программа обучения</span><span class="thin-sub">блоки + экзамены</span></button>
+          <button class="thin-item" data-path><span>Программа обучения</span><span class="thin-sub">${progress.getExamsPassed().length} / ${BLOCKS.length} блоков</span></button>
           <button class="thin-item" data-ear><span>Спой за мной</span><span class="thin-sub">тренировка слуха</span></button>
           <button class="thin-item" data-theory><span>Теория голоса</span><span class="thin-sub">карточки</span></button>
+          <button class="thin-item" data-record><span>Запись голоса</span><span class="thin-sub">послушай себя</span></button>
           <button class="thin-item" data-modes><span>Лад распевок</span><span class="thin-sub">${modeName}</span></button>
         </div>
       </section>
@@ -347,6 +350,8 @@ function renderMenu() {
   if (earBtn) earBtn.addEventListener('click', () => enterMic(() => { applyTrackerRange(); renderEar(app, mic, tracker, { onExit: renderMenu, root: voiceRoot() }); }));
   const theoryBtn = app.querySelector('[data-theory]');
   if (theoryBtn) theoryBtn.addEventListener('click', () => renderTheory(app, { onExit: renderMenu }));
+  const recBtn = app.querySelector('[data-record]');
+  if (recBtn) recBtn.addEventListener('click', () => enterMic(() => renderRecorder(app, mic, { onExit: renderMenu })));
   const modesBtn = app.querySelector('[data-modes]');
   if (modesBtn) modesBtn.addEventListener('click', renderModesScreen);
   const setBtn = app.querySelector('[data-settings]');

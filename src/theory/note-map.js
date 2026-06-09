@@ -34,10 +34,11 @@ export function hzToY(hz, height, minHz = 65.41, maxHz = 1046.5) {
   return height - t * height;
 }
 
-/** Зона попадания по абсолютному отклонению в центах. */
-export function centsZone(absCents) {
-  if (absCents <= 20) return 'green';
-  if (absCents <= 40) return 'yellow';
+/** Зона попадания по абсолютному отклонению в центах. Пороги настраиваемы
+ *  (для вибрато зелёную зону расширяем — колебание не должно штрафоваться). */
+export function centsZone(absCents, green = 20, yellow = 40) {
+  if (absCents <= green) return 'green';
+  if (absCents <= yellow) return 'yellow';
   return 'red';
 }
 

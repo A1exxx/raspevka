@@ -11,6 +11,9 @@ export class NoteHighway {
     this.ctx = canvas.getContext('2d');
     this.ex = exercise;
     this.secPerBeat = 60 / (exercise.tempo || 90);
+    // Пороги зон (центы). Для вибрато расширяем зелёную — колебание не штрафуем.
+    this.greenCents = exercise.greenCents || 20;
+    this.yellowCents = exercise.yellowCents || 40;
     this.pxPerSec = opts.pxPerSec || 150;
     this.hitFrac = opts.hitFrac ?? 0.26; // позиция линии попадания (доля ширины)
     this.leadIn = opts.leadIn ?? 2.2; // сек до первой ноты
@@ -60,7 +63,7 @@ export class NoteHighway {
     if (!active) return { index: -1, zone: null, voiced: false };
     if (!voiced || !sungHz) return { index: active.index, zone: 'red', voiced: false };
     const cents = Math.abs(centsOff(sungHz, active.seg.hz));
-    return { index: active.index, zone: centsZone(cents), voiced: true };
+    return { index: active.index, zone: centsZone(cents, this.greenCents, this.yellowCents), voiced: true };
   }
 
   draw(now, sungHz, voiced) {
@@ -122,7 +125,7 @@ export class NoteHighway {
     if (voiced && sungHz) {
       curY = this.yFor(sungHz, h);
       if (active) {
-        const z = centsZone(Math.abs(centsOff(sungHz, active.seg.hz)));
+        const z = centsZone(Math.abs(centsOff(sungHz, active.seg.hz)), this.greenCents, this.yellowCents);
         color = z === 'green' ? '#2fab84' : z === 'yellow' ? '#e0a64a' : '#e0544b';
       } else {
         color = '#0e8d7f';

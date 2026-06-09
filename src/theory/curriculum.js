@@ -1,12 +1,12 @@
 // curriculum.js — учебная программа: блоки → упражнения → экзамен с чек-поинтом.
 // v1 на наших собственных распевках (копирайт-чисто). Ноты музыканта добавляются позже
 // как новые exId без изменения структуры. Блок открывается, когда сдан экзамен предыдущего.
-import { hum3, lipTrill, sustain, fiveNoteScale, agilityRun, octaveJump, vowelChain, jumpToFifth, ladVocalise } from './exercises.js';
+import { hum3, lipTrill, sustain, fiveNoteScale, agilityRun, octaveJump, vowelChain, jumpToFifth, ladVocalise, vibratoHold } from './exercises.js';
 
 // Реестр «id упражнения → конструктор». id совпадает с тем, что возвращает make().
 export const EX_MAKERS = {
   hum3, trill: lipTrill, sustain, scale5: fiveNoteScale, agility: agilityRun,
-  jump: octaveJump, vowels: vowelChain, jump5: jumpToFifth, lad: ladVocalise,
+  jump: octaveJump, vowels: vowelChain, jump5: jumpToFifth, lad: ladVocalise, vibrato: vibratoHold,
 };
 
 // Блоки программы. items — шаги по порядку (дыхание + распевки); exam — ключевое
@@ -34,6 +34,11 @@ export const BLOCKS = [
     id: 'b4', title: 'Лад и музыкальное мышление', sub: 'Лады, атака интервалов',
     items: [ex('lad', 'Ладовая «ЯМ»'), ex('jump5', 'Скачок к V ступени')],
     exam: { exId: 'lad', pass: 0.55 },
+  },
+  {
+    id: 'b5', title: 'Вибрато', sub: 'Ровный звук и мягкое колебание',
+    items: [ex('sustain', 'Удержание ноты'), ex('vibrato', 'Вибрато')],
+    exam: { exId: 'vibrato', pass: 0.5 },
   },
 ];
 
