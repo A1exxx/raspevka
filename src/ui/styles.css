@@ -728,6 +728,45 @@ canvas.fs-canvas { height: 320px; }
   .splash-bar i { width: 100%; }
 }
 
+/* ============ Каталог / учебная программа ============ */
+.block-list { display: flex; flex-direction: column; gap: 10px; }
+.block-card, .block-item {
+  appearance: none; cursor: pointer; text-align: left; font: inherit; color: var(--text);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 14px 16px; display: flex; align-items: center; gap: 13px;
+  transition: border-color .2s, background .2s, transform .12s;
+}
+.block-card:hover:not(:disabled), .block-item:hover { border-color: var(--accent); }
+.block-card:active:not(:disabled), .block-item:active { transform: scale(.99); }
+.block-card.locked { opacity: .55; cursor: not-allowed; }
+.block-card.done { border-color: var(--accent); background: var(--accent-soft); }
+.bc-badge {
+  flex: 0 0 30px; height: 30px; border-radius: 50%; display: inline-flex;
+  align-items: center; justify-content: center; font-weight: 800; font-size: 14px;
+  background: var(--bg); border: 1px solid var(--line); color: var(--text-dim);
+}
+.block-card.done .bc-badge { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.block-card.open .bc-badge { color: var(--accent-2); border-color: var(--accent); }
+.bc-main { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.bc-main b { font-size: 16px; font-weight: 700; }
+.bc-sub { font-size: 13px; color: var(--text-dim); }
+.bc-arrow { color: var(--text-dim); font-size: 20px; }
+.bi-check {
+  flex: 0 0 26px; height: 26px; border-radius: 50%; display: inline-flex;
+  align-items: center; justify-content: center; font-weight: 700; font-size: 13px;
+  background: var(--bg); border: 1px solid var(--line); color: var(--text-dim);
+}
+.bi-check.on { background: var(--green); color: #fff; border-color: var(--green); }
+.bi-name { flex: 1; font-weight: 600; }
+
+.teacher-cta {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--accent-soft); border: 1px solid #c9e8e2; border-radius: 14px;
+  padding: 12px 14px; margin: 6px 0;
+}
+.teacher-cta span { font-size: 14px; color: #28534d; }
+.teacher-cta .btn { flex: 0 0 auto; padding: 8px 14px; }
+
 /* ============ Выбор лада (select) ============ */
 .lad-select {
   width: 100%; appearance: none; -webkit-appearance: none;

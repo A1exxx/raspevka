@@ -67,6 +67,25 @@ export function markLessonDone(id) {
   return p.lessons;
 }
 
+/** Сданные экзамены блоков учебной программы (массив id блоков). */
+export function getExamsPassed() { return load().examsPassed || []; }
+export function markExamPassed(blockId) {
+  const p = load();
+  p.examsPassed = p.examsPassed || [];
+  if (!p.examsPassed.includes(blockId)) { p.examsPassed.push(blockId); save(p); }
+  return p.examsPassed;
+}
+
+/** Пройденные упражнения блоков (для галочек): { [blockId]: [exId,...] }. */
+export function getBlockItems(blockId) { return (load().blockItems || {})[blockId] || []; }
+export function markBlockItem(blockId, exId) {
+  const p = load();
+  p.blockItems = p.blockItems || {};
+  const arr = p.blockItems[blockId] || [];
+  if (!arr.includes(exId)) { arr.push(exId); p.blockItems[blockId] = arr; save(p); }
+  return arr;
+}
+
 /** Выбранный лад (по умолчанию ионийский/мажор). */
 export function getModeKey() { return load().modeKey || 'ionian'; }
 export function setModeKey(k) { const p = load(); p.modeKey = k; save(p); return k; }

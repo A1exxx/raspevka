@@ -16,6 +16,8 @@ import { renderEar } from './screens/ear-training.js';
 import { renderPath } from './screens/path.js';
 import { SONGS, songMidis } from './theory/songs.js';
 import { renderModesPicker } from './screens/modes-picker.js';
+import { renderCatalog, renderBlockDetail } from './screens/catalog.js';
+import { BLOCKS, EX_MAKERS } from './theory/curriculum.js';
 import { renderSettings } from './screens/settings.js';
 import { renderCalibrate } from './screens/calibrate.js';
 import { setOutputVolume } from './audio/reference-tone.js';
@@ -286,7 +288,7 @@ function renderMenu() {
       <section class="home-sec">
         <div class="sec-title">Курс и развитие</div>
         <div class="thin-list">
-          <button class="thin-item" data-path><span>Путь обучения</span><span class="thin-sub">по шагам</span></button>
+          <button class="thin-item" data-path><span>Программа обучения</span><span class="thin-sub">блоки + экзамены</span></button>
           <button class="thin-item" data-ear><span>Спой за мной</span><span class="thin-sub">тренировка слуха</span></button>
           <button class="thin-item" data-theory><span>Теория голоса</span><span class="thin-sub">карточки</span></button>
           <button class="thin-item" data-modes><span>Лад распевок</span><span class="thin-sub">${modeName}</span></button>
@@ -340,7 +342,7 @@ function renderMenu() {
     btn.addEventListener('click', () => renderRhythm(app, mic, voiceRoot(), RHYTHM[btn.dataset.rhythm], { onExit: renderMenu }));
   });
   const pathBtn = app.querySelector('[data-path]');
-  if (pathBtn) pathBtn.addEventListener('click', renderPathScreen);
+  if (pathBtn) pathBtn.addEventListener('click', renderCatalogScreen);
   const earBtn = app.querySelector('[data-ear]');
   if (earBtn) earBtn.addEventListener('click', () => enterMic(() => { applyTrackerRange(); renderEar(app, mic, tracker, { onExit: renderMenu, root: voiceRoot() }); }));
   const theoryBtn = app.querySelector('[data-theory]');
@@ -384,6 +386,110 @@ function startSong(i, explain = true) {
 function renderModesScreen() {
   stopRaf();
   renderModesPicker(app, { onExit: renderMenu });
+}
+
+// ---------- Учебная программа: каталог → блок → упражнения / экзамен ----------
+function renderCatalogScreen() {
+  stopRaf();
+  renderCatalog(app, {
+    blocks: BLOCKS,
+    examsPassed: progress.getExamsPassed(),
+    onExit: renderMenu,
+    onOpenBlock: openBlock,
+    onSchool: renderSchoolInfo,
+  });
+}
+
+function openBlock(index) {
+  stopRaf();
+  const block = BLOCKS[index];
+  renderBlockDetail(app, {
+    block, index,
+    examsPassed: progress.getExamsPassed(),
+    doneItems: progress.getBlockItems(block.id),
+    onExit: renderCatalogScreen,
+    onRunItem: runBlockItem,
+    onExam: runExam,
+    onSchool: renderSchoolInfo,
+  });
+}
+
+function runBlockItem(block, k) {
+  const exId = block.items[k];
+  enterMic(() => {
+    applyTrackerRange();
+    const ex = EX_MAKERS[exId](voiceRoot(), progress.getModeKey());
+    const r = voiceRange();
+    const reps = transposePlan(ex, r.low, r.high, 3);
+    renderGame(app, mic, tracker, ex, {
+      explain: true, reps,
+      rebuild: () => EX_MAKERS[exId](voiceRoot(), progress.getModeKey()),
+      onResult: (agg) => { if (agg.pct >= 0.5) progress.markBlockItem(block.id, exId); },
+      onExit: () => openBlock(BLOCKS.indexOf(block)),
+      onAgain: () => runBlockItem(block, k),
+    });
+  });
+}
+
+function runExam(block) {
+  enterMic(() => {
+    applyTrackerRange();
+    const ex = EX_MAKERS[block.exam.exId](voiceRoot(), progress.getModeKey());
+    const r = voiceRange();
+    const reps = transposePlan(ex, r.low, r.high, 2);
+    renderGame(app, mic, tracker, ex, {
+      explain: true, reps,
+      rebuild: () => EX_MAKERS[block.exam.exId](voiceRoot(), progress.getModeKey()),
+      onComplete: (agg) => renderExamResult(block, agg), // свой результат-экран экзамена
+      onExit: () => openBlock(BLOCKS.indexOf(block)),
+      onAgain: () => runExam(block),
+    });
+  });
+}
+
+function renderExamResult(block, agg) {
+  stopRaf();
+  const pct = Math.round(agg.pct * 100);
+  const passed = agg.pct >= block.exam.pass;
+  if (passed) progress.markExamPassed(block.id);
+  else if (progress.getEnergy() > 0) progress.addEnergy(-1);
+  const idx = BLOCKS.indexOf(block);
+  const nextUnlocked = passed && idx + 1 < BLOCKS.length;
+  const col = passed ? 'var(--green)' : 'var(--coral)';
+  app.innerHTML = `
+    <div class="screen summary">
+      <div class="verdict" style="color:${col}">${passed ? 'Экзамен сдан!' : 'Пока не сдан'}</div>
+      <div class="big-pct" style="color:${col}">${pct}<span>%</span></div>
+      <p class="hint">${passed
+        ? `Блок «${block.title}» пройден.${nextUnlocked ? ' Открыт следующий блок.' : ''}`
+        : `Нужно ${Math.round(block.exam.pass * 100)}%. Энергия −1 (восстановится со временем). Можно пересдать сразу.`}</p>
+      <div class="teacher-cta"><span>Разобрать ошибки с педагогом — быстрее.</span><button class="btn btn-ghost" id="toSchool">На урок</button></div>
+      <div class="row">
+        <button class="btn btn-ghost" id="toBlock">К блоку</button>
+        <button class="btn btn-primary" id="primary">${passed ? (nextUnlocked ? 'Следующий блок' : 'К программе') : 'Пересдать'}</button>
+      </div>
+    </div>`;
+  document.getElementById('toBlock').addEventListener('click', () => openBlock(idx));
+  document.getElementById('toSchool').addEventListener('click', renderSchoolInfo);
+  document.getElementById('primary').addEventListener('click', () => {
+    if (!passed) runExam(block);
+    else if (nextUnlocked) openBlock(idx + 1);
+    else renderCatalogScreen();
+  });
+}
+
+function renderSchoolInfo() {
+  stopRaf();
+  app.innerHTML = `
+    <div class="screen">
+      <div class="game-top"><button class="icon-btn" id="back">‹ Назад</button></div>
+      <div class="brand"><h1>Школа «Прояви»</h1><p>Живые уроки с педагогом — глубже и быстрее, чем в одиночку.</p></div>
+      <div class="card">
+        <p class="how">Приложение даёт ежедневную практику и самоконтроль. Педагог ставит голос, слышит нюансы и ведёт по программе под твой конкретный голос.</p>
+        <p class="hint" style="margin-top:12px">Запись на уроки появится здесь. Пока — практикуйся в приложении.</p>
+      </div>
+    </div>`;
+  document.getElementById('back').addEventListener('click', renderCatalogScreen);
 }
 
 function renderSettingsScreen() {
