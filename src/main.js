@@ -19,6 +19,7 @@ import { renderModesPicker } from './screens/modes-picker.js';
 import { renderCatalog, renderBlockDetail } from './screens/catalog.js';
 import { renderRecorder } from './screens/recorder.js';
 import { renderBackingSong } from './screens/backing-song.js';
+import { renderLeadForm } from './screens/lead-form.js';
 import { BLOCKS, EX_MAKERS } from './theory/curriculum.js';
 import { renderSettings } from './screens/settings.js';
 import { renderCalibrate } from './screens/calibrate.js';
@@ -302,6 +303,7 @@ function renderMenu() {
           <button class="thin-item" data-record><span>Запись голоса</span><span class="thin-sub">послушай себя</span></button>
           <button class="thin-item" data-backing><span>Пой под фонограмму</span><span class="thin-sub">распевка с повышением</span></button>
           <button class="thin-item" data-modes><span>Лад распевок</span><span class="thin-sub">${modeName}</span></button>
+          <button class="thin-item thin-cta" data-teacher><span>Урок с педагогом</span><span class="thin-sub">бесплатный пробный →</span></button>
         </div>
       </section>
       <section class="home-sec">
@@ -368,6 +370,8 @@ function renderMenu() {
   if (modesBtn) modesBtn.addEventListener('click', renderModesScreen);
   const setBtn = app.querySelector('[data-settings]');
   if (setBtn) setBtn.addEventListener('click', renderSettingsScreen);
+  const teacherBtn = app.querySelector('[data-teacher]');
+  if (teacherBtn) teacherBtn.addEventListener('click', () => renderSchoolInfo(renderMenu));
   app.querySelectorAll('[data-song]').forEach((btn) => {
     btn.addEventListener('click', () => startSong(Number(btn.dataset.song)));
   });
@@ -502,18 +506,9 @@ function renderExamResult(block, agg) {
   });
 }
 
-function renderSchoolInfo() {
+function renderSchoolInfo(back) {
   stopRaf();
-  app.innerHTML = `
-    <div class="screen">
-      <div class="game-top"><button class="icon-btn" id="back">‹ Назад</button></div>
-      <div class="brand"><h1>Школа «Прояви»</h1><p>Живые уроки с педагогом — глубже и быстрее, чем в одиночку.</p></div>
-      <div class="card">
-        <p class="how">Приложение даёт ежедневную практику и самоконтроль. Педагог ставит голос, слышит нюансы и ведёт по программе под твой конкретный голос.</p>
-        <p class="hint" style="margin-top:12px">Запись на уроки появится здесь. Пока — практикуйся в приложении.</p>
-      </div>
-    </div>`;
-  document.getElementById('back').addEventListener('click', renderCatalogScreen);
+  renderLeadForm(app, { onExit: back || renderCatalogScreen });
 }
 
 function renderSettingsScreen() {

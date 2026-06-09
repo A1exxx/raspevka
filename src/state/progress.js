@@ -67,6 +67,17 @@ export function markLessonDone(id) {
   return p.lessons;
 }
 
+/** Заявки на урок к педагогу (лид-формы). Пока хранятся локально; позже — отправка на бэкенд. */
+export function getLeads() { return load().leads || []; }
+export function saveLead(lead) {
+  const p = load();
+  p.leads = p.leads || [];
+  p.leads.push({ ts: Date.now(), ...lead });
+  if (p.leads.length > 50) p.leads = p.leads.slice(-50);
+  save(p);
+  return p.leads;
+}
+
 /** Сданные экзамены блоков учебной программы (массив id блоков). */
 export function getExamsPassed() { return load().examsPassed || []; }
 export function markExamPassed(blockId) {

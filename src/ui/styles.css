@@ -747,6 +747,24 @@ canvas.fs-canvas { height: 320px; }
 .rec-timer.live { color: var(--coral); }
 .rec-btn { width: 100%; max-width: 360px; }
 
+/* ============ Лид-форма «к педагогу» ============ */
+.field { display: block; margin-bottom: 14px; }
+.field > span { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 6px; }
+.leadform input, .leadform textarea {
+  width: 100%; font: inherit; font-size: 16px; color: var(--text); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; resize: vertical;
+  transition: border-color .2s var(--ease);
+}
+.leadform input:focus, .leadform textarea:focus { outline: none; border-color: var(--accent); }
+.thin-cta { background: var(--accent-soft); border-color: #c9e8e2 !important; }
+.thin-cta > span:first-child { color: var(--accent-2); font-weight: 700; }
+.leadform-done { align-items: center; text-align: center; gap: 14px; }
+.lf-check {
+  width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--accent-soft); color: var(--accent); margin: 0 auto;
+}
+.lf-check svg { width: 34px; height: 34px; }
+
 /* ============ Плеер фонограммы ============ */
 .player { display: flex; align-items: center; gap: 14px; }
 .player-time { color: var(--text-dim); font-size: 14px; font-variant-numeric: tabular-nums; }
