@@ -5,7 +5,7 @@
 ## Координаты
 - Проект: `D:\vocal-trainer` (vanilla JS + Vite + Canvas, без бэкенда, localStorage).
 - LIVE: **https://a1exxx.github.io/raspevka/** · GitHub: **A1exxx/raspevka**.
-- Текущий HEAD master: **abeb0c0**. Деплой gh-pages: **5f396fa**.
+- Текущий HEAD master: **ef47246**. Деплой gh-pages: **b55d67c**. Чекпоинт: **`approved-2026-06-09-qa-polish`**.
 - Детекция тона — pitchy (MPM). Стек давно собран; идёт продуктовая доводка.
 
 ## Деплой (как катать)
