@@ -6,6 +6,7 @@ import { RHYTHM } from '../src/screens/rhythm.js';
 import { miniKeyboard } from '../src/ui/illustrations.js';
 import { getMode, modeUnlocked, degreeToSemitone, degreesToSemitones } from '../src/theory/modes.js';
 import { findEchoDelay, reduceDelays } from '../src/audio/latency-calibrate.js';
+import { BLOCKS, EX_MAKERS, blockUnlocked } from '../src/theory/curriculum.js';
 
 const checks = [];
 const eq = (name, got, want, tol = 0) => {
@@ -148,6 +149,67 @@ for (let i = 0; i < 120; i++) vib.record(0, 'green', 16, true, 45 * Math.sin(2 *
 const rVib = vib.result();
 eq('vibrato detected', rVib.vibrato.present, true);
 eq('vibrato rate ~6Hz', rVib.vibrato.rateHz, 6, 2);
+
+// === Учебная программа: целостность реестра + гейтинг блоков ===
+eq('BLOCKS count', BLOCKS.length, 5);
+let curriculumOk = true, badId = '';
+for (const b of BLOCKS) {
+  for (const it of b.items) {
+    if (it.t === 'ex' && !EX_MAKERS[it.id]) { curriculumOk = false; badId = 'item:' + it.id; }
+  }
+  if (!EX_MAKERS[b.exam.exId]) { curriculumOk = false; badId = 'exam:' + b.exam.exId; }
+  if (!(b.exam.pass > 0 && b.exam.pass <= 1)) { curriculumOk = false; badId = 'pass:' + b.id; }
+}
+checks.push([curriculumOk, 'curriculum: все id блоков/экзаменов резолвятся в упражнения', badId]);
+eq('block1 открыт всегда', blockUnlocked(0, []), true);
+eq('block2 закрыт без экзамена b1', blockUnlocked(1, []), false);
+eq('block2 открыт после b1', blockUnlocked(1, ['b1']), true);
+eq('block2 экзамен = Disco Vowels(vscale)', BLOCKS[1].exam.exId, 'vscale');
+
+// === Правки музыканта: точная транскрипция L02 целыми массивами (смещения в полутонах от тоники) ===
+const offs = (fn) => fn(60).notes.map((n) => n.midi - 60);
+eq('vowelHold offsets (E×10 → G×10)', offs(vowelHold).join(','), '0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3');
+eq('vowelScale Disco offsets', offs(vowelScale).join(','), '0,1,5,7,8,7,5,1,7,5');
+eq('vowelAgility NoBubble offsets', offs(vowelAgility).join(','), '0,3,1,5,3,7,5,8,7,3,5,1,0');
+eq('vowelClimb HighFive offsets (E↔B ×5 + гамма)', offs(vowelClimb).join(','), '0,7,0,7,0,7,0,7,0,7,0,1,3,5,7');
+eq('jamesCharles offsets', offs(jamesCharles).join(','), '0,1,5,0,1,5,0,1,5,8,8,7,5,1');
+eq('гласные НЕ ладозависимы (modeKey undefined)', vowelHold(60).modeKey, undefined);
+eq('Скачок к V — квинта ВНИЗ (−5 полутонов)', jumpToFifth(60, 'ionian').notes[6].midi - 60, -5);
+
+// === Логика состояния (progress.js) — со стабом localStorage/navigator ===
+globalThis.localStorage = (() => { let s = {}; return {
+  getItem: (k) => (k in s ? s[k] : null), setItem: (k, v) => { s[k] = String(v); }, removeItem: (k) => { delete s[k]; }, clear: () => { s = {}; },
+  get length() { return Object.keys(s).length; }, key: (i) => Object.keys(s)[i] ?? null,
+}; })();
+// navigator уже есть в Node (не мобильный) → desktop-дефолты; стаб не нужен.
+const P = await import('../src/state/progress.js');
+eq('громкость по умолч. (desktop) = 1.8', P.getVolumeMult(), 1.8);
+P.setVolume('max'); eq('громкость max = 4.2', P.getVolumeMult(), 4.2);
+eq('задержка по умолч. (speaker)', P.getLatency(), 0.09, 1e-9);
+P.setRoute('bt'); eq('задержка bt = 0.24', P.getLatency(), 0.24, 1e-9);
+P.setLatencyManual(0.15); eq('ручная калибровка перекрывает маршрут', P.getLatency(), 0.15, 1e-9);
+eq('энергия стартует MAX', P.getEnergy(), P.getMaxEnergy());
+P.addEnergy(-4); eq('энергия −4', P.getEnergy(), P.getMaxEnergy() - 4);
+// реген: отмотать energyTs на 51 минуту назад → +2 единицы (1 за 25 мин)
+{ const pk = globalThis.localStorage.key(0); const obj = JSON.parse(globalThis.localStorage.getItem(pk)); obj.energyTs = Date.now() - 51 * 60000; globalThis.localStorage.setItem(pk, JSON.stringify(obj)); }
+eq('энергия восстанавливается со временем (1+2=3)', P.getEnergy(), 3);
+// лиды
+P.saveLead({ name: 'Тест', contact: 'tg', pref: 'female' });
+eq('лид сохранён', P.getLeads().length, 1);
+eq('лид содержит предпочтение', P.getLeads()[0].pref, 'female');
+// экзамены + интеграция с гейтингом
+P.markExamPassed('b1');
+eq('экзамен b1 отмечен', P.getExamsPassed().includes('b1'), true);
+eq('после сдачи b1 блок2 открыт (интеграция)', blockUnlocked(1, P.getExamsPassed()), true);
+P.markBlockItem('b1', 'hum3');
+eq('пункт блока отмечен', P.getBlockItems('b1').includes('hum3'), true);
+// режим подсказки (фикс протечки поводыря, Заход 1.I)
+P.setGuide(true); P.setHeadphones(false);
+eq('подсказка без наушников = prehear (не течёт в микрофон)', P.getGuideMode(), 'prehear');
+P.setHeadphones(true);
+eq('подсказка с наушниками = continuous', P.getGuideMode(), 'continuous');
+P.setGuide(false);
+eq('подсказка выкл = off', P.getGuideMode(), 'off');
 
 let pass = 0;
 for (const [ok, name, info] of checks) {
