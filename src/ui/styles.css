@@ -758,6 +758,10 @@ canvas.fs-canvas { height: 320px; }
 }
 .bi-check.on { background: var(--green); color: #fff; border-color: var(--green); }
 .bi-name { flex: 1; font-weight: 600; }
+.bi-tag {
+  margin-left: 8px; font-size: 11px; font-weight: 700; vertical-align: middle;
+  color: var(--accent-2); background: var(--accent-soft); border-radius: 999px; padding: 2px 8px;
+}
 
 .teacher-cta {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;

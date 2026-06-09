@@ -1,10 +1,6 @@
 // catalog.js — каталог учебной программы: список блоков (с прохождением) и детали блока
 // (упражнения + экзамен). Движок прогона/скоринга — общий (renderGame через колбэки main).
-import { EX_MAKERS, blockUnlocked } from '../theory/curriculum.js';
-
-function exName(exId) {
-  try { return EX_MAKERS[exId] ? EX_MAKERS[exId](60).name : exId; } catch (e) { return exId; }
-}
+import { blockUnlocked } from '../theory/curriculum.js';
 
 // CTA к педагогу — мостик в школу (перелив трафика).
 function teacherCTA() {
@@ -44,15 +40,16 @@ export function renderCatalog(app, { blocks, examsPassed, onExit, onOpenBlock, o
 
 export function renderBlockDetail(app, { block, index, examsPassed, doneItems, onExit, onRunItem, onExam, onSchool }) {
   const passed = examsPassed.includes(block.id);
-  const items = block.items.map((exId, k) => {
-    const done = doneItems.includes(exId);
+  const items = block.items.map((it, k) => {
+    const done = doneItems.includes(it.id);
+    const tag = it.t === 'breath' ? '<span class="bi-tag">дыхание</span>' : '';
     return `<button class="block-item" data-item="${k}">
         <span class="bi-check ${done ? 'on' : ''}">${done ? '✓' : k + 1}</span>
-        <span class="bi-name">${exName(exId)}</span>
+        <span class="bi-name">${it.name}${tag}</span>
         <span class="bc-arrow">›</span>
       </button>`;
   }).join('');
-  const allDone = block.items.every((id) => doneItems.includes(id));
+  const allDone = block.items.every((it) => doneItems.includes(it.id));
 
   app.innerHTML = `
     <div class="screen catalog">

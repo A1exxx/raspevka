@@ -415,17 +415,24 @@ function openBlock(index) {
 }
 
 function runBlockItem(block, k) {
-  const exId = block.items[k];
+  const item = block.items[k];
+  const idx = BLOCKS.indexOf(block);
   enterMic(() => {
     applyTrackerRange();
-    const ex = EX_MAKERS[exId](voiceRoot(), progress.getModeKey());
+    if (item.t === 'breath') {
+      // дыхание не оценивается по высоте — засчитываем за выполнение (дошёл/вышел)
+      renderBreathing(app, mic, item.id, { onExit: () => { progress.markBlockItem(block.id, item.id); openBlock(idx); } });
+      return;
+    }
+    const exMake = () => EX_MAKERS[item.id](voiceRoot(), progress.getModeKey());
+    const ex = exMake();
     const r = voiceRange();
     const reps = transposePlan(ex, r.low, r.high, 3);
     renderGame(app, mic, tracker, ex, {
       explain: true, reps,
-      rebuild: () => EX_MAKERS[exId](voiceRoot(), progress.getModeKey()),
-      onResult: (agg) => { if (agg.pct >= 0.5) progress.markBlockItem(block.id, exId); },
-      onExit: () => openBlock(BLOCKS.indexOf(block)),
+      rebuild: exMake,
+      onResult: (agg) => { if (agg.pct >= 0.5) progress.markBlockItem(block.id, item.id); },
+      onExit: () => openBlock(idx),
       onAgain: () => runBlockItem(block, k),
     });
   });

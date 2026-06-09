@@ -9,26 +9,30 @@ export const EX_MAKERS = {
   jump: octaveJump, vowels: vowelChain, jump5: jumpToFifth, lad: ladVocalise,
 };
 
-// Блоки программы. items — упражнения по порядку; exam — ключевое упражнение + порог сдачи.
+// Блоки программы. items — шаги по порядку (дыхание + распевки); exam — ключевое
+// упражнение + порог сдачи. item: { t:'breath'|'ex', id, name }.
+const ex = (id, name) => ({ t: 'ex', id, name });
+const breath = (id, name) => ({ t: 'breath', id, name });
+
 export const BLOCKS = [
   {
-    id: 'b1', title: 'Мягкий старт', sub: 'Активация голоса и резонаторов',
-    items: ['hum3', 'trill', 'sustain'],
+    id: 'b1', title: 'Базовый импульс', sub: 'Дыхание, опора, мягкая активация',
+    items: [breath('belly', 'Дыхание животом'), breath('hiss', 'Долгий выдох «с-с-с»'), ex('hum3', 'Мычание по гамме'), ex('trill', 'Губной тренаж «brrr»')],
     exam: { exId: 'hum3', pass: 0.55 },
   },
   {
     id: 'b2', title: 'Ясность гласных', sub: 'Выравнивание гласных и точность',
-    items: ['vowels', 'scale5'],
+    items: [ex('vowels', 'Цепочка гласных'), ex('scale5', 'Гамма «Ма-Мэ»')],
     exam: { exId: 'scale5', pass: 0.6 },
   },
   {
     id: 'b3', title: 'Интонация и гибкость', sub: 'Гаммы, беглость, скачки',
-    items: ['scale5', 'agility', 'jump'],
+    items: [ex('scale5', 'Гамма «Ма-Мэ»'), ex('agility', 'Беглость «Ма»'), ex('jump', 'Октавный скачок')],
     exam: { exId: 'agility', pass: 0.55 },
   },
   {
     id: 'b4', title: 'Лад и музыкальное мышление', sub: 'Лады, атака интервалов',
-    items: ['lad', 'jump5'],
+    items: [ex('lad', 'Ладовая «ЯМ»'), ex('jump5', 'Скачок к V ступени')],
     exam: { exId: 'lad', pass: 0.55 },
   },
 ];
