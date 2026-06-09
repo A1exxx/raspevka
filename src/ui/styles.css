@@ -747,6 +747,11 @@ canvas.fs-canvas { height: 320px; }
 .rec-timer.live { color: var(--coral); }
 .rec-btn { width: 100%; max-width: 360px; }
 
+/* ============ Плеер фонограммы ============ */
+.player { display: flex; align-items: center; gap: 14px; }
+.player-time { color: var(--text-dim); font-size: 14px; font-variant-numeric: tabular-nums; }
+.backing .bar { margin: 4px 0 2px; }
+
 /* ============ Прогресс программы ============ */
 .prog-wrap { display: flex; flex-direction: column; gap: 6px; margin: -8px 0 4px; }
 .prog-bar { height: 8px; background: var(--bg-soft); border-radius: 999px; overflow: hidden; border: 1px solid var(--line); }

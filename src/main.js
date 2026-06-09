@@ -18,6 +18,7 @@ import { SONGS, songMidis } from './theory/songs.js';
 import { renderModesPicker } from './screens/modes-picker.js';
 import { renderCatalog, renderBlockDetail } from './screens/catalog.js';
 import { renderRecorder } from './screens/recorder.js';
+import { renderBackingSong } from './screens/backing-song.js';
 import { BLOCKS, EX_MAKERS } from './theory/curriculum.js';
 import { renderSettings } from './screens/settings.js';
 import { renderCalibrate } from './screens/calibrate.js';
@@ -299,6 +300,7 @@ function renderMenu() {
           <button class="thin-item" data-ear><span>Спой за мной</span><span class="thin-sub">тренировка слуха</span></button>
           <button class="thin-item" data-theory><span>Теория голоса</span><span class="thin-sub">карточки</span></button>
           <button class="thin-item" data-record><span>Запись голоса</span><span class="thin-sub">послушай себя</span></button>
+          <button class="thin-item" data-backing><span>Пой под фонограмму</span><span class="thin-sub">распевка с повышением</span></button>
           <button class="thin-item" data-modes><span>Лад распевок</span><span class="thin-sub">${modeName}</span></button>
         </div>
       </section>
@@ -357,6 +359,11 @@ function renderMenu() {
   if (theoryBtn) theoryBtn.addEventListener('click', () => renderTheory(app, { onExit: renderMenu }));
   const recBtn = app.querySelector('[data-record]');
   if (recBtn) recBtn.addEventListener('click', () => enterMic(() => renderRecorder(app, mic, { onExit: renderMenu })));
+  const backingBtn = app.querySelector('[data-backing]');
+  if (backingBtn) backingBtn.addEventListener('click', () => enterMic(() => {
+    const r = voiceRange();
+    renderBackingSong(app, mic, tracker, { onExit: () => { applyTrackerRange(); renderMenu(); }, lowMidi: r.low, highMidi: r.high });
+  }));
   const modesBtn = app.querySelector('[data-modes]');
   if (modesBtn) modesBtn.addEventListener('click', renderModesScreen);
   const setBtn = app.querySelector('[data-settings]');
