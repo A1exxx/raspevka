@@ -353,6 +353,22 @@ canvas.trace { height: 300px; }
 .game-settings[open] > summary { color: var(--text); }
 .game-settings .inline-settings { padding-bottom: 14px; }
 
+/* Продвинутые настройки звука — свёрнуты, чтобы экран был чистым */
+.more-settings { border: 1px solid var(--line); border-radius: 12px; background: var(--bg); padding: 0 12px; }
+.more-settings > summary {
+  padding: 11px 2px; cursor: pointer; color: var(--text-dim); font-size: 13px; font-weight: 600;
+  list-style: none; display: flex; align-items: center; gap: 6px;
+}
+.more-settings > summary::-webkit-details-marker { display: none; }
+.more-settings > summary::before { content: "⚙"; opacity: .75; }
+.more-settings[open] > summary { color: var(--text); border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+.more-settings[open] { padding-bottom: 12px; }
+.more-settings .seg-label { margin-top: 4px; }
+.more-settings .seg-label:first-of-type { margin-top: 0; }
+
+/* Превью-контур мелодии на экране объяснения */
+.preview-contour { height: 50px; margin-top: 12px; margin-bottom: 0; }
+
 /* ============ Дашборд прогресса ============ */
 .stat-row { display: flex; gap: 10px; width: 100%; }
 .stat-tile {

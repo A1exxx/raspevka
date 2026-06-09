@@ -8,6 +8,10 @@ import { hzToNoteInfo, centsOff } from '../theory/note-map.js';
 import * as progress from '../state/progress.js';
 import { logEvent } from '../state/analytics.js';
 import { MODES, modeUnlocked } from '../theory/modes.js';
+import { contourGlyph } from '../ui/illustrations.js';
+
+// Открыт ли блок «продвинутых» настроек (тембр/грув/наушники) — сохраняем между перерисовками.
+let moreSettingsOpen = false;
 
 export function renderGame(app, mic, tracker, exercise, opts = {}) {
   const { onExit, onAgain, onComplete, onResult, explain } = opts;
@@ -398,6 +402,7 @@ function renderExplain(app, exercise, { onExit, onStart, onModeChange }) {
       <div class="card">
         ${exercise.desc ? `<p class="blurb">${exercise.desc}</p>` : ''}
         ${exercise.how ? `<p class="how"><b>Как делать.</b> ${exercise.how}</p>` : ''}
+        <div class="ex-glyph preview-contour" title="Форма распевки: выше квадрат — выше нота">${contourGlyph(exercise.notes.map((n) => n.midi))}</div>
         <p class="how mech"><b>Как устроена игра.</b> Ноты едут к вертикальной линии слева. Пой так, чтобы твой светящийся шарик совпал с нотой по высоте: <b style="color:var(--green)">зелёный</b> — точно, <b style="color:var(--amber)">жёлтый</b> — почти, <b style="color:var(--coral)">красный</b> — мимо. Сначала прозвучит <b>аккорд тоники</b> и образец мелодии — это твоя опора, чтобы попасть. «Подсказка тоном» подыгрывает нужную ноту (без наушников — коротко перед тем, как её петь).</p>
       </div>
       ${modeSelectBlock(exercise)}
@@ -435,14 +440,19 @@ function controlsBlock() {
       <div class="seg">${vbtn('quiet', 'Тихо')}${vbtn('normal', 'Норм')}${vbtn('loud', 'Громко')}${vbtn('max', 'Макс')}</div>
       <div class="seg-label">Темп</div>
       <div class="seg">${b('easy', 'Медл.')}${b('medium', 'Средне')}${b('fast', 'Быстро')}</div>
-      <div class="seg-label">Звук подсказки</div>
-      <div class="seg">${tbtn('piano', 'Пиано')}${tbtn('guitar', 'Гитара')}${tbtn('soft', 'Мягкий')}</div>
-      <div class="seg-label">Грув (ритм-подложка · лучше в наушниках)</div>
-      <div class="seg">${gbtn('off', 'Выкл')}${gbtn('auto', 'Авто')}${gbtn('pop', 'Поп')}${gbtn('funk', 'Фанк')}${gbtn('soft', 'Мягкий')}</div>
       <div class="toggle-row">
         <button class="toggle ${guideOn ? 'on' : ''}" data-guidetoggle="1">Подсказка тоном: ${guideOn ? 'вкл' : 'выкл'}</button>
-        <button class="toggle ${hp ? 'on' : ''}" data-hptoggle="1">Наушники: ${hp ? 'да' : 'нет'}</button>
       </div>
+      <details class="more-settings" ${moreSettingsOpen ? 'open' : ''}>
+        <summary>Ещё настройки звука: тембр, грув, наушники</summary>
+        <div class="seg-label">Звук подсказки</div>
+        <div class="seg">${tbtn('piano', 'Пиано')}${tbtn('guitar', 'Гитара')}${tbtn('soft', 'Мягкий')}</div>
+        <div class="seg-label">Грув (ритм-подложка · лучше в наушниках)</div>
+        <div class="seg">${gbtn('off', 'Выкл')}${gbtn('auto', 'Авто')}${gbtn('pop', 'Поп')}${gbtn('funk', 'Фанк')}${gbtn('soft', 'Мягкий')}</div>
+        <div class="toggle-row">
+          <button class="toggle ${hp ? 'on' : ''}" data-hptoggle="1">Наушники: ${hp ? 'да' : 'нет'}</button>
+        </div>
+      </details>
     </div>
   `;
 }
@@ -470,6 +480,9 @@ function wireControls(root, rerender, micEngine) {
   if (g) g.addEventListener('click', () => { progress.setGuide(!progress.getGuide()); rerender(); });
   const h = root.querySelector('[data-hptoggle]');
   if (h) h.addEventListener('click', () => { progress.setHeadphones(!progress.getHeadphones()); rerender(); });
+  // Запоминаем, открыт ли блок продвинутых настроек, чтобы перерисовка его не схлопывала.
+  const more = root.querySelector('.more-settings');
+  if (more) more.addEventListener('toggle', () => { moreSettingsOpen = more.open; });
 }
 
 // «Почему» — короткий разбор по итогам: тенденция занижения/завышения + слабые ноты.
