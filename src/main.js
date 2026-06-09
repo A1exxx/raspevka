@@ -3,7 +3,7 @@ import { MicEngine } from './audio/mic.js';
 import { PitchTracker } from './audio/pitch-detector.js';
 import { hzToNoteInfo, hzToY, centsZone, midiToHz } from './theory/note-map.js';
 import { renderGame } from './screens/game.js';
-import { fiveNoteScale, agilityRun, sustain, octaveJump, hum3, lipTrill, transposePlan, vowelChain, jumpToFifth, ladVocalise, vibratoHold, vowelHold, vowelScale, vowelAgility, vowelClimb, jamesCharles } from './theory/exercises.js';
+import { fiveNoteScale, agilityRun, sustain, octaveJump, hum3, lipTrill, transposePlan, vowelChain, jumpToFifth, ladVocalise, vibratoHold, vowelHold, vowelScale, vowelAgility, vowelClimb, jamesCharles, vibratoWobble, timbreVocalise, timbreShift, registerArp, registerOctave, beltScale, beltOctave, articStaccato, articGroups, resistTurn, resistRun } from './theory/exercises.js';
 import { renderSession } from './screens/session.js';
 import { renderVoice } from './screens/voice.js';
 import { renderDashboard } from './screens/progress-dash.js';
@@ -54,6 +54,17 @@ const EXERCISES = [
   { label: 'Скачок к V ступени', sub: 'Ям · атака интервала', ic: 'arrows', make: (r) => jumpToFifth(r, progress.getModeKey()) },
   { label: 'Ладовая «ЯМ»', sub: 'гамма лада вверх-вниз', ic: 'stairs', make: (r) => ladVocalise(r, progress.getModeKey()) },
   { label: 'Вибрато', sub: 'ровная волна голосом', ic: 'wave', make: (r) => vibratoHold(r) },
+  { label: 'Раскачка вибрато', sub: 'А · запуск вибрато', ic: 'wave', make: (r) => vibratoWobble(r) },
+  { label: 'Тёплый тон', sub: 'Мо · качество тембра', ic: 'fork', make: (r) => timbreVocalise(r) },
+  { label: 'Ровный тон на двух', sub: 'А · единый тембр', ic: 'fork', make: (r) => timbreShift(r) },
+  { label: 'Через регистры', sub: 'Но · passaggio', ic: 'arrows', make: (r) => registerArp(r) },
+  { label: 'Октавная связка', sub: 'А · соединить регистры', ic: 'arrows', make: (r) => registerOctave(r) },
+  { label: 'Белтинг — гамма', sub: 'Эй · яркая подача', ic: 'bolt', make: (r) => beltScale(r) },
+  { label: 'Белт — октава', sub: 'Эй · опёртый верх', ic: 'arrows', make: (r) => beltOctave(r) },
+  { label: 'Чёткое стаккато', sub: 'Та · артикуляция', ic: 'bolt', make: (r) => articStaccato(r) },
+  { label: 'Слоги по группам', sub: 'Та-Ка · дикция', ic: 'lips', make: (r) => articGroups(r) },
+  { label: 'Стамина-фигура', sub: 'Ма · выносливость', ic: 'stairs', make: (r) => resistTurn(r) },
+  { label: 'Выносливая гамма', sub: 'Ма · длинный пробег', ic: 'stairs', make: (r) => resistRun(r) },
 ];
 
 // Корень упражнений из центра типа голоса (иначе C4).

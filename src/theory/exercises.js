@@ -127,6 +127,130 @@ export function vibratoHold(rootMidi) {
   };
 }
 
+// === Распевки из уроков L04–L10 (ноты сняты программно по PDF, смещения в полутонах от тоники,
+//     НЕ ладозависимы — та же конвенция, что у гласных L02). ===
+
+/** Раскачка вибрато (L04) — лёгкое колебание высоты, переходящее в вибрато. */
+export function vibratoWobble(rootMidi) {
+  const offs = [0, 1, 0, 1, 0, 1, 0, 5, 6, 5, 6, 5, 6, 5];
+  return {
+    id: 'vwobble', name: 'Раскачка вибрато', syllable: 'А', tempo: 120, kind: 'vibrato', root: rootMidi, grooveStyle: 'soft', greenCents: 55,
+    desc: 'Запуск вибрато: ровный звук с лёгким «качанием» высоты — основа естественного вибрато.',
+    how: 'Пой «А» и добавь мягкое колебание голосом — вверх-вниз небольшими шагами. Колебание идёт от опоры дыхания, не дави горлом.',
+    notes: offs.map((o) => beat(rootMidi + o, 0.5)),
+  };
+}
+
+/** Тёплый тон (L05) — выравнивание тембра по короткому мотиву и гамме. */
+export function timbreVocalise(rootMidi) {
+  const offs = [0, 1, 3, 0, 1, 3, 1, 0, 0, 1, 3, 5, 7, 5];
+  return {
+    id: 'timbre', name: 'Тёплый тон', syllable: 'Мо', tempo: 96, kind: 'scale', root: rootMidi, grooveStyle: 'ballad',
+    desc: 'Качество тембра: ровный, округлый звук при движении голоса по нотам.',
+    how: 'Пой «Мо» округло и тепло, держи одинаковый тембр на каждой ноте. Не зажимай, звук в маску.',
+    notes: offs.map((o) => beat(rootMidi + o, 0.5)),
+  };
+}
+
+/** Опора тембра на двух звуках (L05) — ровность при смене высоты на кварту. */
+export function timbreShift(rootMidi) {
+  const offs = [0, 0, 0, -5, -5, 0, 0, -5, -5];
+  return {
+    id: 'timbre2', name: 'Ровный тон на двух', syllable: 'А', tempo: 80, kind: 'sustain', root: rootMidi, grooveStyle: 'ballad',
+    desc: 'Единый тембр при переходе между двумя высотами (вниз на кварту и обратно).',
+    how: 'Держи одинаковый округлый звук на обеих нотах — не «бели» нижнюю и не зажимай верхнюю.',
+    notes: offs.map((o) => beat(rootMidi + o, 1)),
+  };
+}
+
+/** Арпеджио через регистры (L06) — соединение грудного/головного через опорные тоны. */
+export function registerArp(rootMidi) {
+  const offs = [0, 3, 0, 7, 0, 12, 0, 7, 0, 3];
+  return {
+    id: 'regarp', name: 'Через регистры', syllable: 'Но', tempo: 92, kind: 'jump', root: rootMidi, grooveStyle: 'soft',
+    desc: 'Плавный переход (passaggio): соединяем нижний и верхний регистр через опорные тоны аккорда.',
+    how: 'Пой «Но», возвращаясь к тонике и беря всё выше (терция → квинта → октава). Без «слома» на переходе — мягко.',
+    notes: offs.map((o) => beat(rootMidi + o, 0.6)),
+  };
+}
+
+/** Октавная связка (L06) — ровный переход через регистровый «мост». */
+export function registerOctave(rootMidi) {
+  const offs = [0, 12, 0, 12];
+  return {
+    id: 'regoct', name: 'Октавная связка', syllable: 'А', tempo: 76, kind: 'jump', root: rootMidi, grooveStyle: 'soft',
+    desc: 'Связка регистров на октаве — без резкого «переключения» голоса.',
+    how: 'Спокойно прыгай на октаву вверх и обратно, целься в центр ноты. Верх не криком, а на опоре и резонансе.',
+    notes: offs.map((o) => beat(rootMidi + o, 1.5)),
+  };
+}
+
+/** Белтинг — 5-нотная гамма (L07), яркая опёртая подача. */
+export function beltScale(rootMidi) {
+  const offs = [0, 1, 3, 5, 7, 5, 3, 1, 0];
+  return {
+    id: 'belt', name: 'Белтинг — гамма', syllable: 'Эй', tempo: 112, kind: 'scale', root: rootMidi, grooveStyle: 'drive',
+    desc: 'Яркая опёртая подача (белтинг) на пятинотной гамме — мощно, но без зажима.',
+    how: 'Пой «Эй» ярко и звонко, опираясь дыханием. Звук вперёд (в маску), горло свободно. Не дави на верхних нотах.',
+    notes: offs.map((o) => beat(rootMidi + o, 0.6)),
+  };
+}
+
+/** Октавный белт (L07) — мощная атака верха через октаву. */
+export function beltOctave(rootMidi) {
+  const offs = [0, 12, 0, 12, 0, 12, 0];
+  return {
+    id: 'beltoct', name: 'Белт — октава', syllable: 'Эй', tempo: 100, kind: 'jump', root: rootMidi, grooveStyle: 'drive',
+    desc: 'Опёртая атака верхней ноты через октаву — энергично и безопасно.',
+    how: 'Бери октаву вверх ярко и точно, на опоре. Не тянись горлом — звук на дыхании и в резонаторах.',
+    notes: offs.map((o) => beat(rootMidi + o, 0.8)),
+  };
+}
+
+/** Артикуляция — стаккато на одной ноте (L08), чёткие согласные. */
+export function articStaccato(rootMidi) {
+  const offs = [0, 0, 0, 0, 0, 0, 0, 0];
+  return {
+    id: 'artic', name: 'Чёткое стаккато', syllable: 'Та', tempo: 132, kind: 'agility', root: rootMidi, grooveStyle: 'funk',
+    desc: 'Чёткая артикуляция и точная атака: одна нота, быстрые ясные слоги.',
+    how: 'Пой «Та-Та-Та» коротко и чётко на одной высоте. Согласная ясная, гласная ровная, звук не «расползается».',
+    notes: offs.map((o) => beat(rootMidi + o, 0.5)),
+  };
+}
+
+/** Артикуляция группами (L08) — слоги на двух высотах (вниз на кварту). */
+export function articGroups(rootMidi) {
+  const offs = [0, 0, 0, -5, -5, -5, 0, 0, 0, -5, -5, -5];
+  return {
+    id: 'artic2', name: 'Слоги по группам', syllable: 'Та-Ка', tempo: 120, kind: 'agility', root: rootMidi, grooveStyle: 'funk',
+    desc: 'Дикция при смене высоты: чёткие слоги группами на двух нотах.',
+    how: 'Пой «Та-Ка-Та» группами, чисто меняя высоту вниз и обратно. Каждый слог ясный, ритм ровный.',
+    notes: offs.map((o) => beat(rootMidi + o, 0.5)),
+  };
+}
+
+/** Сопротивление — фигура-стамина (L10), повтор устойчивого мотива. */
+export function resistTurn(rootMidi) {
+  const offs = [0, 1, 3, 1, 0, 1, 3, 1, 0, 1, 3, 1, 0];
+  return {
+    id: 'resist', name: 'Стамина-фигура', syllable: 'Ма', tempo: 116, kind: 'agility', root: rootMidi, grooveStyle: 'march',
+    desc: 'Выносливость и ровность: устойчивый мотив-«волчок» много раз без потери опоры.',
+    how: 'Пой «Ма» по фигуре вверх-вниз ровно и не уставая. Дыхание ровное, опора держится до конца.',
+    notes: offs.map((o) => beat(rootMidi + o, 0.5)),
+  };
+}
+
+/** Сопротивление — выносливая гамма (L10), длинный пробег. */
+export function resistRun(rootMidi) {
+  const offs = [0, 1, 3, 5, 7, 5, 3, 1, 0, 1, 3, 5, 7, 5, 3, 1, 0];
+  return {
+    id: 'resist2', name: 'Выносливая гамма', syllable: 'Ма', tempo: 126, kind: 'agility', root: rootMidi, grooveStyle: 'march',
+    desc: 'Дыхательная выносливость: длинный ровный пробег по гамме без добора воздуха.',
+    how: 'Пой «Ма» по гамме вверх-вниз дважды на одном дыхании, ровно и точно. Распредели воздух до конца.',
+    notes: offs.map((o) => beat(rootMidi + o, 0.5)),
+  };
+}
+
 /** Сирена/глиссандо — плавный подъём и спуск (как непрерывная линия). */
 export function siren(rootMidi) {
   const up = [0, 3, 7, 12];

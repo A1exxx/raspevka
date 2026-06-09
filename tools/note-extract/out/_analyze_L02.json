@@ -1,0 +1,236 @@
+{
+  "file": "L02 Vowel Placement - Cheryl Porter Vocal Method (1).pdf",
+  "staff_lines_per_page0_count": 0,
+  "cp_stats": [
+    {
+      "cp": "U+F4BE",
+      "count": 135,
+      "xspread": 488.7,
+      "yspread": 595.7,
+      "yvals": [
+        130.9,
+        133.4,
+        135.9,
+        138.4,
+        140.8,
+        175.9,
+        180.8,
+        201.6,
+        204.1,
+        206.6,
+        209.0,
+        211.5,
+        386.0,
+        388.4,
+        390.6,
+        390.9,
+        393.1,
+        393.4,
+        395.6,
+        395.9,
+        398.4,
+        400.5,
+        403.0,
+        575.3,
+        577.8,
+        580.3,
+        582.7,
+        585.2,
+        612.8,
+        615.2
+      ],
+      "fonts": [
+        "Bravura"
+      ]
+    },
+    {
+      "cp": "U+E240",
+      "count": 14,
+      "xspread": 418.6,
+      "yspread": 545.7,
+      "yvals": [
+        163.5,
+        600.4,
+        631.1,
+        638.5,
+        642.9,
+        676.8,
+        681.8,
+        706.7,
+        709.2
+      ],
+      "fonts": [
+        "Bravura"
+      ]
+    },
+    {
+      "cp": "U+E4E6",
+      "count": 10,
+      "xspread": 239.5,
+      "yspread": 545.7,
+      "yvals": [
+        166.0,
+        610.3,
+        641.0,
+        691.7,
+        711.7
+      ],
+      "fonts": [
+        "Bravura"
+      ]
+    },
+    {
+      "cp": "U+E050",
+      "count": 10,
+      "xspread": 0.0,
+      "yspread": 585.8,
+      "yvals": [
+        130.9,
+        170.9,
+        201.6,
+        388.4,
+        393.1,
+        575.3,
+        615.2,
+        646.0,
+        696.7,
+        716.7
+      ],
+      "fonts": [
+        "Bravura"
+      ]
+    },
+    {
+      "cp": "U+ECA5",
+      "count": 6,
+      "xspread": 0.0,
+      "yspread": 484.3,
+      "yvals": [
+        102.7,
+        142.7,
+        360.2,
+        364.8,
+        547.0,
+        587.0
+      ],
+      "fonts": [
+        "Bravura-Text"
+      ]
+    },
+    {
+      "cp": "U+E08A",
+      "count": 6,
+      "xspread": 0.0,
+      "yspread": 484.3,
+      "yvals": [
+        126.0,
+        166.0,
+        383.5,
+        388.1,
+        570.4,
+        610.3
+      ],
+      "fonts": [
+        "Bravura"
+      ]
+    },
+    {
+      "cp": "U+F4BD",
+      "count": 5,
+      "xspread": 360.2,
+      "yspread": 520.0,
+      "yvals": [
+        130.9,
+        211.5,
+        395.6,
+        580.3,
+        650.9
+      ],
+      "fonts": [
+        "Bravura"
+      ]
+    },
+    {
+      "cp": "U+E1E7",
+      "count": 5,
+      "xspread": 427.7,
+      "yspread": 328.5,
+      "yvals": [
+        395.6,
+        577.8,
+        648.5,
+        694.2,
+        724.1
+      ],
+      "fonts": [
+        "Bravura"
+      ]
+    },
+    {
+      "cp": "U+E5D0",
+      "count": 4,
+      "xspread": 87.0,
+      "yspread": 115.6,
+      "yvals": [
+        612.8,
+        652.8,
+        694.2,
+        728.4
+      ],
+      "fonts": [
+        "Bravura"
+      ]
+    },
+    {
+      "cp": "U+E4E4",
+      "count": 3,
+      "xspread": 115.7,
+      "yspread": 525.7,
+      "yvals": [
+        166.0,
+        691.7
+      ],
+      "fonts": [
+        "Bravura"
+      ]
+    },
+    {
+      "cp": "U+E4E5",
+      "count": 3,
+      "xspread": 389.7,
+      "yspread": 70.7,
+      "yvals": [
+        641.0,
+        711.7
+      ],
+      "fonts": [
+        "Bravura"
+      ]
+    },
+    {
+      "cp": "U+E044",
+      "count": 2,
+      "xspread": 0.0,
+      "yspread": 5.0,
+      "yvals": [
+        689.2,
+        694.2
+      ],
+      "fonts": [
+        "Bravura"
+      ]
+    },
+    {
+      "cp": "U+E262",
+      "count": 1,
+      "xspread": 0.0,
+      "yspread": 0.0,
+      "yvals": [
+        726.6
+      ],
+      "fonts": [
+        "Bravura"
+      ]
+    }
+  ]
+}

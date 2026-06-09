@@ -1,5 +1,5 @@
 import { hzToNoteInfo, midiToHz, centsOff, centsZone, hzToY, noteToHz } from '../src/theory/note-map.js';
-import { fiveNoteScale, agilityRun, sustain, octaveJump, referenceFreqs, hum3, lipTrill, transposePlan, vowelHold, vowelScale, vowelAgility, vowelClimb, jamesCharles, jumpToFifth, vibratoHold } from '../src/theory/exercises.js';
+import { fiveNoteScale, agilityRun, sustain, octaveJump, referenceFreqs, hum3, lipTrill, transposePlan, vowelHold, vowelScale, vowelAgility, vowelClimb, jamesCharles, jumpToFifth, vibratoHold, vibratoWobble, timbreVocalise, timbreShift, registerArp, registerOctave, beltScale, beltOctave, articStaccato, articGroups, resistTurn, resistRun } from '../src/theory/exercises.js';
 import { Scorer } from '../src/game/scoring.js';
 import { classifyVoice, getVoiceType, VOICE_TYPES } from '../src/theory/voice-types.js';
 import { RHYTHM } from '../src/screens/rhythm.js';
@@ -151,7 +151,7 @@ eq('vibrato detected', rVib.vibrato.present, true);
 eq('vibrato rate ~6Hz', rVib.vibrato.rateHz, 6, 2);
 
 // === Учебная программа: целостность реестра + гейтинг блоков ===
-eq('BLOCKS count', BLOCKS.length, 5);
+eq('BLOCKS count', BLOCKS.length, 10);
 let curriculumOk = true, badId = '';
 for (const b of BLOCKS) {
   for (const it of b.items) {
@@ -165,6 +165,25 @@ eq('block1 открыт всегда', blockUnlocked(0, []), true);
 eq('block2 закрыт без экзамена b1', blockUnlocked(1, []), false);
 eq('block2 открыт после b1', blockUnlocked(1, ['b1']), true);
 eq('block2 экзамен = Disco Vowels(vscale)', BLOCKS[1].exam.exId, 'vscale');
+eq('block6 = Тембр', BLOCKS[5].title, 'Тембр и тон');
+eq('block10 = Сопротивление', BLOCKS[9].title, 'Сопротивление');
+eq('block7 закрыт без экзамена b6', blockUnlocked(6, ['b1','b2','b3','b4','b5']), false);
+eq('block7 открыт после b6', blockUnlocked(6, ['b1','b2','b3','b4','b5','b6']), true);
+
+// === Распевки L04–L10 (точные офсеты из PDF, не ладозависимы) ===
+const off2 = (fn) => fn(60).notes.map((n) => n.midi - 60);
+eq('vibratoWobble offsets (L04)', off2(vibratoWobble).join(','), '0,1,0,1,0,1,0,5,6,5,6,5,6,5');
+eq('timbreVocalise offsets (L05)', off2(timbreVocalise).join(','), '0,1,3,0,1,3,1,0,0,1,3,5,7,5');
+eq('timbreShift offsets (L05)', off2(timbreShift).join(','), '0,0,0,-5,-5,0,0,-5,-5');
+eq('registerArp offsets (L06)', off2(registerArp).join(','), '0,3,0,7,0,12,0,7,0,3');
+eq('registerOctave offsets (L06)', off2(registerOctave).join(','), '0,12,0,12');
+eq('beltScale offsets (L07)', off2(beltScale).join(','), '0,1,3,5,7,5,3,1,0');
+eq('beltOctave offsets (L07)', off2(beltOctave).join(','), '0,12,0,12,0,12,0');
+eq('articStaccato одна нота ×8 (L08)', off2(articStaccato).join(','), '0,0,0,0,0,0,0,0');
+eq('articGroups offsets (L08)', off2(articGroups).join(','), '0,0,0,-5,-5,-5,0,0,0,-5,-5,-5');
+eq('resistTurn offsets (L10)', off2(resistTurn).join(','), '0,1,3,1,0,1,3,1,0,1,3,1,0');
+eq('resistRun offsets (L10)', off2(resistRun).join(','), '0,1,3,5,7,5,3,1,0,1,3,5,7,5,3,1,0');
+eq('новые распевки НЕ ладозависимы', [vibratoWobble, timbreVocalise, registerArp, beltScale, articStaccato, resistTurn].every((f) => f(60).modeKey === undefined), true);
 
 // === Правки музыканта: точная транскрипция L02 целыми массивами (смещения в полутонах от тоники) ===
 const offs = (fn) => fn(60).notes.map((n) => n.midi - 60);
