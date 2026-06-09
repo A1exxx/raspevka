@@ -47,7 +47,8 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: max(20px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom));
+  /* нижний отступ с запасом под плавающую кнопку микрофона, чтобы она не перекрывала контент */
+  padding: max(20px, env(safe-area-inset-top)) 20px calc(env(safe-area-inset-bottom) + 84px);
 }
 
 /* ============ Карточки / экраны ============ */
