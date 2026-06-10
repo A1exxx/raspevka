@@ -5,7 +5,7 @@
 ## Координаты
 - Проект: `D:\vocal-trainer` (vanilla JS + Vite + Canvas, без бэкенда, localStorage).
 - LIVE: **https://a1exxx.github.io/raspevka/** · GitHub: **A1exxx/raspevka**.
-- Текущий HEAD master: **c8cc6a7**. Деплой gh-pages: **ca16bee**. Чекпоинт: **`approved-2026-06-09-all-blocks`** (10 блоков из L03–L10; экстрактор в tools/note-extract/).
+- Текущий HEAD master: **f751691**. Деплой gh-pages: **b335507**. Чекпоинт: **`approved-2026-06-10-final-mode`** — «конечный режим перед упаковкой»: clock+dev-панель (?dev=1 / 7 тапов по логотипу), заморозка стрика+celebration, главная v3 (категории-ленты+карточка программы), welcome/magic-demo онбординг, тёмная сцена (тумблер в настройках), лид-форма→Telegram (слот в src/state/lead-config.js + docs/TEACHER-BOT-SETUP.md), монетизация-каркас ВЫКЛ (5/день+триал 7дн, вкл из dev-панели), demo.html виджет, PNG-иконки+manifest, инвестор-питч docs/pitch-investor.html, сверка музыканту docs/MUSICIAN-CHECK-RU.md. Тесты 147/147.
 - Детекция тона — pitchy (MPM). Стек давно собран; идёт продуктовая доводка.
 
 ## Деплой (как катать)
