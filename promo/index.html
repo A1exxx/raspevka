@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Распевка — промо 15с</title>
+<style>
+  /* Бренд приложения (тёмная сцена): plum-чёрный фон, teal-свечение, зоны green/amber/red */
+  :root {
+    --bg0: #0d1219; --bg1: #0a0e14;
+    --teal: #2dd4bf; --teal-glow: #3de5c9;
+    --green: #3ee6a8; --amber: #ffc24d; --red: #ff6b61;
+    --ink: #ecf1f7; --dim: #93a0b2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  [data-composition-id="root"] {
+    position: relative; width: 1080px; height: 1920px; overflow: hidden;
+    background: radial-gradient(140% 90% at 50% 0%, var(--bg0) 0%, var(--bg1) 70%);
+    font-family: 'Inter', system-ui, sans-serif; color: var(--ink);
+  }
+  canvas#hw { position: absolute; inset: 0; }
+  /* верхнее тёплое свечение — фон не «пустой чёрный» */
+  .glow-top {
+    position: absolute; top: -380px; left: 50%; transform: translateX(-50%);
+    width: 1400px; height: 800px; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(45,212,191,.18), transparent 70%);
+  }
+  .grain { position: absolute; inset: 0; opacity: .05; mix-blend-mode: overlay;
+    background-image: repeating-conic-gradient(rgba(255,255,255,.6) 0 .0003turn, transparent 0 .0009turn); }
+
+  /* ---- Бит 1: хук ---- */
+  .b1 { position: absolute; top: 150px; left: 84px; right: 84px; }
+  .eyebrow { font-size: 26px; font-weight: 700; letter-spacing: .22em; color: var(--teal-glow); margin-bottom: 26px; }
+  .b1 h1 { font-size: 128px; font-weight: 800; line-height: 1.02; letter-spacing: -.02em; }
+  .b1 .sub { margin-top: 26px; font-size: 52px; font-weight: 700; color: var(--dim); }
+  .b1 .sub b { color: var(--ink); }
+
+  /* ---- Бит 2: подпись демо ---- */
+  .b2 { position: absolute; left: 84px; right: 84px; bottom: 240px; text-align: left; }
+  .b2 .cap { font-size: 84px; font-weight: 800; line-height: 1.06; letter-spacing: -.015em; }
+  .b2 .cap em { font-style: normal; color: var(--green); }
+  .live-tag {
+    position: absolute; top: 470px; left: 84px;
+    display: inline-flex; align-items: center; gap: 14px;
+    font-size: 30px; font-weight: 700; color: var(--dim);
+    background: rgba(255,255,255,.06); border: 2px solid rgba(255,255,255,.14);
+    padding: 16px 28px; border-radius: 999px;
+  }
+  .live-dot { width: 16px; height: 16px; border-radius: 50%; background: var(--red); }
+  .hit-pop {
+    position: absolute; font-size: 44px; font-weight: 800; color: var(--green);
+    text-shadow: 0 0 30px rgba(62,230,168,.8); white-space: nowrap;
+  }
+  #pop1 { top: 905px; left: 420px; }
+  #pop2 { top: 760px; left: 460px; }
+  #pop3 { top: 660px; left: 430px; }
+
+  /* ---- Бит 3: статы ---- */
+  .b3 { position: absolute; left: 84px; right: 84px; bottom: 220px; display: flex; flex-direction: column; gap: 22px; }
+  .stat {
+    display: flex; align-items: center; gap: 22px;
+    background: rgba(255,255,255,.07); border: 2px solid rgba(255,255,255,.13);
+    border-radius: 24px; padding: 30px 36px; backdrop-filter: blur(6px);
+  }
+  .stat .ic { font-size: 46px; }
+  .stat .tx { font-size: 44px; font-weight: 800; letter-spacing: -.01em; }
+  .stat .tx span { color: var(--dim); font-weight: 600; }
+
+  /* ---- Бит 4: бренд-финал ---- */
+  .b4 { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; text-align: center; }
+  .b4-bg { position: absolute; inset: 0; background: radial-gradient(90% 60% at 50% 45%, rgba(13,18,25,.55), rgba(10,14,20,.92)); }
+  .eq { display: flex; gap: 14px; align-items: flex-end; height: 130px; position: relative; }
+  .eq i { width: 26px; border-radius: 13px; background: linear-gradient(180deg, var(--teal-glow), var(--teal)); box-shadow: 0 0 44px rgba(45,212,191,.55); }
+  .eq i:nth-child(1){height:42%} .eq i:nth-child(2){height:74%} .eq i:nth-child(3){height:100%}
+  .eq i:nth-child(4){height:60%} .eq i:nth-child(5){height:32%}
+  .b4 h2 { position: relative; font-size: 148px; font-weight: 800; letter-spacing: -.02em; }
+  .b4 .tag { position: relative; font-size: 46px; font-weight: 700; color: var(--dim); }
+  .b4 .url {
+    position: relative; margin-top: 12px; font-size: 38px; font-weight: 700; color: var(--bg1);
+    background: linear-gradient(105deg, var(--teal-glow), var(--teal));
+    padding: 22px 44px; border-radius: 999px; box-shadow: 0 0 70px rgba(45,212,191,.45);
+  }
+  .b4 .free { position: relative; font-size: 34px; font-weight: 700; color: var(--green); letter-spacing: .08em; }
+</style>
+</head>
+<body>
+<div data-composition-id="root" data-width="1080" data-height="1920" data-start="0" data-duration="15">
+  <canvas id="hw" width="1080" height="1920"></canvas>
+  <div class="glow-top"></div>
+  <div class="grain"></div>
+
+  <div class="b1" id="b1">
+    <div class="eyebrow" id="b1-eye">РАСПЕВКА · ТРЕНАЖЁР ГОЛОСА</div>
+    <h1 id="b1-h">Поёшь<br/>мимо нот?</h1>
+    <div class="sub" id="b1-sub">Теперь это <b>видно</b>.</div>
+  </div>
+
+  <div class="live-tag" id="liveTag"><span class="live-dot" id="liveDot"></span>твой голос — вживую</div>
+  <div class="hit-pop" id="pop1">+ Точно!</div>
+  <div class="hit-pop" id="pop2">+ Точно!</div>
+  <div class="hit-pop" id="pop3">В точку ✦</div>
+
+  <div class="b2" id="b2">
+    <div class="cap" id="b2-cap">Пой — и <em>попадай в ноты</em></div>
+  </div>
+
+  <div class="b3" id="b3">
+    <div class="stat" id="st1"><span class="ic">🎼</span><span class="tx">26 распевок <span>по проф. нотам</span></span></div>
+    <div class="stat" id="st2"><span class="ic">🏆</span><span class="tx">Программа <span>· 10 блоков с экзаменами</span></span></div>
+    <div class="stat" id="st3"><span class="ic">🎤</span><span class="tx">Твой тембр голоса <span>— за 1 минуту</span></span></div>
+  </div>
+
+  <div class="b4" id="b4">
+    <div class="b4-bg" id="b4-bg"></div>
+    <div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i></div>
+    <h2 id="b4-h">Распевка</h2>
+    <div class="tag" id="b4-tag">Игровой тренажёр голоса</div>
+    <div class="free" id="b4-free">БЕСПЛАТНО · ПРЯМО В БРАУЗЕРЕ</div>
+    <div class="url" id="b4-url">a1exxx.github.io/raspevka</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const DUR = 15;
+    const tl = gsap.timeline({ paused: true });
+
+    /* ================= ДЕТЕРМИНИРОВАННЫЙ НОТНЫЙ ХАЙВЕЙ (canvas) =================
+       Состояние не накапливается: каждый кадр полностью вычисляется из t
+       (след пересчитывается из pitch(t-k·dt)) → идеально скрабится. */
+    const cv = document.getElementById('hw');
+    const cx = cv.getContext('2d');
+    const W = 1080, H = 1920;
+    const BAND_TOP = 520, BAND_BOT = 1500;       // зона хайвея (свободна от текстов)
+    const HIT_X = 340, PXS = 330;                 // линия попадания, px/сек
+    // Мелодия (старт, длительность, ступень 0..12)
+    const NOTES = [
+      [0.6,.5,1],[1.25,.5,3],[1.9,.5,2],[2.55,.5,4],
+      [3.35,.45,3],[3.85,.45,5],[4.35,.45,6],[4.85,.6,8],
+      [5.65,.45,6],[6.15,.45,8],[6.65,.45,9],[7.2,.8,11],
+      [8.35,.5,9],[8.95,.5,8],[9.55,.5,9],[10.15,.7,11],
+      [11.15,.5,8],[11.75,.6,9],[12.45,1.5,12],
+    ];
+    const HIT_FROM = 3.2; // до этого момента «голос» мажет (красный/жёлтый), после — попадает
+    const yOf = (p) => BAND_BOT - (p / 13) * (BAND_BOT - BAND_TOP);
+    function targetAt(t) {
+      let cur = null, last = NOTES[0][2];
+      for (const [s, d, p] of NOTES) { if (t >= s && t < s + d) { cur = p; } if (t >= s) last = p; }
+      return { cur, last };
+    }
+    function pitchOf(t) { // «голос»: глисс к цели + вибрато; в miss-фазе — гуляет
+      const { cur, last } = targetAt(t);
+      const base = cur != null ? cur : last;
+      const vib = 0.14 * Math.sin(t * 12.4);
+      const miss = t < HIT_FROM ? (1.7 * Math.sin(t * 3.1) + 0.9 * Math.sin(t * 7.7)) : 0;
+      const settle = cur != null ? 0 : 0.35 * Math.sin(t * 5.3); // между нотами слегка плывёт
+      return base + vib + miss + settle;
+    }
+    function zoneColor(diff) {
+      const a = Math.abs(diff);
+      return a < 0.5 ? '#3ee6a8' : a < 1.2 ? '#ffc24d' : '#ff6b61';
+    }
+    function draw(t) {
+      cx.clearRect(0, 0, W, H);
+      // сетка полутонов
+      for (let p = 0; p <= 13; p++) {
+        const y = yOf(p);
+        cx.strokeStyle = p % 4 === 0 ? 'rgba(255,255,255,.10)' : 'rgba(255,255,255,.045)';
+        cx.lineWidth = 2;
+        cx.beginPath(); cx.moveTo(0, y); cx.lineTo(W, y); cx.stroke();
+      }
+      // линия попадания
+      cx.strokeStyle = 'rgba(61,229,201,.75)'; cx.lineWidth = 5; cx.setLineDash([14, 16]);
+      cx.beginPath(); cx.moveTo(HIT_X, BAND_TOP - 50); cx.lineTo(HIT_X, BAND_BOT + 50); cx.stroke();
+      cx.setLineDash([]);
+      // ноты-плашки
+      for (const [s, d, p] of NOTES) {
+        const x = HIT_X + (s - t) * PXS, w = Math.max(d * PXS - 10, 26), y = yOf(p);
+        if (x + w < -40 || x > W + 40) continue;
+        const active = t >= s && t < s + d;
+        cx.fillStyle = active ? 'rgba(61,229,201,.95)' : 'rgba(61,229,201,.22)';
+        if (active) { cx.shadowColor = 'rgba(61,229,201,.9)'; cx.shadowBlur = 34; }
+        roundRect(x, y - 19, w, 38, 19); cx.fill();
+        cx.shadowBlur = 0;
+      }
+      // вспышки-кольца на попаданиях
+      for (const [s, , p] of NOTES) {
+        if (s < HIT_FROM) continue;
+        const dt = t - s;
+        if (dt > 0 && dt < 0.4) {
+          cx.strokeStyle = `rgba(62,230,168,${(1 - dt / 0.4) * .9})`;
+          cx.lineWidth = 6;
+          cx.beginPath(); cx.arc(HIT_X, yOf(p), 24 + dt * 300, 0, Math.PI * 2); cx.stroke();
+        }
+      }
+      // след голоса (полностью из функции — скраб-безопасно)
+      const N = 78, dt0 = 0.016, dx = 3.4;
+      for (let k = N; k >= 0; k--) {
+        const tt = t - k * dt0;
+        if (tt < 0.2) continue;
+        const pv = pitchOf(tt);
+        const { cur, last } = targetAt(tt);
+        const col = zoneColor(pv - (cur != null ? cur : last));
+        const x = HIT_X - k * dx, y = yOf(pv);
+        cx.globalAlpha = 0.12 + (1 - k / N) * 0.65;
+        cx.fillStyle = col;
+        if (k < 3) { cx.shadowColor = col; cx.shadowBlur = 26; }
+        cx.beginPath(); cx.arc(x, y, k === 0 ? 15 : 5.5, 0, Math.PI * 2); cx.fill();
+        cx.shadowBlur = 0;
+      }
+      cx.globalAlpha = 1;
+    }
+    function roundRect(x, y, w, h, r) {
+      const rr = Math.min(r, h / 2, w / 2);
+      cx.beginPath();
+      cx.moveTo(x + rr, y);
+      cx.arcTo(x + w, y, x + w, y + h, rr);
+      cx.arcTo(x + w, y + h, x, y + h, rr);
+      cx.arcTo(x, y + h, x, y, rr);
+      cx.arcTo(x, y, x + w, y, rr);
+      cx.closePath();
+    }
+    const P = { t: 0 };
+    tl.to(P, { t: DUR, duration: DUR, ease: 'none', onUpdate: () => draw(P.t) }, 0);
+    draw(0);
+
+    /* ================= ТЕКСТОВЫЕ БИТЫ ================= */
+    // Бит 1 (0.25–3.4): хук. Входы с разными ease/направлениями.
+    tl.fromTo('#b1-eye', { opacity: 0, letterSpacing: '.5em' }, { opacity: 1, letterSpacing: '.22em', duration: .7, ease: 'expo.out' }, 0.25);
+    tl.fromTo('#b1-h', { opacity: 0, y: 90 }, { opacity: 1, y: 0, duration: .8, ease: 'power4.out' }, 0.4);
+    tl.fromTo('#b1-sub', { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: .55, ease: 'back.out(1.4)' }, 0.95);
+    tl.to('#b1', { opacity: 0, y: -50, duration: .35, ease: 'power2.in' }, 3.0);
+    tl.set('#b1', { visibility: 'hidden' }, 3.4);
+
+    // live-метка у линии (вход на старте hit-фазы) + пульс точки на таймлайне
+    tl.fromTo('#liveTag', { opacity: 0, scale: .7 }, { opacity: 1, scale: 1, duration: .5, ease: 'back.out(2)' }, 3.3);
+    tl.to('#liveDot', { opacity: .25, yoyo: true, repeat: 14, duration: .4, ease: 'sine.inOut' }, 3.3);
+    tl.to('#liveTag', { opacity: 0, duration: .3, ease: 'power2.in' }, 10.9);
+    tl.set('#liveTag', { visibility: 'hidden' }, 11.2);
+
+    // Бит 2 (3.6–8.3): подпись + «+Точно!» на реальных попаданиях (4.85 / 6.65 / 7.2)
+    tl.fromTo('#b2-cap', { opacity: 0, y: 70 }, { opacity: 1, y: 0, duration: .65, ease: 'expo.out' }, 3.6);
+    tl.to('#b2', { opacity: 0, y: -34, duration: .3, ease: 'power2.in' }, 8.0);
+    tl.set('#b2', { visibility: 'hidden' }, 8.3);
+    const pop = (id, at) => {
+      tl.fromTo(id, { opacity: 0, scale: .5, y: 16 }, { opacity: 1, scale: 1, y: 0, duration: .28, ease: 'back.out(2.6)' }, at);
+      tl.to(id, { opacity: 0, y: -40, duration: .5, ease: 'power1.in' }, at + 0.55);
+      tl.set(id, { visibility: 'hidden' }, at + 1.1);
+    };
+    pop('#pop1', 4.95); pop('#pop2', 6.75); pop('#pop3', 7.3);
+
+    // Бит 3 (8.5–11.6): статы — три направления, три ease, стаггер 0.16
+    tl.fromTo('#st1', { opacity: 0, x: -110 }, { opacity: 1, x: 0, duration: .55, ease: 'power3.out' }, 8.5);
+    tl.fromTo('#st2', { opacity: 0, x: 110 }, { opacity: 1, x: 0, duration: .55, ease: 'expo.out' }, 8.66);
+    tl.fromTo('#st3', { opacity: 0, scale: .8, y: 40 }, { opacity: 1, scale: 1, y: 0, duration: .5, ease: 'back.out(1.7)' }, 8.82);
+    tl.to('#b3', { opacity: 0, y: -40, duration: .35, ease: 'power2.in' }, 11.2);
+    tl.set('#b3', { visibility: 'hidden' }, 11.6);
+
+    // Бит 4 (11.7–15, финал): бренд. Затемнение подложки, логотип-эквалайзер дышит.
+    tl.set('#b4', { visibility: 'visible' }, 11.6);
+    tl.fromTo('#b4-bg', { opacity: 0 }, { opacity: 1, duration: .8, ease: 'sine.inOut' }, 11.6);
+    tl.fromTo('#eq', { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, duration: .6, ease: 'back.out(1.8)' }, 11.9);
+    tl.fromTo('#eq i', { scaleY: .4 }, { scaleY: 1, duration: .5, ease: 'elastic.out(1, .55)', stagger: .07, transformOrigin: 'bottom' }, 11.95);
+    tl.fromTo('#b4-h', { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: .7, ease: 'power4.out' }, 12.2);
+    tl.fromTo('#b4-tag', { opacity: 0 }, { opacity: 1, duration: .5, ease: 'sine.out' }, 12.6);
+    tl.fromTo('#b4-free', { opacity: 0, letterSpacing: '.3em' }, { opacity: 1, letterSpacing: '.08em', duration: .6, ease: 'expo.out' }, 12.85);
+    tl.fromTo('#b4-url', { opacity: 0, scale: .85 }, { opacity: 1, scale: 1, duration: .55, ease: 'back.out(1.6)' }, 13.1);
+    // дыхание логотипа — на таймлайне (скрабится), конечные повторы
+    tl.to('#eq', { scale: 1.05, yoyo: true, repeat: 3, duration: .45, ease: 'sine.inOut' }, 13.2);
+
+    // стартовое состояние финального блока (скрыт до своего бита)
+    gsap.set('#b4', { visibility: 'hidden' });
+    gsap.set('#b4-bg', { opacity: 0 });
+
+    window.__timelines['root'] = tl;
+  </script>
+</div>
+</body>
+</html>
