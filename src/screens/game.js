@@ -9,6 +9,7 @@ import * as progress from '../state/progress.js';
 import { logEvent } from '../state/analytics.js';
 import { MODES, modeUnlocked } from '../theory/modes.js';
 import { contourGlyph } from '../ui/illustrations.js';
+import { celebrate, haptic } from '../ui/celebrate.js';
 
 // Открыт ли блок «продвинутых» настроек (тембр/грув/наушники) — сохраняем между перерисовками.
 let moreSettingsOpen = false;
@@ -39,7 +40,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   const repLabel = (reps && reps.length > 1) ? ` · ${repIndex + 1}/${reps.length}` : '';
 
   app.innerHTML = `
-    <div class="screen game">
+    <div class="screen game ${progress.getDarkStage() ? 'stage-dark' : ''}">
       <div class="game-top">
         <button class="icon-btn" id="exit">‹ Меню</button>
         <div class="ex-name">${ex.name} · <span class="syl">«${ex.syllable}»</span>${repLabel}</div>
@@ -82,14 +83,14 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   // меняешь темп на экране объяснения/итога, и следующий проход уже с ним.
   const factor = progress.difficultyFactor();
   const exRun = { ...ex, tempo: Math.max(40, Math.round(ex.tempo * factor)) };
-  const highway = new NoteHighway(canvas, exRun);
+  const highway = new NoteHighway(canvas, exRun, { theme: progress.getDarkStage() ? 'dark' : 'light' });
   const scorer = new Scorer(ex.notes.length);
   // Компенсация задержки — из калибровки/маршрута вывода (Bluetooth опаздывает сильнее).
   const latency = progress.getLatency();
   // На динамике (не наушники/не BT) грув протекает в микрофон → будем приглушать на голос.
   const noBleed = progress.getHeadphones() || progress.getRouteKey() !== 'speaker';
   let grooveHandle = null;
-  let raf = null, startPerf = 0, lastPerf = 0, finished = false, pausedAbort = false, lastVoicedMs = 0;
+  let raf = null, startPerf = 0, lastPerf = 0, finished = false, pausedAbort = false, lastVoicedMs = 0, lastHapticIndex = -1;
   const guideHandles = [];
   const timers = [];
   const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
@@ -222,6 +223,11 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
       let cents = null;
       if (ev.voiced && sungHz && highway.timed[ev.index]) cents = centsOff(sungHz, highway.timed[ev.index].hz);
       scorer.record(ev.index, ev.zone, dt, ev.voiced, cents);
+      // Короткая вибрация при первом точном попадании в КАЖДУЮ ноту (тактильная награда).
+      if (ev.zone === 'green' && ev.voiced && ev.index !== lastHapticIndex) {
+        haptic(12);
+        lastHapticIndex = ev.index;
+      }
     }
     highway.draw(now, voiced ? sungHz : null, voiced);
 
@@ -289,6 +295,9 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     // Сообщаем результат вызывающему (напр. «Путь» засчитывает урок только при успехе).
     if (onResult) onResult(agg);
     if (onComplete) { onComplete(agg); return; }
+    // Одиночная распевка ≥50% — засчитываем день (стрик/дневная цель).
+    // Полная распевка и экзамены идут через onComplete и записываются своим флоу.
+    if (avgPct >= 0.5) progress.recordSession({ pct: avgPct, stars: agg.stars });
     // Энергия/жизни (по ТЗ, смягчено): <40% → разбор и предложение заново со списанием
     // энергии (без авто-рестарта — выбор за тобой); ≥50% → пополнение. Энергия восстанавливается со временем.
     if (avgPct < 0.4) {
@@ -300,6 +309,8 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   }
 
   function renderSummary(agg) {
+    // Празднование: 2★ — скромно, 3★ — ярко (+haptic). Уважает reduced-motion.
+    if (agg.stars >= 2) { celebrate(agg.stars >= 3 ? 2 : 1); haptic(agg.stars >= 3 ? 30 : 15); }
     const stars = '★'.repeat(agg.stars) + '☆'.repeat(3 - agg.stars);
     const pct = Math.round(agg.pct * 100);
     const verdict = agg.stars >= 3 ? 'Отлично!' : agg.stars === 2 ? 'Хорошо!' : agg.stars === 1 ? 'Неплохо' : 'Ещё разок';

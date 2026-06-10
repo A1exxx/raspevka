@@ -23,10 +23,13 @@ import { renderLeadForm } from './screens/lead-form.js';
 import { BLOCKS, EX_MAKERS } from './theory/curriculum.js';
 import { renderSettings } from './screens/settings.js';
 import { renderCalibrate } from './screens/calibrate.js';
+import { renderDevPanel } from './screens/dev-panel.js';
+import { renderPaywall } from './screens/paywall.js';
 import { setOutputVolume } from './audio/reference-tone.js';
 import { getMode } from './theory/modes.js';
 import { contourGlyph } from './ui/illustrations.js';
 import * as progress from './state/progress.js';
+import * as clock from './state/clock.js';
 
 const app = document.getElementById('app');
 const mic = new MicEngine({ fftSize: 2048 });
@@ -38,33 +41,45 @@ const DEFAULT_ROOT = 60;
 
 // Ладозависимые упражнения берут текущий лад (progress.getModeKey()) → выбор лада
 // реально меняет все гаммовые распевки (а не одну), что и даёт ценность тарифу Pro.
+// cat — категория для группировки «Свободной практики» на главной.
+// ВАЖНО: порядок/индексы НЕ менять — на них ссылаются уроки «Пути» (path.js).
 const EXERCISES = [
-  { label: 'Мычание по гамме', sub: '«М» · I-II-III-II-I', ic: 'lips', make: (r) => hum3(r, progress.getModeKey()) },
-  { label: 'Губной тренаж «brrr»', sub: 'brrr / «Р» · 5 нот + квинта', ic: 'wave', make: (r) => lipTrill(r, progress.getModeKey()) },
-  { label: 'Удержание ноты', sub: 'держать ровный звук', ic: 'fork', make: (r) => sustain(r, 8) },
-  { label: 'Гамма «Ма-Мэ»', sub: 'попадать в ноты гаммы', ic: 'stairs', make: (r) => fiveNoteScale(r, progress.getModeKey()) },
-  { label: 'Беглость «Ма»', sub: 'быстрые ноты — как в рекламе', ic: 'bolt', make: (r) => agilityRun(r, progress.getModeKey()) },
-  { label: 'Октавный скачок', sub: 'прыжок на октаву и назад', ic: 'arrows', make: (r) => octaveJump(r) },
-  { label: 'Цепочка гласных', sub: 'Ми-Ме-Ма · выравнивание', ic: 'lips', make: (r) => vowelChain(r, progress.getModeKey()) },
-  { label: 'Calm Down Vowels', sub: 'И-Э-А-О-У · позиция', ic: 'lips', make: (r) => vowelHold(r) },
-  { label: 'Disco Vowels', sub: 'И-Э-А-О-У · точность', ic: 'stairs', make: (r) => vowelScale(r, progress.getModeKey()) },
-  { label: 'James Charles Warm Up', sub: 'гласные + Ми-Ме-Ма', ic: 'wave', make: (r) => jamesCharles(r, progress.getModeKey()) },
-  { label: 'High Five', sub: 'И-Э-А-О-У · подъём', ic: 'arrows', make: (r) => vowelClimb(r, progress.getModeKey()) },
-  { label: 'No Bubble Gum', sub: 'гибкость на гласных', ic: 'bolt', make: (r) => vowelAgility(r, progress.getModeKey()) },
-  { label: 'Скачок к V ступени', sub: 'Ям · атака интервала', ic: 'arrows', make: (r) => jumpToFifth(r, progress.getModeKey()) },
-  { label: 'Ладовая «ЯМ»', sub: 'гамма лада вверх-вниз', ic: 'stairs', make: (r) => ladVocalise(r, progress.getModeKey()) },
-  { label: 'Вибрато', sub: 'ровная волна голосом', ic: 'wave', make: (r) => vibratoHold(r) },
-  { label: 'Раскачка вибрато', sub: 'А · запуск вибрато', ic: 'wave', make: (r) => vibratoWobble(r) },
-  { label: 'Тёплый тон', sub: 'Мо · качество тембра', ic: 'fork', make: (r) => timbreVocalise(r) },
-  { label: 'Ровный тон на двух', sub: 'А · единый тембр', ic: 'fork', make: (r) => timbreShift(r) },
-  { label: 'Через регистры', sub: 'Но · passaggio', ic: 'arrows', make: (r) => registerArp(r) },
-  { label: 'Октавная связка', sub: 'А · соединить регистры', ic: 'arrows', make: (r) => registerOctave(r) },
-  { label: 'Белтинг — гамма', sub: 'Эй · яркая подача', ic: 'bolt', make: (r) => beltScale(r) },
-  { label: 'Белт — октава', sub: 'Эй · опёртый верх', ic: 'arrows', make: (r) => beltOctave(r) },
-  { label: 'Чёткое стаккато', sub: 'Та · артикуляция', ic: 'bolt', make: (r) => articStaccato(r) },
-  { label: 'Слоги по группам', sub: 'Та-Ка · дикция', ic: 'lips', make: (r) => articGroups(r) },
-  { label: 'Стамина-фигура', sub: 'Ма · выносливость', ic: 'stairs', make: (r) => resistTurn(r) },
-  { label: 'Выносливая гамма', sub: 'Ма · длинный пробег', ic: 'stairs', make: (r) => resistRun(r) },
+  { label: 'Мычание по гамме', sub: '«М» · I-II-III-II-I', ic: 'lips', cat: 'warm', make: (r) => hum3(r, progress.getModeKey()) },
+  { label: 'Губной тренаж «brrr»', sub: 'brrr / «Р» · 5 нот + квинта', ic: 'wave', cat: 'warm', make: (r) => lipTrill(r, progress.getModeKey()) },
+  { label: 'Удержание ноты', sub: 'держать ровный звук', ic: 'fork', cat: 'warm', make: (r) => sustain(r, 8) },
+  { label: 'Гамма «Ма-Мэ»', sub: 'попадать в ноты гаммы', ic: 'stairs', cat: 'pitch', make: (r) => fiveNoteScale(r, progress.getModeKey()) },
+  { label: 'Беглость «Ма»', sub: 'быстрые ноты — как в рекламе', ic: 'bolt', cat: 'pitch', make: (r) => agilityRun(r, progress.getModeKey()) },
+  { label: 'Октавный скачок', sub: 'прыжок на октаву и назад', ic: 'arrows', cat: 'pitch', make: (r) => octaveJump(r) },
+  { label: 'Цепочка гласных', sub: 'Ми-Ме-Ма · выравнивание', ic: 'lips', cat: 'vowel', make: (r) => vowelChain(r, progress.getModeKey()) },
+  { label: 'Calm Down Vowels', sub: 'И-Э-А-О-У · позиция', ic: 'lips', cat: 'vowel', make: (r) => vowelHold(r) },
+  { label: 'Disco Vowels', sub: 'И-Э-А-О-У · точность', ic: 'stairs', cat: 'vowel', make: (r) => vowelScale(r, progress.getModeKey()) },
+  { label: 'James Charles Warm Up', sub: 'гласные + Ми-Ме-Ма', ic: 'wave', cat: 'vowel', make: (r) => jamesCharles(r, progress.getModeKey()) },
+  { label: 'High Five', sub: 'И-Э-А-О-У · подъём', ic: 'arrows', cat: 'vowel', make: (r) => vowelClimb(r, progress.getModeKey()) },
+  { label: 'No Bubble Gum', sub: 'гибкость на гласных', ic: 'bolt', cat: 'vowel', make: (r) => vowelAgility(r, progress.getModeKey()) },
+  { label: 'Скачок к V ступени', sub: 'Ям · атака интервала', ic: 'arrows', cat: 'pitch', make: (r) => jumpToFifth(r, progress.getModeKey()) },
+  { label: 'Ладовая «ЯМ»', sub: 'гамма лада вверх-вниз', ic: 'stairs', cat: 'pitch', make: (r) => ladVocalise(r, progress.getModeKey()) },
+  { label: 'Вибрато', sub: 'ровная волна голосом', ic: 'wave', cat: 'vib', make: (r) => vibratoHold(r) },
+  { label: 'Раскачка вибрато', sub: 'А · запуск вибрато', ic: 'wave', cat: 'vib', make: (r) => vibratoWobble(r) },
+  { label: 'Тёплый тон', sub: 'Мо · качество тембра', ic: 'fork', cat: 'vib', make: (r) => timbreVocalise(r) },
+  { label: 'Ровный тон на двух', sub: 'А · единый тембр', ic: 'fork', cat: 'vib', make: (r) => timbreShift(r) },
+  { label: 'Через регистры', sub: 'Но · passaggio', ic: 'arrows', cat: 'reg', make: (r) => registerArp(r) },
+  { label: 'Октавная связка', sub: 'А · соединить регистры', ic: 'arrows', cat: 'reg', make: (r) => registerOctave(r) },
+  { label: 'Белтинг — гамма', sub: 'Эй · яркая подача', ic: 'bolt', cat: 'reg', make: (r) => beltScale(r) },
+  { label: 'Белт — октава', sub: 'Эй · опёртый верх', ic: 'arrows', cat: 'reg', make: (r) => beltOctave(r) },
+  { label: 'Чёткое стаккато', sub: 'Та · артикуляция', ic: 'bolt', cat: 'artic', make: (r) => articStaccato(r) },
+  { label: 'Слоги по группам', sub: 'Та-Ка · дикция', ic: 'lips', cat: 'artic', make: (r) => articGroups(r) },
+  { label: 'Стамина-фигура', sub: 'Ма · выносливость', ic: 'stairs', cat: 'artic', make: (r) => resistTurn(r) },
+  { label: 'Выносливая гамма', sub: 'Ма · длинный пробег', ic: 'stairs', cat: 'artic', make: (r) => resistRun(r) },
+];
+
+// Категории «Свободной практики» (порядок показа на главной).
+const CATS = [
+  ['warm', 'Разогрев'],
+  ['vowel', 'Гласные'],
+  ['pitch', 'Точность и гибкость'],
+  ['vib', 'Вибрато и тембр'],
+  ['reg', 'Регистры и сила'],
+  ['artic', 'Дикция и выносливость'],
 ];
 
 // Корень упражнений из центра типа голоса (иначе C4).
@@ -140,7 +155,52 @@ function renderSplash() {
 
 function bootToMenu() {
   setupMicFab();
+  // Тест-режим по URL (?dev=1) — для QA-прогонов.
+  try { if (new URLSearchParams(location.search).has('dev')) progress.setDevMode(true); } catch (e) { /* ok */ }
+  // Первый запуск: «магия за минуту» — определить голос до меню (главное первое впечатление).
+  if (!progress.getVoice() && !progress.load().welcomed) { renderWelcome(); return; }
   renderMenu();
+}
+
+// ---------- Приветствие первого запуска (magic-demo) ----------
+function renderWelcome() {
+  stopRaf();
+  app.innerHTML = `
+    <div class="screen welcome">
+      <div class="brand">
+        <div class="eq eq-static" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <h1>Привет! Это «Распевка»</h1>
+        <p>Игровой тренажёр голоса: пой — и смотри, как твой голос попадает в ноты. Начнём с волшебного: за минуту узнаем твой тип голоса и диапазон.</p>
+      </div>
+      <button class="btn btn-primary" id="wlc-go" style="width:100%">🎤 Определить мой голос · 1 минута</button>
+      <button class="btn btn-ghost" id="wlc-skip" style="width:100%">Сначала осмотрюсь</button>
+      <p class="hint">Понадобится доступ к микрофону — мы слушаем только высоту тона, ничего не записываем и не отправляем.</p>
+    </div>
+  `;
+  const markWelcomed = () => progress.save({ ...progress.load(), welcomed: true });
+  document.getElementById('wlc-skip').addEventListener('click', () => { markWelcomed(); renderMenu(); });
+  document.getElementById('wlc-go').addEventListener('click', () => {
+    markWelcomed();
+    enterMic(() => renderVoice(app, mic, tracker, {
+      onDone: () => { applyTrackerRange(); renderFirstExercise(); },
+      onExit: renderMenu,
+    }));
+  });
+}
+
+// После определения голоса — сразу первая распевка (момент успеха, не возврат в меню).
+function renderFirstExercise() {
+  stopRaf();
+  app.innerHTML = `
+    <div class="screen welcome">
+      <div class="brand"><h1>Отлично! 🎉</h1>
+        <p>Упражнения уже подстроились под твой голос. Попробуем первую распевку — мягкое мычание, 1 минута.</p></div>
+      <button class="btn btn-primary" id="fe-go" style="width:100%">Первая распевка →</button>
+      <button class="btn btn-ghost" id="fe-menu" style="width:100%">В меню</button>
+    </div>
+  `;
+  document.getElementById('fe-go').addEventListener('click', () => startExercise(0));
+  document.getElementById('fe-menu').addEventListener('click', renderMenu);
 }
 
 // ---------- Микрофон: ленивое включение + постоянная кнопка ----------
@@ -241,8 +301,9 @@ const dayWord = (n) => (n % 10 === 1 && n % 100 !== 11 ? 'день' : 'дн.');
 // ---------- Экран 2: меню (домашний) ----------
 function renderMenu() {
   stopRaf();
-  // Распевки — сетка карточек с РИСУНКОМ МЕЛОДИИ (наглядно «куда ведёт» голос).
-  const exCards = EXERCISES.map((e, i) => {
+  // Распевки — карточки с РИСУНКОМ МЕЛОДИИ, сгруппированы по категориям
+  // в горизонтальные ленты (главная остаётся короткой, а выбор — большим).
+  const exTile = (e, i) => {
     const midis = e.make(60).notes.map((n) => n.midi); // форма от фикс. тоники (root не влияет на рисунок)
     return `
     <button class="ex-tile" data-ex="${i}">
@@ -250,7 +311,15 @@ function renderMenu() {
       <span class="ex-tile-main">${e.label}</span>
       <span class="ex-tile-sub">${e.sub}</span>
     </button>`;
+  };
+  const practiceRows = CATS.map(([key, title]) => {
+    const tiles = EXERCISES.map((e, i) => (e.cat === key ? exTile(e, i) : '')).join('');
+    return `<div class="cat-title">${title}</div><div class="ex-row">${tiles}</div>`;
   }).join('');
+  // Программа обучения — главный путь: куда идти дальше.
+  const examsPassed = progress.getExamsPassed();
+  const nextBlockIdx = BLOCKS.findIndex((b) => !examsPassed.includes(b.id));
+  const progPct = Math.round((examsPassed.length / BLOCKS.length) * 100);
   // Дыхание/артикуляция — тонкие компактные строки.
   const breathThin = Object.entries(BREATHING).map(([k, b]) => `
     <button class="thin-item" data-breath="${k}"><span>${b.title}</span><span class="thin-sub">${b.kind === 'exhale' ? 'выдох' : 'дыхание'}</span></button>
@@ -267,10 +336,10 @@ function renderMenu() {
   const streak = progress.getStreak();
   const voice = progress.getVoice();
   const vType = voice && getVoiceType(voice.key);
-  // «Сегодня»: сделана ли тренировка сегодня + ротация «фокуса дня»
-  const today = new Date().toISOString().slice(0, 10);
-  const todayDone = progress.getHistory().some((h) => h.date === today);
-  const _d = new Date();
+  // «Сегодня»: сделана ли тренировка сегодня + ротация «фокуса дня» (время — через clock,
+  // чтобы тест-режим мог перематывать дни).
+  const todayDone = progress.isDailyDone();
+  const _d = clock.today();
   const focusIdx = (_d.getDate() + _d.getMonth()) % EXERCISES.length;
   const focus = EXERCISES[focusIdx];
   const modeName = getMode(progress.getModeKey()).name;
@@ -283,6 +352,8 @@ function renderMenu() {
         <div class="home-chips">
           <div class="energy-chip" title="Энергия — копится за точные распевки"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>${energy}/${maxE}</div>
           ${streak > 0 ? `<div class="streak-chip">${flameSvg()} ${streak} ${dayWord(streak)}</div>` : ''}
+          ${progress.getFreezes() > 0 ? `<div class="energy-chip" title="Заморозка стрика — страхует 1 пропущенный день">❄ ${progress.getFreezes()}</div>` : ''}
+          ${progress.getDevMode() ? '<button class="gear-btn" data-dev aria-label="Тест-режим" title="Тест-режим">🧪</button>' : ''}
           <button class="gear-btn" data-settings aria-label="Настройки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
         </div>
       </header>
@@ -294,9 +365,12 @@ function renderMenu() {
         <span class="hero-arrow">→</span>
       </button>
 
-      <button class="focus-chip" data-focus>
-        <span class="fc-label">Фокус дня — <b>${focus.label}</b></span>
-        <span class="fc-go">→</span>
+      <button class="hero-card program-card" data-path>
+        <div class="hero-eyebrow">Программа обучения</div>
+        <div class="hero-title pc-title">${nextBlockIdx === -1 ? 'Все блоки пройдены! 🏆' : `Блок ${nextBlockIdx + 1} · ${BLOCKS[nextBlockIdx].title}`}</div>
+        <div class="prog-bar pc-bar"><i style="width:${progPct}%"></i></div>
+        <div class="hero-sub">${examsPassed.length} / ${BLOCKS.length} блоков · каждый завершается экзаменом</div>
+        <span class="hero-arrow">→</span>
       </button>
 
       <div class="tiles">
@@ -305,30 +379,34 @@ function renderMenu() {
         <button class="tile" data-dash="1">${icon('chart')}<span class="tile-main">Прогресс</span><span class="tile-sub">${streak > 0 ? streak + ' ' + dayWord(streak) + ' подряд' : 'статистика'}</span></button>
       </div>
 
+      <button class="focus-chip" data-focus>
+        <span class="fc-label">Фокус дня — <b>${focus.label}</b></span>
+        <span class="fc-go">→</span>
+      </button>
+
       <section class="home-sec">
-        <div class="sec-title">Курс и развитие</div>
+        <div class="sec-title">Свободная практика</div>
+        ${practiceRows}
+      </section>
+      <section class="home-sec">
+        <div class="sec-title">Дыхание и ритм</div>
+        <div class="thin-list">${rhythmThin}${breathThin}</div>
+      </section>
+      <section class="home-sec">
+        <div class="sec-title">Песни</div>
+        <div class="ex-row">${songCards}</div>
+      </section>
+      <section class="home-sec">
+        <div class="sec-title">Инструменты</div>
         <div class="thin-list">
-          <button class="thin-item" data-path><span>Программа обучения</span><span class="thin-sub">${progress.getExamsPassed().length} / ${BLOCKS.length} блоков</span></button>
           <button class="thin-item" data-ear><span>Спой за мной</span><span class="thin-sub">тренировка слуха</span></button>
           <button class="thin-item" data-theory><span>Теория голоса</span><span class="thin-sub">карточки</span></button>
           <button class="thin-item" data-record><span>Запись голоса</span><span class="thin-sub">послушай себя</span></button>
           <button class="thin-item" data-backing><span>Пой под фонограмму</span><span class="thin-sub">распевка с повышением</span></button>
           <button class="thin-item" data-modes><span>Лад распевок</span><span class="thin-sub">${modeName}</span></button>
-          <button class="thin-item thin-cta" data-teacher><span>Урок с педагогом</span><span class="thin-sub">бесплатный пробный →</span></button>
         </div>
       </section>
-      <section class="home-sec">
-        <div class="sec-title">Распевки</div>
-        <div class="ex-grid">${exCards}</div>
-      </section>
-      <section class="home-sec">
-        <div class="sec-title">Дыхание и артикуляция</div>
-        <div class="thin-list">${rhythmThin}${breathThin}</div>
-      </section>
-      <section class="home-sec">
-        <div class="sec-title">Песни</div>
-        <div class="ex-grid">${songCards}</div>
-      </section>
+      <button class="thin-item thin-cta" data-teacher style="width:100%"><span>Урок с живым педагогом</span><span class="thin-sub">бесплатный пробный →</span></button>
       <p class="hint">Темп и «подсказку тоном» настраивай прямо в упражнении — значок ⚙.</p>
     </div>
   `;
@@ -386,9 +464,49 @@ function renderMenu() {
   app.querySelectorAll('[data-song]').forEach((btn) => {
     btn.addEventListener('click', () => startSong(Number(btn.dataset.song)));
   });
+  // Тест-режим: чип 🧪 (когда включён) или 7 быстрых тапов по заголовку.
+  const devBtn = app.querySelector('[data-dev]');
+  if (devBtn) devBtn.addEventListener('click', renderDevScreen);
+  const logo = app.querySelector('.home-head h1');
+  if (logo) {
+    let taps = 0, lastTap = 0;
+    logo.addEventListener('click', () => {
+      const t = Date.now();
+      taps = t - lastTap < 600 ? taps + 1 : 1;
+      lastTap = t;
+      if (taps >= 7) { taps = 0; progress.setDevMode(true); renderDevScreen(); }
+    });
+  }
+}
+
+function renderDevScreen() {
+  stopRaf();
+  renderDevPanel(app, { onExit: renderMenu });
+}
+
+// Пейволл (показывается только при включённом флаге — см. dev-панель).
+function renderPaywallScreen() {
+  stopRaf();
+  renderPaywall(app, {
+    onExit: renderMenu,
+    onTrialStarted: renderMenu,
+    onTeacher: () => renderSchoolInfo(renderMenu),
+  });
+}
+
+/** Гейт свободной практики: при включённом пейволле считаем распевки дня и упираемся в лимит. */
+function gateUse(fn) {
+  if (progress.isPaywalled()) { renderPaywallScreen(); return; }
+  if (progress.getPaywallEnabled()) progress.countUse();
+  fn();
 }
 
 function startExercise(i, explain = true) {
+  // Повтор («Ещё раз») лимит не тратит — считаем только новые запуски.
+  if (explain) { gateUse(() => startExercise2(i, explain)); return; }
+  startExercise2(i, explain);
+}
+function startExercise2(i, explain) {
   enterMic(() => {
     applyTrackerRange();
     const exercise = EXERCISES[i].make(voiceRoot());
@@ -407,6 +525,10 @@ function startExercise(i, explain = true) {
 }
 
 function startSong(i, explain = true) {
+  if (explain) { gateUse(() => startSong2(i, explain)); return; }
+  startSong2(i, explain);
+}
+function startSong2(i, explain) {
   enterMic(() => {
     const ex = SONGS[i].make(voiceRoot());
     renderGame(app, mic, tracker, ex, {

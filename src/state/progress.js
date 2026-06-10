@@ -1,4 +1,7 @@
 // progress.js — localStorage: диапазон голоса, стрик, история сессий.
+// Время берём ТОЛЬКО из clock (не Date.now) — чтобы тест-режим мог «перематывать» дни.
+import * as clock from './clock.js';
+
 const KEY = 'raspevka.progress.v1';
 
 export function load() {
@@ -26,17 +29,33 @@ export function setRange(low, high) {
   return p.range;
 }
 
-function dayStr(d) { return d.toISOString().slice(0, 10); }
+function dayStr(d) { return clock.dayStr(d); }
 
-/** Записать завершённую сессию, обновить стрик. Возвращает {streak, total}. */
+/**
+ * Записать завершённую сессию, обновить стрик.
+ * Заморозка стрика: если пропущен РОВНО один день и есть заморозка — она тратится,
+ * стрик продолжается. Заморозки копятся: +1 за каждые 7 дней подряд (максимум 2).
+ * Возвращает {streak, total, freezeSpent}.
+ */
 export function recordSession(result) {
   const p = load();
-  const today = dayStr(new Date());
-  const yesterday = dayStr(new Date(Date.now() - 864e5));
+  const today = clock.dayStr();
+  const yesterday = clock.dayStr(new Date(clock.now() - 864e5));
+  const dayBefore = clock.dayStr(new Date(clock.now() - 2 * 864e5));
+  let freezeSpent = false;
 
   if (p.lastDate !== today) {
-    p.streak = p.lastDate === yesterday ? (p.streak || 0) + 1 : 1;
+    if (p.lastDate === yesterday) {
+      p.streak = (p.streak || 0) + 1;
+    } else if (p.lastDate === dayBefore && (p.freezes || 0) > 0) {
+      p.freezes -= 1;
+      freezeSpent = true;
+      p.streak = (p.streak || 0) + 1;
+    } else {
+      p.streak = 1;
+    }
     p.lastDate = today;
+    if (p.streak > 0 && p.streak % 7 === 0) p.freezes = Math.min(2, (p.freezes || 0) + 1);
   } else if (!p.streak) {
     p.streak = 1;
   }
@@ -47,11 +66,30 @@ export function recordSession(result) {
   p.total = (p.total || 0) + 1;
 
   save(p);
-  return { streak: p.streak, total: p.total };
+  return { streak: p.streak, total: p.total, freezeSpent };
 }
 
 export function getStreak() {
   return load().streak || 0;
+}
+
+/** Заморозки стрика (страховка на 1 пропущенный день). */
+export function getFreezes() { return load().freezes || 0; }
+export function setFreezes(n) { const p = load(); p.freezes = Math.max(0, Math.min(2, Math.round(n))); save(p); return p.freezes; }
+
+/** Дневная цель: выполнена ли тренировка сегодня (хотя бы одна распевка). */
+export function isDailyDone() {
+  const today = clock.dayStr();
+  return (load().history || []).some((h) => h.date === today);
+}
+
+/** Тестовые сеттеры (dev-панель): стрик и дата последней тренировки. */
+export function devSetStreak(n) {
+  const p = load();
+  p.streak = Math.max(0, Math.round(n));
+  p.lastDate = clock.dayStr();
+  save(p);
+  return p.streak;
 }
 
 export function getHistory() { return load().history || []; }
@@ -72,7 +110,7 @@ export function getLeads() { return load().leads || []; }
 export function saveLead(lead) {
   const p = load();
   p.leads = p.leads || [];
-  p.leads.push({ ts: Date.now(), ...lead });
+  p.leads.push({ ts: clock.now(), ...lead });
   if (p.leads.length > 50) p.leads = p.leads.slice(-50);
   save(p);
   return p.leads;
@@ -114,7 +152,7 @@ export function getEnergy() {
   const p = load();
   let e = p.energy == null ? MAX_ENERGY : p.energy;
   if (e < MAX_ENERGY && p.energyTs) {
-    const regen = Math.floor((Date.now() - p.energyTs) / (REGEN_MIN * 60000));
+    const regen = Math.floor((clock.now() - p.energyTs) / (REGEN_MIN * 60000));
     if (regen > 0) e = Math.min(MAX_ENERGY, e + regen);
   }
   return e;
@@ -124,7 +162,7 @@ export function setEnergy(v) {
   const clamped = Math.max(0, Math.min(MAX_ENERGY, Math.round(v)));
   p.energy = clamped;
   // если не полная — запомним момент, от которого пойдёт восстановление
-  p.energyTs = clamped < MAX_ENERGY ? Date.now() : null;
+  p.energyTs = clamped < MAX_ENERGY ? clock.now() : null;
   save(p);
   return clamped;
 }
@@ -157,7 +195,7 @@ export function recordNote(midi) {
   else if (midi < p.range.low) { p.range.low = midi; extended = 'low'; }
   if (extended) {
     p.rangeHistory = p.rangeHistory || [];
-    p.rangeHistory.push({ date: dayStr(new Date()), low: p.range.low, high: p.range.high });
+    p.rangeHistory.push({ date: clock.dayStr(), low: p.range.low, high: p.range.high });
     if (p.rangeHistory.length > 100) p.rangeHistory = p.rangeHistory.slice(-100);
     save(p);
   }
@@ -177,7 +215,7 @@ export function setVoice(key, low = null, high = null) {
     p.range = { low: Math.round(low), high: Math.round(high) };
     // История диапазона — чтобы показывать рост во времени в дашборде.
     p.rangeHistory = p.rangeHistory || [];
-    p.rangeHistory.push({ date: dayStr(new Date()), low: Math.round(low), high: Math.round(high) });
+    p.rangeHistory.push({ date: clock.dayStr(), low: Math.round(low), high: Math.round(high) });
     if (p.rangeHistory.length > 100) p.rangeHistory = p.rangeHistory.slice(-100);
   }
   save(p);
@@ -282,6 +320,10 @@ export function setLatencyManual(sec) {
   return p.latencyManual;
 }
 
+/** Тёмный экран пения (премиум-вид игрового экрана). По умолчанию ВЫКЛ — светлый. */
+export function getDarkStage() { return load().darkStage === true; }
+export function setDarkStage(on) { const p = load(); p.darkStage = !!on; save(p); return p.darkStage; }
+
 /** Авто-усиление микрофона (AGC). По умолчанию ВЫКЛ — стабильнее детекция высоты
  *  (AGC создан для голосовой связи, «пампит» амплитуду и мешает MPM). Вкл — для очень тихих микрофонов. */
 export function getMicAGC() { return load().micAGC === true; }
@@ -325,4 +367,75 @@ export function recordBreathBest(seconds) {
   p.breathBest = Math.max(p.breathBest || 0, seconds);
   save(p);
   return p.breathBest;
+}
+
+// ================== Монетизация (каркас, ВЫКЛЮЧЕН по умолчанию) ==================
+// Модель (по ресёрчу конкурентов): freemium + soft-paywall по числу распевок в день
+// + 7-дневный триал. Включается флагом paywallEnabled из dev-панели — до включения
+// пользователь ничего не видит. НЕ time/energy-cap (антипаттерн Duolingo).
+
+export const FREE_PER_DAY = 5;      // бесплатных распевок в день при включённом пейволле
+export const TRIAL_DAYS = 7;
+
+export function getPaywallEnabled() { return load().paywallEnabled === true; }
+export function setPaywallEnabled(on) { const p = load(); p.paywallEnabled = !!on; save(p); return p.paywallEnabled; }
+
+/** Старт 7-дневного триала (один раз). */
+export function startTrial() {
+  const p = load();
+  if (!p.trialStart) { p.trialStart = clock.now(); save(p); }
+  return p.trialStart;
+}
+export function getTrialDaysLeft() {
+  const t = load().trialStart;
+  if (!t) return null; // триал не начат
+  const left = TRIAL_DAYS - Math.floor((clock.now() - t) / 864e5);
+  return Math.max(0, left);
+}
+export function isTrialActive() {
+  const left = getTrialDaysLeft();
+  return left != null && left > 0;
+}
+export function devResetTrial() { const p = load(); delete p.trialStart; save(p); }
+
+/** Премиум-доступ: платный тариф ИЛИ активный триал. */
+export function isPremium() {
+  return getTier() !== 'free' || isTrialActive();
+}
+
+/** Счётчик распевок за сегодня (для soft-paywall). Считаем на старте упражнения. */
+export function getUsesToday() {
+  const p = load();
+  return p.uses && p.uses.date === clock.dayStr() ? p.uses.count : 0;
+}
+export function countUse() {
+  const p = load();
+  const today = clock.dayStr();
+  p.uses = p.uses && p.uses.date === today ? { date: today, count: p.uses.count + 1 } : { date: today, count: 1 };
+  save(p);
+  return p.uses.count;
+}
+
+/** Упёрся ли пользователь в дневной лимит (пейволл выключен → всегда false). */
+export function isPaywalled() {
+  if (!getPaywallEnabled() || isPremium()) return false;
+  return getUsesToday() >= FREE_PER_DAY;
+}
+
+// ================== Тест-режим (dev-панель) ==================
+export function getDevMode() { return load().devMode === true; }
+export function setDevMode(on) { const p = load(); p.devMode = !!on; save(p); return p.devMode; }
+
+/** Разблокировать все блоки программы (пометить экзамены сданными). */
+export function devUnlockAllBlocks(blockIds) {
+  const p = load();
+  p.examsPassed = blockIds.slice();
+  save(p);
+  return p.examsPassed;
+}
+export function devLockAllBlocks() {
+  const p = load();
+  delete p.examsPassed;
+  delete p.blockItems;
+  save(p);
 }

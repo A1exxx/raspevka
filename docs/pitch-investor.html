@@ -1,175 +1,168 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Распевка × Прояви — для партнёра</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>«Распевка» × «Прояви» — предложение для партнёра</title>
 <style>
-  :root{
-    --bg:#eef2f4; --surface:#ffffff; --ink:#1b2430; --dim:#5c6775;
-    --accent:#0e8d7f; --accent-2:#0a766a; --soft:#e3f3f0; --line:#e4e9ef;
-    --gold:#c4880a; --green:#12a36b;
-    --shadow:0 18px 50px -28px rgba(20,33,55,.32);
-    --r:18px;
-    --font:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  /* Самодостаточный одностраничник: открывается локально, красиво печатается в PDF
+     (Ctrl+P). Системные шрифты — ничего не грузится извне. */
+  :root {
+    --teal: #0e8d7f; --teal-d: #0a766a; --teal-soft: #e3f3f0;
+    --ink: #1b2430; --dim: #687485; --line: #e2e7ee; --bg: #f5f7f9;
+    --green: #2fab84; --amber: #e0a64a;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:var(--font);color:var(--ink);background:
-    radial-gradient(130% 60% at 50% -10%,#fff 0%,var(--bg) 60%) fixed;
-    line-height:1.6;-webkit-font-smoothing:antialiased;padding:40px 20px 80px}
-  .doc{max-width:820px;margin:0 auto}
-  .brandbar{display:flex;align-items:center;justify-content:space-between;
-    font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-2);
-    font-weight:700;margin-bottom:30px}
-  .brandbar .tag{color:var(--dim);font-weight:600;text-transform:none;letter-spacing:0}
-  .hero{background:linear-gradient(140deg,#fff 0%,var(--soft) 140%);
-    border:1px solid var(--line);border-radius:26px;padding:46px 40px;box-shadow:var(--shadow);
-    position:relative;overflow:hidden}
-  .hero::after{content:'';position:absolute;right:-50px;top:-50px;width:200px;height:200px;
-    border-radius:50%;background:radial-gradient(circle,rgba(14,141,127,.16),transparent 70%)}
-  .hero .eyebrow{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-2);font-weight:700}
-  .hero h1{font-size:clamp(28px,5vw,42px);line-height:1.12;font-weight:800;letter-spacing:-.02em;margin:12px 0 16px;position:relative}
-  .hero p{font-size:18px;color:var(--dim);max-width:60ch;position:relative}
-  section{margin-top:42px}
-  h2{font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent-2);
-    font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--line)}
-  h3{font-size:20px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px}
-  p.lead{font-size:16px;color:var(--ink);margin-bottom:14px}
-  p.body{color:var(--dim);margin-bottom:12px}
-  ul{list-style:none;display:flex;flex-direction:column;gap:11px;margin:6px 0 4px}
-  ul li{position:relative;padding-left:30px;color:var(--ink)}
-  ul li b{color:var(--ink)}
-  ul li svg{position:absolute;left:0;top:3px;width:18px;height:18px;color:var(--accent)}
-  .flywheel{display:grid;grid-template-columns:1fr;gap:14px;margin-top:8px}
-  .fw{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
-  .fw .n{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;
-    background:var(--soft);color:var(--accent-2);font-weight:800;font-size:14px;margin-bottom:8px}
-  .fw h4{font-size:17px;font-weight:800;margin-bottom:4px}
-  .fw p{color:var(--dim);font-size:15px}
-  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 16px;text-align:center;box-shadow:var(--shadow)}
-  .kpi .num{font-size:30px;font-weight:800;color:var(--accent-2);line-height:1}
-  .kpi .lbl{font-size:13px;color:var(--dim);margin-top:8px;line-height:1.35}
-  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:15px;
-    background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  th,td{padding:13px 14px;text-align:left;border-bottom:1px solid var(--line)}
-  th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--dim);font-weight:700;background:#f7f9fb}
-  td b{color:var(--ink)}
-  tr:last-child td{border-bottom:none}
-  tr.best td{background:var(--soft)}
-  tr.best td:first-child{font-weight:800;color:var(--accent-2)}
-  .callout{background:var(--soft);border:1px solid #c9e8e2;border-radius:16px;padding:20px 22px;margin-top:8px}
-  .callout h3{color:var(--accent-2)}
-  .callout p{color:#28534d}
-  .muted{font-size:13px;color:var(--dim);margin-top:40px;text-align:center}
-  @media (max-width:560px){.kpis{grid-template-columns:1fr}.hero{padding:32px 24px}
-    table{font-size:13px}th,td{padding:10px 9px}}
-  @media print{body{background:#fff;padding:0}.hero,.kpi,table{box-shadow:none}
-    section{break-inside:avoid}}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    color: var(--ink); background: var(--bg); line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 860px; margin: 0 auto; padding: 48px 28px 80px; }
+  h1, h2 { font-family: Georgia, 'Times New Roman', serif; letter-spacing: -.01em; }
+  h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.12; }
+  h2 { font-size: 24px; margin: 0 0 14px; }
+  section { background: #fcfdfe; border: 1px solid var(--line); border-radius: 18px; padding: 28px; margin-top: 18px; }
+  .hero { background: linear-gradient(135deg, #0e8d7f 0%, #0a766a 100%); color: #fff; border: none; padding: 40px 32px; }
+  .hero .eyebrow { text-transform: uppercase; letter-spacing: .14em; font-size: 12px; opacity: .85; margin-bottom: 12px; }
+  .hero p.lead { font-size: 18px; margin-top: 14px; max-width: 640px; opacity: .96; }
+  .hero .live {
+    display: inline-block; margin-top: 22px; background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.3); color: #fff; text-decoration: none;
+    padding: 12px 20px; border-radius: 999px; font-weight: 700; font-size: 15px;
+  }
+  .hero .live b { color: #b9f4e9; }
+  .dim { color: var(--dim); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+  @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+  .cell { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .cell b { display: block; margin-bottom: 4px; }
+  .flow { display: flex; align-items: stretch; gap: 0; margin-top: 16px; flex-wrap: wrap; }
+  .fbox { flex: 1; min-width: 180px; background: var(--teal-soft); border-radius: 12px; padding: 14px 16px; font-size: 14px; }
+  .fbox b { color: var(--teal-d); }
+  .farr { align-self: center; padding: 0 10px; color: var(--teal); font-size: 22px; font-weight: 700; }
+  ul { padding-left: 20px; margin-top: 8px; }
+  li { margin: 6px 0; }
+  table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 14.5px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  th { color: var(--dim); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+  td b { font-variant-numeric: tabular-nums; }
+  .hl td { background: var(--teal-soft); }
+  .stat { display: inline-block; background: var(--teal-soft); color: var(--teal-d); font-weight: 700; border-radius: 999px; padding: 4px 12px; font-size: 13px; margin: 4px 6px 0 0; }
+  .ask { border: 2px solid var(--teal); }
+  .num { font-family: Georgia, serif; font-size: 34px; color: var(--teal-d); }
+  footer { text-align: center; color: var(--dim); font-size: 13px; margin-top: 28px; }
+  @media print {
+    body { background: #fff; }
+    .page { padding: 0; max-width: none; }
+    section { break-inside: avoid; border-color: #ccc; margin-top: 12px; padding: 18px 22px; }
+    .hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
 </style>
 </head>
 <body>
-<div class="doc">
+<div class="page">
 
-  <div class="brandbar">
-    <span>Распевка × Прояви</span>
-    <span class="tag">Материал для партнёра / инвестора</span>
-  </div>
-
-  <div class="hero">
-    <div class="eyebrow">Не изобретаем велосипед — улучшаем то, что уже приносит деньги</div>
-    <h1>Приложения для вокала зарабатывают. Школы вокала зарабатывают.<br>Мы соединяем их — и трафик течёт в обе стороны.</h1>
-    <p>Берём две модели, по отдельности доказавшие прибыльность, и впервые связываем их в один маховик: приложение приводит массовую аудиторию и рекламирует школу, школа монетизирует её и возвращает учеников в приложение. Оба канала зарабатывают, трафик переливается между ними — и привлечение дешевеет.</p>
-  </div>
-
-  <section>
-    <h2>Суть предложения</h2>
-    <p class="lead">Мы не ставим на непроверенную гипотезу — мы соединяем два уже работающих бизнеса.</p>
-    <ul>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg><b>Приложения-тренажёры вокала уже прибыльны.</b> Yousician, Smule, Vocal Image — миллионы пользователей и платящая аудитория. Спрос и готовность платить доказаны рынком.</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg><b>Онлайн-школы вокала уже прибыльны.</b> Курсы и живые уроки (в мире и в РФ) — отдельный устойчивый рынок с высокой маржой и повторными продажами.</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg><b>Но в вокале никто не связал их в системный перелив трафика.</b> Приложения живут отдельно от школ, школы — отдельно от приложений. Ближайший прецедент — <b>Skoove</b> в соседней нише (фортепиано): тренажёр + живые уроки в одном продукте. Модель уже доказала жизнеспособность — а вокальный сегмент остаётся свободным.</li>
-    </ul>
-    <div class="callout" style="margin-top:18px">
-      <h3>Наша ставка — этот незакрытый стык</h3>
-      <p>Мы не выдумываем новое поведение пользователя и не проверяем сырую идею. Мы берём два проверенных, прибыльных элемента и соединяем их там, где в вокале этого не сделал никто. Риск — не «взлетит ли спрос» (он доказан), а исполнение. А исполнение у нас уже на руках: готовое приложение, действующая школа, сильная команда.</p>
-    </div>
-    <p class="body" style="margin-top:14px;font-size:14px">Честно о ближайших: к модели подходили — Singing Carrots (веб: питч + курсы + разовый фидбек педагога), Ken Tamplin (приложение-видеотека + частные уроки), Vocaberry (приложение от основателя московской студии). Но ни у кого нет полной связки <b>«геймифицированный массовый тренажёр + онлайн-школа с брендом педагогов + кросс-промо в обе стороны»</b>. Именно её мы и занимаем.</p>
+  <section class="hero">
+    <div class="eyebrow">Предложение для партнёра · 2026</div>
+    <h1>«Распевка» × «Прояви»:<br/>приложение приводит — школа монетизирует</h1>
+    <p class="lead">Бесплатный игровой тренажёр голоса и онлайн-школа вокала, соединённые в один денежный маховик. Продукт не на бумаге — <b>приложение уже работает</b>.</p>
+    <a class="live" href="https://a1exxx.github.io/raspevka/" target="_blank" rel="noopener">▶ Открыть живое приложение: <b>a1exxx.github.io/raspevka</b></a>
   </section>
 
   <section>
     <h2>Проблема</h2>
-    <p class="lead">Петь хотят миллионы — но остаются один на один с голосом.</p>
-    <ul>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>Педагог — дорого и страшно начать.</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>Бесплатные ролики не дают обратной связи и системы.</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>Приложения учат «в вакууме», без наставника — поэтому бросают.</li>
-    </ul>
+    <p>Петь хотят миллионы, но человек остаётся один на один с голосом:</p>
+    <div class="grid2">
+      <div class="cell"><b>С педагогом — дорого и страшно начать.</b><span class="dim">Порог входа отсекает большинство желающих.</span></div>
+      <div class="cell"><b>Ролики не дают обратной связи.</b><span class="dim">Не слышишь, попадаешь ли в ноты, и нет системы.</span></div>
+      <div class="cell"><b>Приложения учат «в вакууме».</b><span class="dim">Без живого наставника люди быстро бросают.</span></div>
+      <div class="cell"><b>Школам дорог трафик.</b><span class="dim">Привлечение ученика в онлайн-школу дорожает каждый год.</span></div>
+    </div>
   </section>
 
   <section>
     <h2>Решение — маховик из двух продуктов</h2>
-    <div class="flywheel">
-      <div class="fw"><span class="n">1</span><h4>Приложение «Распевка» → ведёт в школу</h4><p>Игровой тренажёр: поёшь — видишь свою высоту в реальном времени, распевки и дыхание, наглядный прогресс. Бесплатный вход и ежедневная привычка дают массовую аудиторию, которой приложение рекламирует живой разбор в школе.</p></div>
-      <div class="fw"><span class="n">2</span><h4>Школа «Прояви» → возвращает в приложение</h4><p>Живые онлайн-уроки с педагогом, высокая маржа и повторные продажи. Ученикам школы приложение — обязательная практика между уроками; школа постоянно приводит в него активных, мотивированных пользователей.</p></div>
-      <div class="fw"><span class="n">↔</span><h4>Двусторонний перелив трафика</h4><p>Каждый канал рекламирует другой и <b>монетизируется сам</b>: приложение продаёт подписку и ведёт в школу, школа продаёт абонементы и возвращает в приложение. Общая аудитория и единый контент-завод <b>снижают стоимость привлечения на 20–30%</b> — один привлечённый пользователь работает на оба продукта.</p></div>
+    <div class="flow">
+      <div class="fbox"><b>Приложение «Распевка»</b><br/>бесплатный вход, ежедневная привычка: поёшь — видишь свой голос, проходишь программу</div>
+      <div class="farr">⇄</div>
+      <div class="fbox"><b>Школа «Прояви»</b><br/>живые уроки с педагогом для тех, кто хочет быстрее; ученики школы практикуют в приложении</div>
     </div>
+    <ul>
+      <li>В приложении встроена кнопка <b>«Урок с живым педагогом»</b>: заявка с именем, контактом и <b>прогрессом ученика</b> (тип голоса, диапазон, стрик) мгновенно приходит педагогу в Telegram.</li>
+      <li>На сайт школы встраивается <b>живой демо-виджет</b> «спой ноту — увидь её» — редкий «вау»-эффект, конвертирующий посетителей.</li>
+      <li>Общая аудитория и контент работают на оба продукта → <b>стоимость привлечения падает на 20–30%</b>.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Продукт сегодня — уже работает</h2>
+    <p class="dim">Не прототип: ставится на телефон (PWA), детекция высоты тона в реальном времени, игровой скоринг.</p>
+    <div>
+      <span class="stat">26 распевок по профессиональным нотам</span>
+      <span class="stat">Программа: 10 блоков + экзамены</span>
+      <span class="stat">Определение типа голоса за минуту</span>
+      <span class="stat">Дыхание · вибрато · белтинг · дикция</span>
+      <span class="stat">Стрик, энергия, празднования</span>
+      <span class="stat">Заявки к педагогу → Telegram</span>
+      <span class="stat">Демо-виджет для сайта школы</span>
+      <span class="stat">Каркас подписки и триала готов</span>
+    </div>
+    <p style="margin-top:12px">Дальше по плану: публикация в <b>Google Play / RuStore / App Store</b> (обёртка готового PWA) и Telegram Mini App как воронка.</p>
   </section>
 
   <section>
     <h2>Почему сейчас</h2>
-    <div class="kpis">
-      <div class="kpi"><div class="num">$2,1 млрд</div><div class="lbl">рынок приложений для обучения музыке (2024)</div></div>
-      <div class="kpi"><div class="num">~14%</div><div class="lbl">ежегодный рост рынка</div></div>
-      <div class="kpi"><div class="num">×4</div><div class="lbl">рост вероятности покупки после бесплатного пробного урока</div></div>
-    </div>
-    <p class="body" style="margin-top:16px">Продукт уже работает — это не идея на бумаге, а живое приложение и действующая школа.</p>
-  </section>
-
-  <section>
-    <h2>Экономика — просто</h2>
     <ul>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg><b>Школа:</b> абонемент ~18 000 ₽/мес (8 онлайн-уроков). Маржа после оплаты педагогу — 50–60%.</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg><b>Приложение:</b> подписка 3 990 ₽/год, почти нулевая себестоимость на пользователя.</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg><b>Воронка проверена рынком:</b> реальные кейсы дают заявку по 190–520 ₽.</li>
+      <li>Рынок приложений для обучения музыке — <b>$2,1 млрд (2024), рост ~14% в год</b>.</li>
+      <li>Аналог по модели: Simply Sing зарабатывает <b>~$1 млн/мес</b> на подписке — в русскоязычном сегменте сильного прямого аналога нет.</li>
+      <li>Онлайн-образование в России устойчиво растёт; вокал — массовое эмоциональное хобби.</li>
     </ul>
   </section>
 
   <section>
-    <h2>Путь к $20 000 / мес (≈1,85 млн ₽)</h2>
-    <p class="body">Три пути к одной цели. Отличаются тем, <b>откуда основная выручка</b>: больше от школы, поровну или больше от приложения. Школа даёт деньги быстрее, но маржа ниже (платим педагогам); приложение — маржа выше (почти нет затрат на пользователя), но нужно набрать большую аудиторию. «Баланс» — выручка примерно 50/50 между школой и приложением.</p>
+    <h2>Бизнес-модель</h2>
+    <div class="grid2">
+      <div class="cell"><b>Школа: абонемент ~18 000 ₽/мес</b><span class="dim">8 онлайн-уроков; маржа школы после оплаты педагогу — 50–60%</span></div>
+      <div class="cell"><b>Приложение: подписка 3 990 ₽/год</b><span class="dim">freemium: 5 распевок в день бесплатно → подписка; себестоимость на пользователя ≈ 0</span></div>
+    </div>
+    <p style="margin-top:12px"><b>Воронка проверена рынком:</b> бесплатный пробный урок повышает вероятность покупки в 4 раза; реальные кейсы вокальных школ дают заявку по 190–520 ₽. Каналы: VK, Telegram, Яндекс, короткие видео «до/после голоса».</p>
+  </section>
+
+  <section>
+    <h2>Финансовый план — путь к ≈1,85 млн ₽/мес ($20 000)</h2>
+    <p class="dim">Три сценария отличаются тем, откуда основная выручка. Школа даёт деньги быстрее; приложение — маржу выше.</p>
     <table>
-      <thead><tr><th>Сценарий</th><th>Учеников школы</th><th>Подписчиков</th><th>Прибыль/мес</th><th>Маржа</th><th>Срок</th></tr></thead>
-      <tbody>
-        <tr class="best"><td>Школа в основе</td><td>~82</td><td>~900</td><td><b>657 000 ₽</b></td><td>36%</td><td>8–12 мес</td></tr>
-        <tr><td>Баланс</td><td>~52</td><td>~2 200</td><td><b>888 000 ₽</b></td><td>48%</td><td>12–18 мес</td></tr>
-        <tr><td>Приложение в основе</td><td>~21</td><td>~3 500</td><td><b>1,14 млн ₽</b></td><td>61%</td><td>18–24 мес</td></tr>
-      </tbody>
+      <tr><th>Сценарий</th><th>Учеников школы</th><th>Подписчиков прил.</th><th>Прибыль/мес</th><th>Маржа</th><th>Срок</th></tr>
+      <tr><td>Школа в основе</td><td>~82</td><td>~900</td><td><b>657 000 ₽</b></td><td>36%</td><td>8–12 мес</td></tr>
+      <tr class="hl"><td><b>Баланс (рекомендуем)</b></td><td>~52</td><td>~2 200</td><td><b>888 000 ₽</b></td><td>48%</td><td>12–18 мес</td></tr>
+      <tr><td>Приложение в основе</td><td>~21</td><td>~3 500</td><td><b>1,14 млн ₽</b></td><td>61%</td><td>18–24 мес</td></tr>
     </table>
-    <p class="body" style="margin-top:14px">Во всех сценариях — операционная прибыль <b>36–61%</b> на целевой выручке. Рекомендуемый старт — «школа в основе»: даёт выручку с первого месяца.</p>
   </section>
 
-  <section>
+  <section class="ask">
     <h2>Что нужно</h2>
-    <div class="callout">
-      <h3>Стартовый капитал: 0,5–1,5 млн ₽ — почти весь в маркетинг</h3>
-      <p>Поскольку приложение, школа и команда уже есть, деньги не «строят продукт», а покупают рост. <b>Основная часть — привлечение трафика</b> (проверенные каналы: VK, Telegram, Яндекс), меньшая — менеджер продаж, куратор и контент-производство. Выход на цель — 8–18 месяцев.</p>
-    </div>
-  </section>
-
-  <section>
-    <h2>Почему мы — и почему запуск дешевле, чем кажется</h2>
-    <p class="body">Главное преимущество: продукт и команда уже на месте. Деньги не нужно тратить на то, чтобы «построить» — нужно только на то, чтобы «привести людей».</p>
+    <p><span class="num">0,5–1,5 млн ₽</span> &nbsp;стартового капитала (по сценарию)</p>
     <ul>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg><b>Сильные музыканты-методисты</b> — экспертность, методика и контент уже есть. Это и качество школы, и топливо для контент-завода.</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg><b>Сильная команда разработки и поддержки</b> — приложение уже готово и работает. Дальнейшее развитие — недорогая поддержка, а не разработка с нуля.</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg><b>Действующая школа вокала</b> — репутация, живые ученики и проверенная воронка продаж.</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg><b>Поэтому основная статья расходов — маркетинг,</b> а не разработка и не найм. Инвестиции идут прямо в рост, почти без «сгорания» на инфраструктуру.</li>
+      <li><b>Куда идут деньги:</b> привлечение трафика (проверенные каналы), менеджер продаж + куратор, контент.</li>
+      <li><b>Окупаемость:</b> 8–18 месяцев; на целевой выручке бизнес работает с маржой 36–61%.</li>
+      <li><b>Что получает партнёр:</b> вход на раннем этапе в бизнес с готовым продуктом, действующей школой и двойным каналом монетизации.</li>
     </ul>
   </section>
 
-  <p class="muted">Маркетинг и рост со схемами, графиком прогноза и командой — в отдельном документе <b>«Маркетинг и рост»</b> (pitch-marketing.html).</p>
+  <section>
+    <h2>Почему мы</h2>
+    <ul>
+      <li>Действующая <b>школа вокала «Прояви»</b> — экспертность, методика, репутация.</li>
+      <li><b>Готовое работающее приложение</b> — можно открыть и потрогать прямо сейчас (ссылка выше).</li>
+      <li>Модель — сборка из элементов, проверенных рынком, а не эксперимент.</li>
+    </ul>
+  </section>
 
+  <footer>
+    «Распевка» × «Прояви» · 2026 · Подробная операционная модель и продуктовый план — по запросу.<br/>
+    Документ самодостаточен: для PDF — просто «Печать» в браузере (Ctrl+P).
+  </footer>
 </div>
 </body>
 </html>

@@ -5,8 +5,26 @@
 import { midiToHz, centsOff, centsZone } from '../theory/note-map.js';
 import { Note } from 'tonal';
 
+// Цветовые темы хайвея. Тёмная — «премиум-сцена»: светящиеся ноты и след голоса
+// на почти чёрном фоне (фон рисует CSS .stage-dark, тут только цвета элементов).
+const THEMES = {
+  light: {
+    grid: 'rgba(27,36,48,.07)', gridC: 'rgba(27,36,48,.18)', label: 'rgba(27,36,48,.42)',
+    hitLine: 'rgba(14,141,127,.6)', note: 'rgba(14,141,127,.26)', noteActive: 'rgba(14,141,127,.95)',
+    noteGlow: 'rgba(14,141,127,.5)', green: '#2fab84', yellow: '#e0a64a', red: '#e0544b',
+    free: '#0e8d7f', glow: 0,
+  },
+  dark: {
+    grid: 'rgba(255,255,255,.055)', gridC: 'rgba(255,255,255,.14)', label: 'rgba(255,255,255,.45)',
+    hitLine: 'rgba(61,229,201,.7)', note: 'rgba(61,229,201,.2)', noteActive: 'rgba(61,229,201,.95)',
+    noteGlow: 'rgba(61,229,201,.85)', green: '#3ee6a8', yellow: '#ffc24d', red: '#ff6b61',
+    free: '#3de5c9', glow: 10,
+  },
+};
+
 export class NoteHighway {
   constructor(canvas, exercise, opts = {}) {
+    this.theme = THEMES[opts.theme] || THEMES.light;
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.ex = exercise;
@@ -73,23 +91,24 @@ export class NoteHighway {
     const hitX = w * this.hitFrac;
     ctx.clearRect(0, 0, w, h);
 
+    const T = this.theme;
     // горизонтальные ориентиры по полутонам + подписи нот
     for (let m = Math.ceil(this.minMidi); m <= this.maxMidi; m++) {
       const y = this.yFor(midiToHz(m), h);
       const name = Note.fromMidi(m);
       const isC = name && name.startsWith('C');
-      ctx.strokeStyle = isC ? 'rgba(27,36,48,.18)' : 'rgba(27,36,48,.07)';
+      ctx.strokeStyle = isC ? T.gridC : T.grid;
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
       if (isC) {
-        ctx.fillStyle = 'rgba(27,36,48,.42)';
+        ctx.fillStyle = T.label;
         ctx.font = '10px Inter, sans-serif';
         ctx.fillText(name, 4, y - 3);
       }
     }
 
     // линия попадания
-    ctx.strokeStyle = 'rgba(14,141,127,.6)';
+    ctx.strokeStyle = T.hitLine;
     ctx.lineWidth = 2;
     ctx.setLineDash([5, 6]);
     ctx.beginPath(); ctx.moveTo(hitX, 0); ctx.lineTo(hitX, h); ctx.stroke();
@@ -107,14 +126,12 @@ export class NoteHighway {
       const y = this.yFor(seg.hz, h);
       const isActive = i === activeIdx;
       const r = 8;
-      ctx.fillStyle = isActive
-        ? 'rgba(14,141,127,.95)'
-        : 'rgba(14,141,127,.26)';
+      ctx.fillStyle = isActive ? T.noteActive : T.note;
       roundRect(ctx, x, y - noteH / 2, Math.max(wgt, 10), noteH, r);
       ctx.fill();
       if (isActive) {
-        ctx.shadowColor = 'rgba(14,141,127,.5)';
-        ctx.shadowBlur = 18;
+        ctx.shadowColor = T.noteGlow;
+        ctx.shadowBlur = 18 + T.glow;
         ctx.fill();
         ctx.shadowBlur = 0;
       }
@@ -126,9 +143,9 @@ export class NoteHighway {
       curY = this.yFor(sungHz, h);
       if (active) {
         const z = centsZone(Math.abs(centsOff(sungHz, active.seg.hz)), this.greenCents, this.yellowCents);
-        color = z === 'green' ? '#2fab84' : z === 'yellow' ? '#e0a64a' : '#e0544b';
+        color = z === 'green' ? T.green : z === 'yellow' ? T.yellow : T.red;
       } else {
-        color = '#0e8d7f';
+        color = T.free;
       }
     }
     this.trail.push(curY);
@@ -141,6 +158,7 @@ export class NoteHighway {
     ctx.lineWidth = 3;
     ctx.lineJoin = 'round';
     ctx.globalAlpha = 0.45;
+    if (T.glow) { ctx.shadowColor = color; ctx.shadowBlur = T.glow; } // светящийся след на тёмной сцене
     ctx.beginPath();
     let started = false;
     for (let i = 0; i < n; i++) {
@@ -150,6 +168,7 @@ export class NoteHighway {
       if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
     }
     ctx.stroke();
+    ctx.shadowBlur = 0;
     // затухающие точки хвоста
     for (let i = 0; i < n; i++) {
       const y = this.trail[i];

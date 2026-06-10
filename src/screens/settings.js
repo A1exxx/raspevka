@@ -60,6 +60,7 @@ export function renderSettings(app, mic, { onExit, onVoice, onCalibrate }) {
             <button class="toggle ${progress.getGuide() ? 'on' : ''}" id="guide">Подсказка тоном: ${progress.getGuide() ? 'вкл' : 'выкл'}</button>
             <button class="toggle ${progress.getHeadphones() ? 'on' : ''}" id="hp">Наушники: ${progress.getHeadphones() ? 'да' : 'нет'}</button>
           </div>
+          <button class="toggle ${progress.getDarkStage() ? 'on' : ''}" id="darkstage" style="width:100%;margin-top:8px">Тёмный экран пения: ${progress.getDarkStage() ? 'вкл' : 'выкл'} <span class="set-hint">светящийся след голоса</span></button>
           <button class="toggle ${progress.getMicAGC() ? 'on' : ''}" id="agc" style="width:100%;margin-top:8px">Авто-громкость микро (AGC): ${progress.getMicAGC() ? 'вкл' : 'выкл'} <span class="set-hint">${progress.getMicAGC() ? 'громче на телефоне' : 'ровнее долгие ноты'}</span></button>
         </div>
 
@@ -93,6 +94,7 @@ export function renderSettings(app, mic, { onExit, onVoice, onCalibrate }) {
     app.querySelectorAll('[data-groove]').forEach((b) => b.addEventListener('click', () => { progress.setGroove(b.dataset.groove); render(); }));
     document.getElementById('guide').addEventListener('click', () => { progress.setGuide(!progress.getGuide()); render(); });
     document.getElementById('hp').addEventListener('click', () => { progress.setHeadphones(!progress.getHeadphones()); render(); });
+    document.getElementById('darkstage').addEventListener('click', () => { progress.setDarkStage(!progress.getDarkStage()); render(); });
     document.getElementById('agc').addEventListener('click', () => {
       const on = !progress.getMicAGC();
       progress.setMicAGC(on);

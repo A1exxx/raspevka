@@ -230,6 +230,56 @@ eq('подсказка с наушниками = continuous', P.getGuideMode(), 
 P.setGuide(false);
 eq('подсказка выкл = off', P.getGuideMode(), 'off');
 
+// === clock: перемотка времени (тест-режим) ===
+const C = await import('../src/state/clock.js');
+C.resetOffset();
+eq('clock: смещение 0 по умолчанию', C.getOffsetDays(), 0);
+C.shiftDays(3);
+eq('clock: +3 дня', C.getOffsetDays(), 3);
+eq('clock: dayStr сдвинут на 3 дня', C.dayStr(), new Date(Date.now() + 3 * 864e5).toISOString().slice(0, 10));
+C.resetOffset();
+
+// === стрик: продолжение, заморозка, обрыв, начисление заморозки за 7 дней ===
+globalThis.localStorage.clear();
+P.recordSession({ pct: 1, stars: 3 });
+eq('стрик: день 1', P.getStreak(), 1);
+C.shiftDays(1); P.recordSession({ pct: 1, stars: 3 });
+eq('стрик: день подряд → 2', P.getStreak(), 2);
+P.setFreezes(1);
+C.shiftDays(2); // пропустили ровно 1 день
+const rFz = P.recordSession({ pct: 1, stars: 3 });
+eq('стрик: заморозка спасает пропуск', P.getStreak(), 3);
+eq('стрик: freezeSpent=true', rFz.freezeSpent, true);
+eq('стрик: заморозка потрачена', P.getFreezes(), 0);
+C.shiftDays(3); P.recordSession({ pct: 1, stars: 3 });
+eq('стрик: пропуск 2 дней без заморозки → сброс на 1', P.getStreak(), 1);
+for (let d = 0; d < 6; d++) { C.shiftDays(1); P.recordSession({ pct: 1, stars: 3 }); }
+eq('стрик: 7 дней подряд', P.getStreak(), 7);
+eq('стрик: за 7 дней начислена заморозка', P.getFreezes(), 1);
+eq('дневная цель: сегодня выполнена', P.isDailyDone(), true);
+
+// === монетизация (каркас): по умолчанию ВЫКЛ, триал, дневной лимит ===
+eq('пейволл по умолчанию ВЫКЛ', P.getPaywallEnabled(), false);
+eq('isPaywalled=false когда выключен', P.isPaywalled(), false);
+P.setPaywallEnabled(true);
+for (let i = 0; i < P.FREE_PER_DAY; i++) P.countUse();
+eq('лимит дня исчерпан → пейволл', P.isPaywalled(), true);
+C.shiftDays(1);
+eq('новый день → лимит обнулён', P.getUsesToday(), 0);
+eq('новый день → пейволла нет', P.isPaywalled(), false);
+P.startTrial();
+eq('триал активен', P.isTrialActive(), true);
+eq('триал даёт премиум', P.isPremium(), true);
+for (let i = 0; i < P.FREE_PER_DAY + 2; i++) P.countUse();
+eq('премиум не упирается в лимит', P.isPaywalled(), false);
+C.shiftDays(P.TRIAL_DAYS);
+eq('триал истёк через 7 дней', P.isTrialActive(), false);
+eq('после триала премиума нет (free)', P.isPremium(), false);
+P.setPaywallEnabled(false);
+P.devResetTrial();
+C.resetOffset();
+eq('тёмная сцена по умолчанию ВЫКЛ', P.getDarkStage(), false);
+
 let pass = 0;
 for (const [ok, name, info] of checks) {
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}  ${ok ? '' : '<< ' + info}`);

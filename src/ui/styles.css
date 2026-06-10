@@ -928,3 +928,64 @@ h1, .splash-title, .hero-title, .voice-result, .ear-target, .big-pct {
   .block-item:active, .focus-chip:active, .hero-card:active, .voice-card:active,
   .block-card:active { transform: none; }
 }
+
+/* ============ Тёмная сцена пения (премиум-вид, тумблер в настройках) ============ */
+.screen.game.stage-dark {
+  background: linear-gradient(180deg, #0d1219 0%, #0a0e14 100%);
+  border-radius: 22px;
+  padding: 14px 14px 18px;
+  box-shadow: 0 18px 50px rgba(10, 16, 24, .45);
+}
+.stage-dark .ex-name { color: #e8edf4; }
+.stage-dark .syl { color: rgba(255,255,255,.55); }
+.stage-dark .icon-btn { background: rgba(255,255,255,.07); color: #dfe6ef; border-color: rgba(255,255,255,.12); }
+.stage-dark .trace-wrap { background: transparent; border-color: rgba(255,255,255,.09); }
+.stage-dark .hud-msg { color: #aeb9c8; }
+.stage-dark .hud-meter { background: rgba(255,255,255,.08); }
+.stage-dark .hud-notes { color: #8d99ab; }
+/* Крупная моноширинная цифра ноты — читается краем глаза во время пения */
+.stage-dark .hud-notes b {
+  color: #ecf1f7; font-size: 21px;
+  font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.stage-dark .seg-label { color: #6c7a8e; }
+.stage-dark .seg { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); }
+.stage-dark .seg button { color: #93a0b2; }
+.stage-dark .seg button.on { background: #2dd4bf; color: #06281f; }
+.stage-dark .toggle { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); color: #93a0b2; }
+.stage-dark .toggle.on { border-color: #2dd4bf; color: #5eead4; }
+.stage-dark .game-settings { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1); }
+.stage-dark .game-settings > summary { color: #93a0b2; }
+.stage-dark .game-settings[open] > summary { color: #dfe6ef; }
+.stage-dark .more-settings { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.1); }
+
+/* ============ Главная v3: ленты практики + карточка программы + welcome ============ */
+.cat-title {
+  color: var(--text-dim); font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  margin: 14px 2px 8px;
+}
+.cat-title:first-child { margin-top: 0; }
+.ex-row {
+  display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 10px;
+  scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.ex-row::-webkit-scrollbar { display: none; }
+.ex-row .ex-tile { min-width: 158px; max-width: 158px; scroll-snap-align: start; flex-shrink: 0; }
+
+.program-card { background: var(--surface); border: 1px solid var(--line); color: var(--text); }
+.program-card .hero-eyebrow { color: var(--accent-2); }
+.program-card .hero-sub { color: var(--text-dim); }
+.program-card .pc-title { font-size: 21px; }
+.pc-bar { margin: 10px 0 6px; height: 8px; background: var(--bg-soft); border-radius: 999px; overflow: hidden; }
+.pc-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--green)); border-radius: 999px; transition: width .4s var(--ease); }
+
+.welcome { text-align: center; justify-content: center; min-height: 60dvh; }
+.welcome .brand p { max-width: 340px; margin-left: auto; margin-right: auto; }
+.eq-static { display: inline-flex; gap: 5px; align-items: flex-end; height: 34px; margin-bottom: 14px; }
+.eq-static i { width: 7px; border-radius: 4px; background: var(--accent); opacity: .85; }
+.eq-static i:nth-child(1) { height: 40%; } .eq-static i:nth-child(2) { height: 75%; }
+.eq-static i:nth-child(3) { height: 100%; } .eq-static i:nth-child(4) { height: 60%; }
+.eq-static i:nth-child(5) { height: 30%; }

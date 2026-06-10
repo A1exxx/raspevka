@@ -5,6 +5,7 @@ import { VOICE_TYPES, classifyVoice, getVoiceType, rangeLabel, midiName } from '
 import { hzToNoteInfo } from '../theory/note-map.js';
 import { miniKeyboard } from '../ui/illustrations.js';
 import * as progress from '../state/progress.js';
+import { celebrate, haptic } from '../ui/celebrate.js';
 
 export function renderVoice(app, mic, tracker, { onDone, onExit, canSkip = false }) {
   let rafId = null;
@@ -176,6 +177,7 @@ export function renderVoice(app, mic, tracker, { onDone, onExit, canSkip = false
     stop();
     const v = classifyVoice(low, high);
     progress.setVoice(v.key, low, high);
+    celebrate(2); haptic(25); // «вау»-момент: голос определён
     app.innerHTML = `
       <div class="screen summary">
         <div class="verdict" style="font-size:18px;color:var(--text-dim)">Похоже, твой голос —</div>

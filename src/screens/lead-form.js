@@ -1,9 +1,12 @@
 // lead-form.js — «Записаться к педагогу»: заявка на бесплатный пробный урок.
 // Пользователь выбирает предпочтение педагога, пишет цель, оставляет контакт.
 // К заявке прикладывается его прогресс (диапазон/стрик/блоки) — педагогу видно с чем работать.
-// Пока сохраняется локально (бэкенд-отправку добавим позже).
+// Заявка сохраняется локально (не теряется) и, если настроен бот (lead-config.js),
+// мгновенно улетает педагогу в Telegram.
 import * as progress from '../state/progress.js';
 import { getVoiceType, midiName } from '../theory/voice-types.js';
+import { sendLeadToTelegram } from '../state/lead-config.js';
+import { celebrate } from '../ui/celebrate.js';
 
 export function renderLeadForm(app, { onExit }) {
   const v = progress.getVoice();
@@ -52,7 +55,7 @@ export function renderLeadForm(app, { onExit }) {
       pref = b.dataset.pref;
       app.querySelectorAll('#lf-pref [data-pref]').forEach((x) => x.classList.toggle('on', x.dataset.pref === pref));
     }));
-    document.getElementById('lf-send').addEventListener('click', () => {
+    document.getElementById('lf-send').addEventListener('click', async () => {
       const name = document.getElementById('lf-name').value.trim();
       const contact = document.getElementById('lf-contact').value.trim();
       const goal = document.getElementById('lf-goal').value.trim();
@@ -60,12 +63,18 @@ export function renderLeadForm(app, { onExit }) {
         document.getElementById('lf-err').textContent = 'Заполни имя и контакт — иначе педагог не сможет ответить.';
         return;
       }
-      progress.saveLead({ name, contact, pref, goal, stats });
+      const btn = document.getElementById('lf-send');
+      btn.disabled = true;
+      btn.textContent = 'Отправляю…';
+      const lead = { name, contact, pref, goal, stats };
+      progress.saveLead(lead);                  // локально — сразу, не потеряется
+      await sendLeadToTelegram(lead);           // педагогу в TG (если настроен бот)
       done(name);
     });
   }
 
   function done(name) {
+    celebrate(1);
     app.innerHTML = `
       <div class="screen summary leadform-done">
         <div class="lf-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
