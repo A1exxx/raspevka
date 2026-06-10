@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Спой ноту — Распевка</title>
+  <style>
+    /* Демо-виджет: самодостаточный, тёмный «сценический» вид — красиво встраивается
+       на сайт школы. Никаких внешних шрифтов — system stack, мгновенная загрузка. */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(180deg, #0d1219 0%, #0a0e14 100%);
+      color: #e8edf4;
+      display: flex; align-items: center; justify-content: center;
+      padding: 18px;
+    }
+    .demo { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 14px; text-align: center; }
+    h1 { font-size: 22px; letter-spacing: -.01em; }
+    .sub { color: #93a0b2; font-size: 14px; line-height: 1.5; }
+    .note {
+      font-size: clamp(64px, 22vw, 110px); font-weight: 800; line-height: .95; min-height: .95em;
+      font-variant-numeric: tabular-nums; transition: color .15s ease; color: #2a3442;
+    }
+    .note .oct { font-size: .4em; vertical-align: super; opacity: .7; font-weight: 600; }
+    .meter { position: relative; height: 10px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; }
+    .meter::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; background: rgba(255,255,255,.35); transform: translateX(-50%); }
+    .needle { position: absolute; top: 50%; left: 50%; width: 14px; height: 14px; border-radius: 50%; background: #3ee6a8; transform: translate(-50%,-50%); transition: left .08s linear; box-shadow: 0 0 14px currentColor; }
+    canvas { display: block; width: 100%; height: 150px; border-radius: 14px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); }
+    .cents { color: #93a0b2; font-size: 13px; font-variant-numeric: tabular-nums; min-height: 1.2em; }
+    .btn {
+      appearance: none; border: none; border-radius: 999px; padding: 15px 22px;
+      font: inherit; font-weight: 700; font-size: 15px; cursor: pointer;
+      transition: transform .12s ease, filter .2s ease;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-mic { background: #2dd4bf; color: #06281f; box-shadow: 0 10px 28px -12px rgba(45,212,191,.55); }
+    .btn-app { background: transparent; color: #93a0b2; border: 1px solid rgba(255,255,255,.16); text-decoration: none; display: block; }
+    .hint { color: #6c7a8e; font-size: 12px; line-height: 1.5; }
+    .hidden { display: none !important; }
+  </style>
+  <script type="module" crossorigin src="./assets/demo-CMMVdJvF.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/note-map-BdCsI2TM.js">
+</head>
+<body>
+  <div class="demo">
+    <h1>Спой ноту — увидь свой голос 🎤</h1>
+    <p class="sub">Живой тюнер из тренажёра «Распевка»: пой — и нота загорится на экране.</p>
+    <button class="btn btn-mic" id="start">Включить микрофон</button>
+    <div id="stage" class="hidden">
+      <div class="note" id="note">—</div>
+      <div class="meter"><div class="needle" id="needle"></div></div>
+      <p class="cents" id="cents"></p>
+      <canvas id="trace"></canvas>
+    </div>
+    <a class="btn btn-app" href="./index.html" target="_blank" rel="noopener" id="openApp">Открыть «Распевку» — распевки, программа, прогресс →</a>
+    <p class="hint">Звук не записывается и никуда не отправляется — мы определяем только высоту тона.</p>
+  </div>
+</body>
+</html>
