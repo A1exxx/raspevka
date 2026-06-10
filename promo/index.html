@@ -72,14 +72,8 @@
   .eq i { width: 26px; border-radius: 13px; background: linear-gradient(180deg, var(--teal-glow), var(--teal)); box-shadow: 0 0 44px rgba(45,212,191,.55); }
   .eq i:nth-child(1){height:42%} .eq i:nth-child(2){height:74%} .eq i:nth-child(3){height:100%}
   .eq i:nth-child(4){height:60%} .eq i:nth-child(5){height:32%}
-  .b4 h2 { position: relative; font-size: 148px; font-weight: 800; letter-spacing: -.02em; }
-  .b4 .tag { position: relative; font-size: 46px; font-weight: 700; color: var(--dim); }
-  .b4 .url {
-    position: relative; margin-top: 12px; font-size: 38px; font-weight: 700; color: var(--bg1);
-    background: linear-gradient(105deg, var(--teal-glow), var(--teal));
-    padding: 22px 44px; border-radius: 999px; box-shadow: 0 0 70px rgba(45,212,191,.45);
-  }
-  .b4 .free { position: relative; font-size: 34px; font-weight: 700; color: var(--green); letter-spacing: .08em; }
+  .b4 h2 { position: relative; font-size: 152px; font-weight: 800; letter-spacing: -.02em; }
+  .b4 .tag { position: relative; font-size: 48px; font-weight: 700; color: var(--dim); }
 </style>
 </head>
 <body>
@@ -114,8 +108,6 @@
     <div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i></div>
     <h2 id="b4-h">Распевка</h2>
     <div class="tag" id="b4-tag">Игровой тренажёр голоса</div>
-    <div class="free" id="b4-free">БЕСПЛАТНО · ПРЯМО В БРАУЗЕРЕ</div>
-    <div class="url" id="b4-url">a1exxx.github.io/raspevka</div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
@@ -261,11 +253,9 @@
     tl.fromTo('#eq', { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, duration: .6, ease: 'back.out(1.8)' }, 11.9);
     tl.fromTo('#eq i', { scaleY: .4 }, { scaleY: 1, duration: .5, ease: 'elastic.out(1, .55)', stagger: .07, transformOrigin: 'bottom' }, 11.95);
     tl.fromTo('#b4-h', { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: .7, ease: 'power4.out' }, 12.2);
-    tl.fromTo('#b4-tag', { opacity: 0 }, { opacity: 1, duration: .5, ease: 'sine.out' }, 12.6);
-    tl.fromTo('#b4-free', { opacity: 0, letterSpacing: '.3em' }, { opacity: 1, letterSpacing: '.08em', duration: .6, ease: 'expo.out' }, 12.85);
-    tl.fromTo('#b4-url', { opacity: 0, scale: .85 }, { opacity: 1, scale: 1, duration: .55, ease: 'back.out(1.6)' }, 13.1);
-    // дыхание логотипа — на таймлайне (скрабится), конечные повторы
-    tl.to('#eq', { scale: 1.05, yoyo: true, repeat: 3, duration: .45, ease: 'sine.inOut' }, 13.2);
+    tl.fromTo('#b4-tag', { opacity: 0, letterSpacing: '.04em' }, { opacity: 1, letterSpacing: '.16em', duration: .7, ease: 'expo.out' }, 12.6);
+    // дыхание логотипа — на таймлайне (скрабится), конечные повторы; держим финал-кадр
+    tl.to('#eq', { scale: 1.05, yoyo: true, repeat: 3, duration: .5, ease: 'sine.inOut' }, 13.0);
 
     // стартовое состояние финального блока (скрыт до своего бита)
     gsap.set('#b4', { visibility: 'hidden' });
