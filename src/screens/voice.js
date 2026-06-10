@@ -27,7 +27,7 @@ export function renderVoice(app, mic, tracker, { onDone, onExit, canSkip = false
           <p>Знаешь свой тип — выбери. Не знаешь — определим за минуту.</p></div>
         <button class="btn btn-primary" id="detect" style="width:100%">Определить мой голос</button>
         <div class="settings">
-          <div class="seg-label">Тип голоса</div>
+          <div class="seg-label">Тембр голоса</div>
           <div class="seg" id="genderSeg">
             <button data-gender="муж" class="${gender === 'муж' ? 'on' : ''}">Мужские</button>
             <button data-gender="жен" class="${gender === 'жен' ? 'on' : ''}">Женские</button>
@@ -187,7 +187,7 @@ export function renderVoice(app, mic, tracker, { onDone, onExit, canSkip = false
           <p class="how"><b>Твой диапазон:</b> ${midiName(low)} – ${midiName(high)}</p>
           ${miniKeyboard(low, high)}
           <p class="how"><b>Типичный для ${v.name.toLowerCase()}:</b> ${rangeLabel(v)}</p>
-          <p class="how mech">Это ориентир по диапазону, а не окончательный вердикт — точный тип и тембр определит педагог. Упражнения подстроятся под тебя.</p>
+          <p class="how mech">Это ориентир по диапазону, а не окончательный вердикт — точный тембр определит педагог. Упражнения подстроятся под тебя.</p>
         </div>
         <div class="row">
           <button class="btn btn-ghost" id="redo">Переопределить</button>

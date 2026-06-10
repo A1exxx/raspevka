@@ -15,7 +15,7 @@ import { celebrate, haptic } from '../ui/celebrate.js';
 let moreSettingsOpen = false;
 
 export function renderGame(app, mic, tracker, exercise, opts = {}) {
-  const { onExit, onAgain, onComplete, onResult, explain } = opts;
+  const { onExit, onAgain, onComplete, onResult, onNext, nextLabel, explain } = opts;
   // Громкость подсказки/эталона — применяем при входе (регулятор в настройках/панели).
   setOutputVolume(progress.getVolumeMult());
   // Первый вход в упражнение — короткое объяснение, потом сам интерактив.
@@ -325,15 +325,18 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
         ${statsRow(agg)}
         <div class="card tip-card"><p class="how"><b>Разбор.</b> ${tip}</p></div>
         ${controlsBlock()}
+        ${onNext ? `<button class="btn btn-primary" id="next" style="width:100%">${nextLabel || 'Дальше'} →</button>` : ''}
         <div class="row">
           <button class="btn btn-ghost" id="menu">Меню</button>
-          <button class="btn btn-primary" id="again">Ещё раз</button>
+          <button class="btn ${onNext ? 'btn-ghost' : 'btn-primary'}" id="again">Ещё раз</button>
         </div>
       </div>
     `;
     wireControls(app, () => renderSummary(agg), mic);
     document.getElementById('again').addEventListener('click', onAgain);
     document.getElementById('menu').addEventListener('click', onExit);
+    const nextBtn = document.getElementById('next');
+    if (nextBtn) nextBtn.addEventListener('click', onNext);
   }
 
   // <40% нот → разбор и предложение пройти заново (энергия уже списана). Выбор за пользователем,
@@ -413,7 +416,7 @@ function renderExplain(app, exercise, { onExit, onStart, onModeChange }) {
       <div class="card">
         ${exercise.desc ? `<p class="blurb">${exercise.desc}</p>` : ''}
         ${exercise.how ? `<p class="how"><b>Как делать.</b> ${exercise.how}</p>` : ''}
-        <div class="ex-glyph preview-contour" title="Форма распевки: выше квадрат — выше нота">${contourGlyph(exercise.notes.map((n) => n.midi))}</div>
+        <div class="ex-glyph preview-contour" title="Форма распевки: выше плашка — выше нота, длиннее — дольше">${contourGlyph(exercise.notes)}</div>
         <p class="how mech"><b>Как устроена игра.</b> Ноты едут к вертикальной линии слева. Пой так, чтобы твой светящийся шарик совпал с нотой по высоте: <b style="color:var(--green)">зелёный</b> — точно, <b style="color:var(--amber)">жёлтый</b> — почти, <b style="color:var(--coral)">красный</b> — мимо. Сначала прозвучит <b>аккорд тоники</b> и образец мелодии — это твоя опора, чтобы попасть. «Подсказка тоном» подыгрывает нужную ноту (без наушников — коротко перед тем, как её петь).</p>
       </div>
       ${modeSelectBlock(exercise)}

@@ -35,7 +35,7 @@ export function renderSettings(app, mic, { onExit, onVoice, onCalibrate }) {
 
         <div class="card settings">
           <div class="set-row"><div class="seg-label">Мой голос</div>
-            <button class="toggle" id="voice">${vt ? vt.name : 'Определить тип голоса'} ›</button></div>
+            <button class="toggle" id="voice">${vt ? vt.name : 'Определить тембр голоса'} ›</button></div>
 
           <div class="seg-label">Громкость подсказки <span class="set-hint">на телефоне ставь «Громко/Макс»</span></div>
           ${seg([['quiet', 'Тихо'], ['normal', 'Норм'], ['loud', 'Громко'], ['max', 'Макс']], progress.getVolumeKey(), 'vol')}

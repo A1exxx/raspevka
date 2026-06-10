@@ -989,3 +989,9 @@ h1, .splash-title, .hero-title, .voice-result, .ear-target, .big-pct {
 .eq-static i:nth-child(1) { height: 40%; } .eq-static i:nth-child(2) { height: 75%; }
 .eq-static i:nth-child(3) { height: 100%; } .eq-static i:nth-child(4) { height: 60%; }
 .eq-static i:nth-child(5) { height: 30%; }
+
+/* ============ Гид «Как тут всё устроено» ============ */
+.guide-card { text-align: left; padding: 18px 20px; }
+.guide-head { display: flex; align-items: center; gap: 10px; font-size: 16px; margin-bottom: 6px; }
+.guide-ic { font-size: 20px; }
+.guide-card .how { margin: 0; color: var(--text-dim); }

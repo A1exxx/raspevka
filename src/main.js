@@ -25,6 +25,7 @@ import { renderSettings } from './screens/settings.js';
 import { renderCalibrate } from './screens/calibrate.js';
 import { renderDevPanel } from './screens/dev-panel.js';
 import { renderPaywall } from './screens/paywall.js';
+import { renderGuide } from './screens/guide.js';
 import { setOutputVolume } from './audio/reference-tone.js';
 import { getMode } from './theory/modes.js';
 import { contourGlyph } from './ui/illustrations.js';
@@ -170,7 +171,7 @@ function renderWelcome() {
       <div class="brand">
         <div class="eq eq-static" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
         <h1>Привет! Это «Распевка»</h1>
-        <p>Игровой тренажёр голоса: пой — и смотри, как твой голос попадает в ноты. Начнём с волшебного: за минуту узнаем твой тип голоса и диапазон.</p>
+        <p>Игровой тренажёр голоса: пой — и смотри, как твой голос попадает в ноты. Начнём с волшебного: за минуту узнаем твой тембр голоса и диапазон.</p>
       </div>
       <button class="btn btn-primary" id="wlc-go" style="width:100%">🎤 Определить мой голос · 1 минута</button>
       <button class="btn btn-ghost" id="wlc-skip" style="width:100%">Сначала осмотрюсь</button>
@@ -196,10 +197,12 @@ function renderFirstExercise() {
       <div class="brand"><h1>Отлично! 🎉</h1>
         <p>Упражнения уже подстроились под твой голос. Попробуем первую распевку — мягкое мычание, 1 минута.</p></div>
       <button class="btn btn-primary" id="fe-go" style="width:100%">Первая распевка →</button>
+      <button class="btn btn-ghost" id="fe-guide" style="width:100%">💡 Как тут всё устроено · 1 минута</button>
       <button class="btn btn-ghost" id="fe-menu" style="width:100%">В меню</button>
     </div>
   `;
   document.getElementById('fe-go').addEventListener('click', () => startExercise(0));
+  document.getElementById('fe-guide').addEventListener('click', renderGuideScreen);
   document.getElementById('fe-menu').addEventListener('click', renderMenu);
 }
 
@@ -304,10 +307,10 @@ function renderMenu() {
   // Распевки — карточки с РИСУНКОМ МЕЛОДИИ, сгруппированы по категориям
   // в горизонтальные ленты (главная остаётся короткой, а выбор — большим).
   const exTile = (e, i) => {
-    const midis = e.make(60).notes.map((n) => n.midi); // форма от фикс. тоники (root не влияет на рисунок)
+    const notes = e.make(60).notes; // форма от фикс. тоники (root не влияет на рисунок)
     return `
     <button class="ex-tile" data-ex="${i}">
-      ${contourGlyph(midis)}
+      ${contourGlyph(notes)}
       <span class="ex-tile-main">${e.label}</span>
       <span class="ex-tile-sub">${e.sub}</span>
     </button>`;
@@ -354,6 +357,7 @@ function renderMenu() {
           ${streak > 0 ? `<div class="streak-chip">${flameSvg()} ${streak} ${dayWord(streak)}</div>` : ''}
           ${progress.getFreezes() > 0 ? `<div class="energy-chip" title="Заморозка стрика — страхует 1 пропущенный день">❄ ${progress.getFreezes()}</div>` : ''}
           ${progress.getDevMode() ? '<button class="gear-btn" data-dev aria-label="Тест-режим" title="Тест-режим">🧪</button>' : ''}
+          <button class="gear-btn" data-guide aria-label="Подсказки" title="Как тут всё устроено">💡</button>
           <button class="gear-btn" data-settings aria-label="Настройки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
         </div>
       </header>
@@ -464,6 +468,8 @@ function renderMenu() {
   app.querySelectorAll('[data-song]').forEach((btn) => {
     btn.addEventListener('click', () => startSong(Number(btn.dataset.song)));
   });
+  const guideBtn = app.querySelector('[data-guide]');
+  if (guideBtn) guideBtn.addEventListener('click', renderGuideScreen);
   // Тест-режим: чип 🧪 (когда включён) или 7 быстрых тапов по заголовку.
   const devBtn = app.querySelector('[data-dev]');
   if (devBtn) devBtn.addEventListener('click', renderDevScreen);
@@ -482,6 +488,11 @@ function renderMenu() {
 function renderDevScreen() {
   stopRaf();
   renderDevPanel(app, { onExit: renderMenu });
+}
+
+function renderGuideScreen() {
+  stopRaf();
+  renderGuide(app, { onExit: renderMenu, onSettings: renderSettingsScreen });
 }
 
 // Пейволл (показывается только при включённом флаге — см. dev-панель).
@@ -506,18 +517,32 @@ function startExercise(i, explain = true) {
   if (explain) { gateUse(() => startExercise2(i, explain)); return; }
   startExercise2(i, explain);
 }
+/**
+ * Классическая схема распевки (по правке музыканта): начинаем от НИЗА диапазона
+ * голоса, поднимаемся по полутонам, пока верхняя нота распевки не дойдёт до верха
+ * диапазона, и возвращаемся обратно вниз. Баритон E2–E4 → старт на E2, пик E4, финиш E2.
+ */
+function fullRangeRun(makeFn) {
+  const r = voiceRange();
+  const probe = makeFn(60);
+  const minOff = Math.min(...probe.notes.map((n) => n.midi)) - 60; // самая низкая нота отн. тоники
+  const root = r.low - minOff;            // нижняя нота распевки = низ диапазона
+  const ex = makeFn(root);
+  const reps = transposePlan(ex, r.low, r.high, 48); // вверх до упора и обратно (без искусственного потолка)
+  return { ex, reps };
+}
+
 function startExercise2(i, explain) {
   enterMic(() => {
     applyTrackerRange();
-    const exercise = EXERCISES[i].make(voiceRoot());
-    const r = voiceRange();
-    const reps = transposePlan(exercise, r.low, r.high, 4); // вверх до верха и вниз
+    const makeFn = (root) => EXERCISES[i].make(root);
+    const { ex, reps } = fullRangeRun(makeFn);
     // Темп применяется внутри renderGame по текущей сложности (динамично).
     // rebuild — пересборка с актуальным ладом (выбор лада прямо на экране объяснения).
-    renderGame(app, mic, tracker, exercise, {
+    renderGame(app, mic, tracker, ex, {
       explain,
       reps,
-      rebuild: () => EXERCISES[i].make(voiceRoot()),
+      rebuild: () => fullRangeRun(makeFn).ex,
       onExit: renderMenu,
       onAgain: () => startExercise(i, false),
     });
@@ -571,23 +596,27 @@ function openBlock(index) {
 function runBlockItem(block, k) {
   const item = block.items[k];
   const idx = BLOCKS.indexOf(block);
+  // Сопровождение по этапам (по ОС музыканта): после пункта — сразу кнопка «Дальше»
+  // к следующему упражнению блока, а после последнего — к экзамену.
+  const next = block.items[k + 1];
+  const goNext = () => (next ? runBlockItem(block, k + 1) : runExam(block));
   enterMic(() => {
     applyTrackerRange();
     if (item.t === 'breath') {
-      // дыхание не оценивается по высоте — засчитываем за выполнение (дошёл/вышел)
-      renderBreathing(app, mic, item.id, { onExit: () => { progress.markBlockItem(block.id, item.id); openBlock(idx); } });
+      // дыхание не оценивается по высоте — засчитываем за выполнение и ведём дальше
+      renderBreathing(app, mic, item.id, { onExit: () => { progress.markBlockItem(block.id, item.id); goNext(); } });
       return;
     }
-    const exMake = () => EX_MAKERS[item.id](voiceRoot(), progress.getModeKey());
-    const ex = exMake();
-    const r = voiceRange();
-    const reps = transposePlan(ex, r.low, r.high, 3);
+    const exMake = (root) => EX_MAKERS[item.id](root, progress.getModeKey());
+    const { ex, reps } = fullRangeRun(exMake);
     renderGame(app, mic, tracker, ex, {
       explain: true, reps,
-      rebuild: exMake,
+      rebuild: () => fullRangeRun(exMake).ex,
       onResult: (agg) => { if (agg.pct >= 0.5) progress.markBlockItem(block.id, item.id); },
       onExit: () => openBlock(idx),
       onAgain: () => runBlockItem(block, k),
+      nextLabel: next ? `Дальше: ${next.name}` : 'К экзамену блока',
+      onNext: goNext,
     });
   });
 }
@@ -641,7 +670,10 @@ function renderExamResult(block, agg) {
 
 function renderSchoolInfo(back) {
   stopRaf();
-  renderLeadForm(app, { onExit: back || renderCatalogScreen });
+  // back может прийти НЕ функцией (например, event из addEventListener('click', renderSchoolInfo)) —
+  // тогда «Назад» вызывал event и не работал. Принимаем только функцию.
+  const exit = typeof back === 'function' ? back : renderMenu;
+  renderLeadForm(app, { onExit: exit });
 }
 
 function renderSettingsScreen() {
