@@ -84,7 +84,9 @@
 
   /* phone mockups */
   .phones { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:24px; }
-  .phone { background:#05080c; border:1px solid var(--line); border-radius:26px; padding:12px; box-shadow:0 30px 70px -30px rgba(0,0,0,.8); }
+  .phone { background:#05080c; border:1px solid var(--line); border-radius:26px; padding:10px; box-shadow:0 30px 70px -30px rgba(0,0,0,.8); }
+  .phone .shot { display:block; width:100%; border-radius:18px; }
+  .shot-site { display:block; width:100%; border-radius:14px; border:1px solid var(--line); box-shadow:0 22px 55px -30px rgba(0,0,0,.75); }
   .pscreen { background:linear-gradient(180deg,#0d1219,#0a0e14); border-radius:18px; overflow:hidden; aspect-ratio:9/18.5; padding:14px 12px; display:flex; flex-direction:column; gap:9px; position:relative; }
   .pcap { text-align:center; color:var(--dim); font-size:13px; margin-top:10px; }
   .p-row { display:flex; align-items:center; justify-content:space-between; }
@@ -243,60 +245,36 @@
   </div>
 </div></section>
 
+<!-- TRACTION -->
+<section id="traction"><div class="wrap">
+  <div class="eyebrow">Это не «стартап без выручки»</div>
+  <h2 class="sec">Половина бизнеса уже работает и приносит деньги</h2>
+  <p class="lead">Школа «Прояви» — <b style="color:#eef3f8">действующая компания</b> с учениками, педагогами и выручкой уже сегодня. «Распевка» — не «идея на проверку», а новый дешёвый канал привлечения к работающей школе плюс собственная подписка. Инвестиции идут на <b>масштабирование работающего</b>, а не на «проверку гипотезы».</p>
+  <div class="grid3">
+    <div class="card"><h3 style="color:var(--teal2)">🎓 Школа уже зарабатывает</h3><p>Реальные ученики, педагоги, выручка и репутация — сегодня. <span class="faint">[вставить факт: N учеников · ~X ₽/мес выручка школы]</span></p></div>
+    <div class="card"><h3 style="color:var(--teal2)">📱 Приложение в проде</h3><p>Развёрнуто, открывается с телефона, реалтайм-питч работает. Можно потрогать по ссылке прямо на встрече с инвестором.</p></div>
+    <div class="card"><h3 style="color:var(--teal2)">🔗 Воронка собрана</h3><p>Демо-виджет на сайте + кнопка «к педагогу» с заявкой в Telegram — связка «приложение → школа» уже готова технически.</p></div>
+  </div>
+</div></section>
+
 <!-- PRODUCT -->
 <section id="product"><div class="wrap">
   <div class="eyebrow">Продукт · уже работает</div>
   <h2 class="sec">Не прототип — рабочее приложение, которое можно открыть сейчас</h2>
   <p class="lead">Ставится на телефон (PWA), слышит высоту голоса в реальном времени, по-игровому считает попадание. Ниже — ключевые экраны (так выглядит в живом приложении по ссылке вверху).</p>
+  <p class="note" style="margin-top:0;margin-bottom:6px">Это реальные скриншоты живого приложения (не макеты) — открой по ссылке и потрогай сам.</p>
   <div class="phones">
     <div>
-      <div class="phone"><div class="pscreen">
-        <div class="p-row"><span class="p-h">Распевка</span><span class="p-streak">🔥 12 дн.</span></div>
-        <div class="p-row"><div class="p-note">Соль<small> +8¢</small></div></div>
-        <div class="p-hw">
-          <svg viewBox="0 0 150 230" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
-            <g stroke="rgba(255,255,255,.06)" stroke-width="1">
-              <line x1="0" y1="40" x2="150" y2="40"/><line x1="0" y1="80" x2="150" y2="80"/>
-              <line x1="0" y1="120" x2="150" y2="120"/><line x1="0" y1="160" x2="150" y2="160"/><line x1="0" y1="200" x2="150" y2="200"/>
-            </g>
-            <line x1="45" y1="0" x2="45" y2="230" stroke="rgba(61,229,201,.6)" stroke-width="2" stroke-dasharray="5 6"/>
-            <rect x="70" y="112" width="34" height="14" rx="7" fill="rgba(61,229,201,.22)"/>
-            <rect x="112" y="72" width="30" height="14" rx="7" fill="rgba(61,229,201,.22)"/>
-            <rect x="34" y="112" width="22" height="14" rx="7" fill="rgba(61,229,201,.95)"/>
-            <g fill="#3ee6a8">
-              <circle cx="12" cy="150" r="2"/><circle cx="18" cy="146" r="2.2"/><circle cx="24" cy="140" r="2.4"/>
-              <circle cx="30" cy="132" r="2.7"/><circle cx="36" cy="126" r="3"/><circle cx="41" cy="120" r="3.4"/>
-              <circle cx="45" cy="119" r="6" />
-            </g>
-          </svg>
-        </div>
-        <div style="font-size:10px;color:var(--dim);text-align:center">след голоса попадает в ноту</div>
-      </div></div>
-      <div class="pcap">Нотный хайвей: поёшь — светящийся след попадает в ноты</div>
+      <div class="phone"><img class="shot" src="pitch-assets/app-home.jpg" alt="Главный экран приложения «Распевка»"/></div>
+      <div class="pcap">Главный экран: стрик, программа, тембр голоса, распевки</div>
     </div>
     <div>
-      <div class="phone"><div class="pscreen">
-        <div class="p-row"><span class="p-h">Программа</span><span class="p-chip">3 / 10</span></div>
-        <div class="p-prog"><i style="width:30%"></i></div>
-        <div class="p-block done"><span class="num">✓</span><div><b>Базовый импульс</b><br/><span>дыхание, опора</span></div></div>
-        <div class="p-block done"><span class="num">✓</span><div><b>Ясность гласных</b><br/><span>5 распевок</span></div></div>
-        <div class="p-block done"><span class="num">✓</span><div><b>Интонация и гибкость</b><br/><span>гаммы, скачки</span></div></div>
-        <div class="p-block"><span class="num">4</span><div><b>Лад и мышление</b><br/><span>экзамен →</span></div></div>
-        <div class="p-block lock"><span class="num">🔒</span><div><b>Вибрато</b><br/><span>откроется</span></div></div>
-        <div class="p-block lock"><span class="num">🔒</span><div><b>Тембр и тон</b><br/><span>откроется</span></div></div>
-      </div></div>
+      <div class="phone"><img class="shot" src="pitch-assets/app-program.jpg" alt="Программа обучения из 10 блоков"/></div>
       <div class="pcap">Программа из 10 блоков с экзаменами — путь обучения</div>
     </div>
     <div>
-      <div class="phone"><div class="pscreen">
-        <div class="p-row"><span class="p-h">Твой голос</span></div>
-        <div style="color:var(--dim);font-size:11px;text-align:center;margin-top:6px">Похоже, твой тембр —</div>
-        <div class="p-voice">Баритон</div>
-        <div class="p-kbd"><i></i><i></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
-        <div style="color:var(--dim);font-size:11px;text-align:center">Диапазон C3 – C5 · определён за минуту</div>
-        <div class="p-block" style="margin-top:auto;border-color:rgba(45,212,191,.3)"><span class="num">🎤</span><div><b>Урок с педагогом</b><br/><span>бесплатный пробный →</span></div></div>
-      </div></div>
-      <div class="pcap">Тембр голоса за минуту → мягкий переход к живому педагогу</div>
+      <div class="phone"><img class="shot" src="pitch-assets/app-highway.jpg" alt="Нотный хайвей: голос попадает в ноты"/></div>
+      <div class="pcap">Нотный хайвей: поёшь — светящийся след попадает в ноты</div>
     </div>
   </div>
   <div class="grid3" style="margin-top:26px">
@@ -304,6 +282,14 @@
     <div class="card"><span class="ic">🏆</span><h3>Программа 10 блоков</h3><p>дыхание, гласные, интонация, лад, вибрато, тембр, регистры, белтинг, дикция, сопротивление — с экзаменами.</p></div>
     <div class="card"><span class="ic">🔁</span><h3>Удержание</h3><p>стрик, заморозка стрика, дневная цель, празднования — механики, которые в Duolingo дают 8% платящих.</p></div>
   </div>
+
+  <h3 style="font-size:18px;margin:30px 0 6px">…и действующий сайт школы со встроенным живым демо</h3>
+  <p class="lead" style="margin-bottom:14px">Сайт школы «Прояви» уже работает и связан с приложением: на странице — живой демо-виджет «спой ноту, увидь её», который превращает посетителя в «вау» прямо в браузере.</p>
+  <div class="grid2">
+    <div><img class="shot-site" src="pitch-assets/site-hero.jpg" alt="Сайт школы «Прояви»"/><div class="pcap">Сайт школы «Прояви» — премиальный, действующий</div></div>
+    <div><img class="shot-site" src="pitch-assets/site-demo.jpg" alt="Живое демо на сайте школы"/><div class="pcap">Встроенный живой тренажёр — связка app ↔ школа</div></div>
+  </div>
+
   <p class="note">Готовы к публикации: PWA-установка на телефон, иконки и манифест под Google Play / RuStore / App Store, каркас подписки и 7-дневного триала (выключен до решения о монетизации), демо-виджет для сайта школы, отправка заявок педагогу в Telegram.</p>
 </div></section>
 
@@ -318,6 +304,12 @@
   </div>
   <p class="lead" style="margin-top:24px"><b style="color:#eef3f8">Ниша пуста.</b> Yousician и Simply Sing недоступны качественно на русском, Riyaz — индийская специфика, локальный Vocalex не входит даже в топ-5 Music&amp;Audio РФ. Специализированного русскоязычного <b>геймифицированного</b> вокального тренажёра с реалтайм-питчем и связкой со школой — нет.</p>
   <p class="src-line">Источники: <a href="https://growthmarketreports.com/report/music-learning-apps-market" target="_blank" rel="noopener">GrowthMarketReports (2024)</a>; <a href="https://www.imarcgroup.com/russia-edtech-market" target="_blank" rel="noopener">IMARC Russia EdTech</a>; Smart Ranking (02.2026); GetCourse (2024); <a href="https://tracxn.com/d/companies/vocalex/__4STJNCdb46DpYTblN_moWikUGN-oSH8xGvAZKYZTwLI" target="_blank" rel="noopener">Tracxn / Vocalex</a>.</p>
+  <h3 style="font-size:18px;margin-top:28px">Почему именно сейчас</h3>
+  <div class="grid3" style="margin-top:12px">
+    <div class="card"><span class="ic">🏷️</span><h3>Окно для русского рынка открыто</h3><p>Западные лидеры на русском не работают качественно, локальных сильных нет — кто займёт нишу первым, тот её и удержит.</p></div>
+    <div class="card"><span class="ic">📲</span><h3>Технология стала доступной</h3><p>Реалтайм-питч в браузере на телефоне (PWA) — больше не нужен дорогой нативный стек; быстрый запуск и обновления.</p></div>
+    <div class="card"><span class="ic">💹</span><h3>Платный трафик дорожает</h3><p>CAC школ вырос 7× — у того, кто строит дешёвый органический канал (вирусное приложение), растёт преимущество каждый месяц.</p></div>
+  </div>
 </div></section>
 
 <!-- COMPETITORS -->
@@ -375,6 +367,7 @@
       <tr><td>Конверсия установка → триал (Education)</td><td><b>10,9%</b></td><td class="src">Adapty Education Benchmarks, 2025</td></tr>
       <tr><td>Конверсия триал → платящий (Education)</td><td><b>25,6%</b></td><td class="src">Adapty, 2025</td></tr>
       <tr><td>LTV пользователя за 12 мес (Education)</td><td><b>~$45 (~4 300 ₽)</b></td><td class="src">Adapty, 2025</td></tr>
+      <tr class="hl"><td>Целевая дисциплина LTV : CAC</td><td><b>≥ 3 : 1</b></td><td class="src">стандарт юнит-экономики; держим за счёт органики</td></tr>
       <tr><td>Удержание D30 с геймификацией/ментором</td><td><b>35–55%</b> (база — 14–15%)</td><td class="src">Adapty / loyalty.cx, 2024–25</td></tr>
       <tr><td>Доля платящих от MAU (Duolingo, образец)</td><td><b>~8%</b> · $748M выручки/год</td><td class="src">Duolingo SEC, FY2024</td></tr>
       <tr><td>Лид онлайн-образования РФ</td><td><b>~450 ₽</b> (вырос 7× за 3 года)</td><td class="src">vkusnovk.ru, 2024</td></tr>
@@ -403,6 +396,42 @@
   <div class="card" style="margin-top:22px;border-color:rgba(45,212,191,.3)">
     <h3 style="color:var(--teal2)">Почему это реалистично, а не «нарисовано»</h3>
     <p style="margin-top:8px"><b style="color:#eef3f8">120 студентов</b> — обычная загрузка средней онлайн-школы вокала. <b style="color:#eef3f8">3 200 платящих подписчиков</b> — это доли процента от миллионов людей, желающих петь, и в разы меньше, чем у Riyaz (25K платящих) или Simply Sing. То есть цель достигается <b>скромными абсолютными числами</b> на фоне рынка — это вопрос исполнения и трафика, а не «захвата рынка».</p>
+  </div>
+
+  <h3 style="font-size:17px;margin-top:30px">Кривая выхода на цель (сценарий «База»)</h3>
+  <div class="card" style="padding:18px">
+    <svg viewBox="0 0 920 270" style="width:100%;height:auto" role="img" aria-label="График роста чистой прибыли к $20k/мес за 18 месяцев">
+      <defs>
+        <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="rgba(45,212,191,.35)"/><stop offset="100%" stop-color="rgba(45,212,191,0)"/>
+        </linearGradient>
+      </defs>
+      <!-- сетка -->
+      <g stroke="#1f2b38" stroke-width="1">
+        <line x1="60" y1="40.5" x2="880" y2="40.5"/><line x1="60" y1="140" x2="880" y2="140"/><line x1="60" y1="240" x2="880" y2="240"/>
+      </g>
+      <!-- целевая линия $20k -->
+      <line x1="60" y1="40.5" x2="880" y2="40.5" stroke="#3de5c9" stroke-width="1.5" stroke-dasharray="6 6" opacity=".7"/>
+      <text x="64" y="33" fill="#3de5c9" font-size="13" font-weight="700" font-family="Inter,system-ui">≈ $20k/мес (1,9 млн ₽) — цель</text>
+      <!-- область + кривая -->
+      <path d="M60,240 L197,227 L333,203 L470,161 L607,109 L743,62 L880,36 L880,240 L60,240 Z" fill="url(#area)"/>
+      <polyline points="60,240 197,227 333,203 470,161 607,109 743,62 880,36" fill="none" stroke="#2dd4bf" stroke-width="3.5" stroke-linejoin="round"/>
+      <g fill="#3ee6a8">
+        <circle cx="60" cy="240" r="4"/><circle cx="197" cy="227" r="4"/><circle cx="333" cy="203" r="4"/><circle cx="470" cy="161" r="4"/><circle cx="607" cy="109" r="4"/><circle cx="743" cy="62" r="4"/><circle cx="880" cy="36" r="5.5"/>
+      </g>
+      <!-- ось Y подписи -->
+      <g fill="#6b7a8c" font-size="12" font-family="Inter,system-ui" text-anchor="end">
+        <text x="52" y="244">0</text><text x="52" y="144">~$10k</text><text x="52" y="44">~$20k</text>
+      </g>
+      <!-- ось X подписи -->
+      <g fill="#9fb0c2" font-size="12" font-family="Inter,system-ui" text-anchor="middle">
+        <text x="60" y="260">старт</text><text x="197" y="260">3 мес</text><text x="333" y="260">6</text><text x="470" y="260">9</text><text x="607" y="260">12</text><text x="743" y="260">15</text><text x="880" y="260">18 мес</text>
+      </g>
+      <!-- аннотации -->
+      <text x="205" y="220" fill="#9fb0c2" font-size="12" font-family="Inter,system-ui">первые платящие когорты</text>
+      <text x="615" y="100" fill="#9fb0c2" font-size="12" font-family="Inter,system-ui">масштаб работающих каналов</text>
+    </svg>
+    <p class="note" style="margin-top:6px">Форма кривой типична для подписочного роста: медленный старт (отладка воронки), затем ускорение по мере масштабирования работающих каналов. Цифры — иллюстрация сценария «База», не гарантия.</p>
   </div>
 
   <h3 style="font-size:17px;margin-top:30px">Куда идут 2 млн ₽ (за 12–18 месяцев)</h3>
