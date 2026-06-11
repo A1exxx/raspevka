@@ -6,7 +6,7 @@ const ctx = await b.newContext({ viewport: { width: 1040, height: 1200 }, device
 const p = await ctx.newPage();
 await p.goto(pathToFileURL('D:/vocal-trainer/docs/pitch-investor.html').href, { waitUntil: 'networkidle' });
 await sleep(800);
-for (const id of ['product', 'fin']) {
+for (const id of ['marketing', 'ask', 'risks']) {
   const el = await p.$('#' + id);
   await el.scrollIntoViewIfNeeded();
   await sleep(300);
