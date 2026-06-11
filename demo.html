@@ -3,32 +3,20 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Спой ноту — Распевка</title>
+  <title>Спой распевку — Распевка</title>
   <style>
-    /* Демо-виджет: самодостаточный, тёмный «сценический» вид — красиво встраивается
-       на сайт школы. Никаких внешних шрифтов — system stack, мгновенная загрузка. */
+    /* Демо-виджет для сайта школы: короткая распевка (пой за нотами).
+       Самодостаточный, тёмная «сцена», системные шрифты — мгновенная загрузка. */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
     body {
       font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(180deg, #0d1219 0%, #0a0e14 100%);
       color: #e8edf4;
-      display: flex; align-items: center; justify-content: center;
-      padding: 18px;
+      display: flex; align-items: center; justify-content: center; padding: 18px;
     }
-    .demo { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 14px; text-align: center; }
-    h1 { font-size: 22px; letter-spacing: -.01em; }
-    .sub { color: #93a0b2; font-size: 14px; line-height: 1.5; }
-    .note {
-      font-size: clamp(64px, 22vw, 110px); font-weight: 800; line-height: .95; min-height: .95em;
-      font-variant-numeric: tabular-nums; transition: color .15s ease; color: #2a3442;
-    }
-    .note .oct { font-size: .4em; vertical-align: super; opacity: .7; font-weight: 600; }
-    .meter { position: relative; height: 10px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; }
-    .meter::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; background: rgba(255,255,255,.35); transform: translateX(-50%); }
-    .needle { position: absolute; top: 50%; left: 50%; width: 14px; height: 14px; border-radius: 50%; background: #3ee6a8; transform: translate(-50%,-50%); transition: left .08s linear; box-shadow: 0 0 14px currentColor; }
-    canvas { display: block; width: 100%; height: 150px; border-radius: 14px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); }
-    .cents { color: #93a0b2; font-size: 13px; font-variant-numeric: tabular-nums; min-height: 1.2em; }
+    .demo { width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 14px; }
+
     .btn {
       appearance: none; border: none; border-radius: 999px; padding: 15px 22px;
       font: inherit; font-weight: 700; font-size: 15px; cursor: pointer;
@@ -36,24 +24,79 @@
     }
     .btn:active { transform: scale(.97); }
     .btn-mic { background: #2dd4bf; color: #06281f; box-shadow: 0 10px 28px -12px rgba(45,212,191,.55); }
-    .btn-app { background: transparent; color: #93a0b2; border: 1px solid rgba(255,255,255,.16); text-decoration: none; display: block; }
-    .hint { color: #6c7a8e; font-size: 12px; line-height: 1.5; }
+    .btn-app { background: transparent; color: #93a0b2; border: 1px solid rgba(255,255,255,.16); text-decoration: none; display: block; text-align: center; }
+    .btn-ghost { background: rgba(255,255,255,.06); color: #cfd8e3; border: 1px solid rgba(255,255,255,.14); }
+
+    /* Стартовый постер */
+    .poster {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      padding: 26px 18px; border-radius: 16px;
+      background: radial-gradient(120% 90% at 50% 0%, rgba(45,212,191,.10), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .poster .eq { display: inline-flex; gap: 6px; align-items: flex-end; height: 40px; margin-bottom: 4px; }
+    .poster .eq i { width: 8px; border-radius: 4px; background: linear-gradient(180deg,#3ee6a8,#2dd4bf); animation: eq 1.1s ease-in-out infinite; }
+    .poster .eq i:nth-child(1){height:38%;animation-delay:0s}.poster .eq i:nth-child(2){height:72%;animation-delay:.12s}
+    .poster .eq i:nth-child(3){height:100%;animation-delay:.24s}.poster .eq i:nth-child(4){height:58%;animation-delay:.36s}
+    .poster .eq i:nth-child(5){height:30%;animation-delay:.48s}
+    @keyframes eq { 0%,100%{transform:scaleY(.7)}50%{transform:scaleY(1.12)} }
+    @media (prefers-reduced-motion: reduce){ .poster .eq i{animation:none} }
+    .poster .pt { font-weight: 800; font-size: 18px; }
+    .poster .ps { color: #93a0b2; font-size: 13px; text-align: center; }
+
+    /* Сцена упражнения */
+    .stage-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .live-note { font-size: clamp(40px, 13vw, 64px); font-weight: 800; line-height: .9; min-height: .9em; font-variant-numeric: tabular-nums; transition: color .12s ease; color: #2a3442; }
+    .live-note .oct { font-size: .4em; vertical-align: super; opacity: .7; font-weight: 600; }
+    .btn-stop { background: rgba(255,107,97,.14); color: #ff9b92; border: 1px solid rgba(255,107,97,.4); border-radius: 999px; padding: 11px 18px; font: inherit; font-weight: 700; font-size: 14px; cursor: pointer; white-space: nowrap; }
+    .status { color: #aeb9c8; font-size: 15px; font-weight: 600; min-height: 1.3em; text-align: center; }
+    canvas { display: block; width: 100%; height: 220px; border-radius: 14px; background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.07); }
+    .targetrow { display: flex; justify-content: space-between; color: #8d99ab; font-size: 13px; font-variant-numeric: tabular-nums; }
+    .targetrow b { color: #ecf1f7; }
+
+    /* Результат */
+    .result { text-align: center; display: flex; flex-direction: column; gap: 8px; padding: 8px 0; }
+    .stars { font-size: 40px; letter-spacing: 4px; color: #ffc24d; }
+    .verdict { font-size: 22px; font-weight: 800; }
+    .res-sub { color: #93a0b2; font-size: 14px; }
+    .row { display: flex; gap: 10px; }
+    .row > * { flex: 1; }
+
+    .hint { color: #6c7a8e; font-size: 12px; line-height: 1.5; text-align: center; }
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
   <div class="demo">
-    <h1>Спой ноту — увидь свой голос 🎤</h1>
-    <p class="sub">Живой тюнер из тренажёра «Распевка»: пой — и нота загорится на экране.</p>
-    <button class="btn btn-mic" id="start">Включить микрофон</button>
-    <div id="stage" class="hidden">
-      <div class="note" id="note">—</div>
-      <div class="meter"><div class="needle" id="needle"></div></div>
-      <p class="cents" id="cents"></p>
-      <canvas id="trace"></canvas>
+    <button class="btn btn-mic" id="start">▶ Спеть короткую распевку</button>
+
+    <div class="poster" id="poster">
+      <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="pt">До-ре-ми-фа-соль и обратно</span>
+      <span class="ps">5 нот вверх и вниз на «Ма». Сначала прозвучит образец — потом пой за нотами и попадай в цель.</span>
     </div>
-    <a class="btn btn-app" href="./index.html" target="_blank" rel="noopener" id="openApp">Открыть «Распевку» — распевки, программа, прогресс →</a>
-    <p class="hint">Звук не записывается и никуда не отправляется — мы определяем только высоту тона.</p>
+
+    <div id="stage" class="hidden">
+      <div class="stage-top">
+        <div class="live-note" id="note">—</div>
+        <button class="btn-stop" id="stop">■ Стоп</button>
+      </div>
+      <div class="status" id="status">Слушай образец…</div>
+      <canvas id="hw"></canvas>
+      <div class="targetrow"><span>цель: <b id="target">—</b></span><span id="cents"></span></div>
+    </div>
+
+    <div id="result" class="result hidden">
+      <div class="stars" id="stars">☆☆☆</div>
+      <div class="verdict" id="verdict"></div>
+      <div class="res-sub" id="res-sub"></div>
+      <div class="row">
+        <button class="btn btn-ghost" id="retry">↻ Ещё раз</button>
+      </div>
+    </div>
+
+    <a class="btn btn-app" href="./index.html" target="_blank" rel="noopener">Открыть «Распевку» — 26 распевок, программа, прогресс →</a>
+    <p class="hint">Звук не записывается и никуда не отправляется — определяем только высоту тона.</p>
   </div>
   <script type="module" src="/src/demo.js"></script>
 </body>
