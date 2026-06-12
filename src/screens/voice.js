@@ -186,7 +186,7 @@ export function renderVoice(app, mic, tracker, { onDone, onExit, canSkip = false
         <div class="card" style="text-align:left;width:100%">
           <p class="how"><b>Твой диапазон:</b> ${midiName(low)} – ${midiName(high)}</p>
           ${miniKeyboard(low, high)}
-          <p class="how"><b>Типичный для ${v.name.toLowerCase()}:</b> ${rangeLabel(v)}</p>
+          <p class="how"><b>Обычный диапазон для ${v.name.toLowerCase()}:</b> ${rangeLabel(v)}</p>
           <p class="how mech">Это ориентир по диапазону, а не окончательный вердикт — точный тембр определит педагог. Упражнения подстроятся под тебя.</p>
         </div>
         <div class="row">

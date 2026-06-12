@@ -1,8 +1,7 @@
 // game.js — экран упражнения: слушаем эталон → отсчёт → проход по хайвею → итог.
 import { Scorer } from '../game/scoring.js';
 import { NoteHighway } from '../game/note-highway.js';
-import { playSequence, playClick, playTone, playChord, playDrone, setOutputVolume } from '../audio/reference-tone.js';
-import { referenceFreqs } from '../theory/exercises.js';
+import { playMelody, playClick, playTone, playChord, playDrone, setOutputVolume } from '../audio/reference-tone.js';
 import { startGroove } from '../audio/backing.js';
 import { hzToNoteInfo, centsOff } from '../theory/note-map.js';
 import * as progress from '../state/progress.js';
@@ -130,7 +129,6 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
 
   // 0) Аккорд тоники → 1) эталон-мелодия → 2) отсчёт
   const tonic = ex.root != null ? ex.root : ex.notes[0].midi;
-  const freqs = referenceFreqs(ex);
   const timbre = progress.getTimbre();
   highway.draw(0, null, false);
   if (repIndex === 0) {
@@ -138,7 +136,8 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     playChord(mic.ctx, tonic, 0, 1.4, 0.14, timbre);
     later(() => {
       msg.textContent = 'Образец…';
-      const refDur = playSequence(mic.ctx, freqs, 0.34, timbre);
+      // Образец в реальном ритме упражнения (темп прохода, паузы как в нотах).
+      const refDur = playMelody(mic.ctx, exRun.notes, exRun.tempo, timbre);
       later(countIn, refDur * 1000 + 250);
     }, 1650);
   } else {

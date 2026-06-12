@@ -38,15 +38,31 @@ export const BREATHING = {
   },
 };
 
-export function renderBreathing(app, mic, key, { onExit }) {
+// onExit — выход (назад/меню), onDone — упражнение выполнено (зачёт пункта программы),
+// onNext/nextLabel — сопровождение: кнопка «Дальше» к следующему пункту блока.
+export function renderBreathing(app, mic, key, { onExit, onNext, nextLabel, onDone }) {
   const ex = BREATHING[key];
   let rafId = null;
+
+  // Кнопки финала: «Дальше» (если есть сопровождение) + Меню/Ещё раз — как в renderGame.
+  function finishButtons() {
+    return `
+      ${onNext ? `<button class="btn btn-primary" id="next" style="width:100%">${nextLabel || 'Дальше'} →</button>` : ''}
+      <div class="row"><button class="btn btn-ghost" id="menu">Меню</button>
+      <button class="btn ${onNext ? 'btn-ghost' : 'btn-primary'}" id="again">Ещё раз</button></div>`;
+  }
+  function wireFinish(again) {
+    document.getElementById('menu').addEventListener('click', onExit);
+    document.getElementById('again').addEventListener('click', again);
+    const nx = document.getElementById('next');
+    if (nx) nx.addEventListener('click', onNext);
+  }
 
   // ---- Экран объяснения ----
   function explain() {
     app.innerHTML = `
       <div class="screen breathe-intro">
-        <div class="game-top"><button class="icon-btn" id="back">‹ Меню</button></div>
+        <div class="game-top"><button class="icon-btn" id="back">‹ ${onNext ? 'Назад' : 'Меню'}</button></div>
         <div class="brand"><h1>${ex.title}</h1></div>
         <div class="card"><p class="blurb">${ex.blurb}</p>${ex.belly ? bellyDiagram() : ''}</div>
         <button class="btn btn-primary" id="go" style="width:100%">Начать упражнение</button>
@@ -104,16 +120,15 @@ export function renderBreathing(app, mic, key, { onExit }) {
 
     function finishPaced() {
       stop();
+      if (onDone) onDone();
       app.innerHTML = `
         <div class="screen summary">
           <div class="stars">🫁</div>
           <div class="verdict">Готово!</div>
           <p class="hint">${ex.cycles} циклов дыхания пройдено. Голос готов к распевке.</p>
-          <div class="row"><button class="btn btn-ghost" id="menu">Меню</button>
-          <button class="btn btn-primary" id="again">Ещё раз</button></div>
+          ${finishButtons()}
         </div>`;
-      document.getElementById('menu').addEventListener('click', onExit);
-      document.getElementById('again').addEventListener('click', runPaced);
+      wireFinish(runPaced);
     }
   }
 
@@ -158,6 +173,7 @@ export function renderBreathing(app, mic, key, { onExit }) {
 
     function finishExhale(seconds) {
       stop();
+      if (onDone) onDone();
       seconds = Math.max(0, Math.round(seconds * 10) / 10);
       const best = progress.recordBreathBest(seconds);
       const goal = [...ex.goals].reverse().find((g) => seconds >= g.sec);
@@ -167,11 +183,9 @@ export function renderBreathing(app, mic, key, { onExit }) {
           <div class="big-pct">${seconds.toFixed(1)}<span>сек</span></div>
           <div class="verdict">${verdict}</div>
           <p class="hint">ровный выдох на «с-с-с» · твой рекорд: <b>${best.toFixed(1)} сек</b></p>
-          <div class="row"><button class="btn btn-ghost" id="menu">Меню</button>
-          <button class="btn btn-primary" id="again">Ещё раз</button></div>
+          ${finishButtons()}
         </div>`;
-      document.getElementById('menu').addEventListener('click', onExit);
-      document.getElementById('again').addEventListener('click', runExhale);
+      wireFinish(runExhale);
     }
   }
 

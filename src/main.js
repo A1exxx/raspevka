@@ -604,8 +604,14 @@ function runBlockItem(block, k) {
   enterMic(() => {
     applyTrackerRange();
     if (item.t === 'breath') {
-      // дыхание не оценивается по высоте — засчитываем за выполнение и ведём дальше
-      renderBreathing(app, mic, item.id, { onExit: () => { progress.markBlockItem(block.id, item.id); goNext(); } });
+      // дыхание не оценивается по высоте — зачёт по выполнению (onDone), дальше — кнопкой
+      // «Дальше» (onNext); «Меню»/«Прервать» честно возвращают в блок, а не ведут вперёд.
+      renderBreathing(app, mic, item.id, {
+        onExit: () => openBlock(idx),
+        onDone: () => progress.markBlockItem(block.id, item.id),
+        onNext: goNext,
+        nextLabel: next ? `Дальше: ${next.name}` : 'К экзамену блока',
+      });
       return;
     }
     const exMake = (root) => EX_MAKERS[item.id](root, progress.getModeKey());

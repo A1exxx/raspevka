@@ -57,7 +57,7 @@ export function renderGuide(app, { onExit, onSettings }) {
         <p>Короткий гид: что где находится и что подкрутить, если что-то не получается.</p></div>
       ${cards}
       ${onSettings ? '<button class="btn btn-primary" id="toSettings" style="width:100%">Открыть настройки</button>' : ''}
-      <p class="hint">Гид всегда под лампочкой 💡 на главном экране.</p>
+      <p class="hint">Гид всегда под лампочкой 💡 в нижнем левом углу главного экрана.</p>
     </div>
   `;
   document.getElementById('back').addEventListener('click', onExit);

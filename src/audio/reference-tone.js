@@ -94,6 +94,19 @@ export function playSequence(ctx, freqs, secPerNote = 0.42, timbre = 'piano') {
   return freqs.length * secPerNote;
 }
 
+/** Образец-мелодия в РЕАЛЬНОМ ритме упражнения: длительности и паузы (gap) как в нотах.
+ *  Раньше образец играл все ноты ровными — музыкант слышал «неправильный ритм». */
+export function playMelody(ctx, notes, tempo, timbre = 'piano', gain = 0.22) {
+  const spb = 60 / (tempo || 90);
+  let t = 0;
+  for (const n of notes) {
+    const hz = 440 * Math.pow(2, (n.midi - 69) / 12);
+    playTone(ctx, hz, Math.max(0.18, n.beats * spb * 0.92), t, gain, timbre);
+    t += (n.beats + (n.gap || 0)) * spb;
+  }
+  return t;
+}
+
 /** Короткий метроном-«тик». accent=true — выше и громче (сильная доля). */
 export function playClick(ctx, when = 0, accent = false) {
   const t = ctx.currentTime + when;
