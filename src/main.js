@@ -411,8 +411,9 @@ function renderMenu() {
       </section>
       <button class="thin-item thin-cta" data-teacher style="width:100%"><span>Урок с живым педагогом</span><span class="thin-sub">бесплатный пробный →</span></button>
       <p class="hint">Темп и «подсказку тоном» настраивай прямо в упражнении — значок ⚙.</p>
-      <button class="guide-fab" data-guide aria-label="Подсказки" title="Как тут всё устроено">💡</button>
     </div>
+    <!-- вне .screen: у неё transform от entrance-анимации, который ломает position:fixed -->
+    <button class="guide-fab" data-guide aria-label="Подсказки" title="Как тут всё устроено">💡</button>
   `;
   document.getElementById('session').addEventListener('click', () => {
     const go = () => enterMic(() => { applyTrackerRange(); renderSession(app, mic, tracker, { onExit: renderMenu }); });
