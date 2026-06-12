@@ -695,6 +695,9 @@ canvas.fs-canvas { height: 320px; }
 .guide-fab:hover { border-color: var(--accent); }
 .guide-fab:active { transform: scale(.94); }
 
+/* Кнопка «Пропустить образец» в HUD упражнения */
+.btn-skip { padding: 8px 14px; font-size: 13px; }
+
 .settings-screen .card.settings { display: block; }
 .settings-screen .set-row {
   display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px;

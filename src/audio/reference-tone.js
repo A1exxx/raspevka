@@ -95,16 +95,18 @@ export function playSequence(ctx, freqs, secPerNote = 0.42, timbre = 'piano') {
 }
 
 /** Образец-мелодия в РЕАЛЬНОМ ритме упражнения: длительности и паузы (gap) как в нотах.
- *  Раньше образец играл все ноты ровными — музыкант слышал «неправильный ритм». */
+ *  Раньше образец играл все ноты ровными — музыкант слышал «неправильный ритм».
+ *  Возвращает { dur, stop } — stop() обрывает ещё не отзвучавшие ноты («Пропустить»). */
 export function playMelody(ctx, notes, tempo, timbre = 'piano', gain = 0.22) {
   const spb = 60 / (tempo || 90);
   let t = 0;
+  const handles = [];
   for (const n of notes) {
     const hz = 440 * Math.pow(2, (n.midi - 69) / 12);
-    playTone(ctx, hz, Math.max(0.18, n.beats * spb * 0.92), t, gain, timbre);
+    handles.push(playTone(ctx, hz, Math.max(0.18, n.beats * spb * 0.92), t, gain, timbre));
     t += (n.beats + (n.gap || 0)) * spb;
   }
-  return t;
+  return { dur: t, stop() { handles.forEach((h) => h && h.stop && h.stop()); } };
 }
 
 /** Короткий метроном-«тик». accent=true — выше и громче (сильная доля). */

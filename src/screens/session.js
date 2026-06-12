@@ -34,7 +34,8 @@ export function renderSession(app, mic, tracker, { onExit }) {
     interstitial(step, i, () => {
       const onComplete = (res) => { results.push(res); i += 1; next(); };
       if (step.rhythm) {
-        renderRhythm(app, mic, root, step.rhythm, { onExit, onComplete });
+        // Интерстициал уже объяснил шаг — без второго экрана «Начать» подряд.
+        renderRhythm(app, mic, root, step.rhythm, { onExit, onComplete, skipExplain: true });
       } else {
         const reps = transposePlan(step.ex, range.low, range.high, 2); // короче в составе сессии
         renderGame(app, mic, tracker, step.ex, { onExit, onComplete, reps });
@@ -48,6 +49,7 @@ export function renderSession(app, mic, tracker, { onExit }) {
         <div class="game-top"><button class="icon-btn" id="quit">‹ Прервать</button></div>
         <div class="step-count">Упражнение ${idx + 1} из ${seq.length}</div>
         <div class="brand"><h1>${step.title}</h1><p>${step.tip}</p></div>
+        ${step.rhythm ? `<div class="card"><p class="how"><b>Как.</b> ${step.rhythm.how}</p></div>` : ''}
         <div class="progress-dots">
           ${seq.map((_, k) => `<span class="dot ${k < idx ? 'done' : k === idx ? 'now' : ''}"></span>`).join('')}
         </div>

@@ -33,7 +33,7 @@ const LABEL = { 'с': 'С-с-с', 'ш': 'Ш-ш-ш', 'вдох': 'Вдох нос
 // метронома совпадают с нотами (правка музыканта: «одна нота вместо мелодии»).
 const PAD_LOOP = [0, 4, 7, 9, 12, 9, 7, 4]; // до-ми-соль-ля-до'-ля-соль-ми
 
-export function renderRhythm(app, mic, root, exercise, { onExit, onComplete } = {}) {
+export function renderRhythm(app, mic, root, exercise, { onExit, onComplete, skipExplain } = {}) {
   let rafId = null, pausedAbort = false;
   let pad = []; // хэндлы нот подложки (остановить при выходе)
   const timers = [];
@@ -149,5 +149,6 @@ export function renderRhythm(app, mic, root, exercise, { onExit, onComplete } = 
     document.getElementById('again').addEventListener('click', explain);
   }
 
-  explain();
+  // В составе полной распевки интерстициал уже всё объяснил — сразу к делу.
+  if (skipExplain) run(); else explain();
 }

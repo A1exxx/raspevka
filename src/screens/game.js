@@ -131,14 +131,21 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   const tonic = ex.root != null ? ex.root : ex.notes[0].midi;
   const timbre = progress.getTimbre();
   highway.draw(0, null, false);
+  // «Пропустить образец» — длинные распевки не заставляют слушать эталон целиком.
+  function showSkip(onSkip) {
+    cueEl.innerHTML = '<button class="btn btn-ghost btn-skip" id="skipref">Пропустить образец →</button>';
+    document.getElementById('skipref').addEventListener('click', onSkip);
+  }
+  function hideSkip() { cueEl.innerHTML = ''; }
   if (repIndex === 0) {
     msg.textContent = 'Слушай тонику…';
     playChord(mic.ctx, tonic, 0, 1.4, 0.14, timbre);
     later(() => {
       msg.textContent = 'Образец…';
       // Образец в реальном ритме упражнения (темп прохода, паузы как в нотах).
-      const refDur = playMelody(mic.ctx, exRun.notes, exRun.tempo, timbre);
-      later(countIn, refDur * 1000 + 250);
+      const ref = playMelody(mic.ctx, exRun.notes, exRun.tempo, timbre);
+      const toCount = later(() => { hideSkip(); countIn(); }, ref.dur * 1000 + 250);
+      showSkip(() => { clearTimeout(toCount); ref.stop(); hideSkip(); countIn(); });
     }, 1650);
   } else {
     // Повтор выше/ниже — короткое интро: новая тоника + один клик.
