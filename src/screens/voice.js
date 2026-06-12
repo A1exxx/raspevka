@@ -24,7 +24,7 @@ export function renderVoice(app, mic, tracker, { onDone, onExit, canSkip = false
           <button class="icon-btn" id="back">${canSkip ? 'Пропустить' : '‹ Меню'}</button>
         </div>
         <div class="brand"><h1>Твой голос</h1>
-          <p>Знаешь свой тип — выбери. Не знаешь — определим за минуту.</p></div>
+          <p>Знаешь свой тембр — выбери. Не знаешь — определим за минуту.</p></div>
         <button class="btn btn-primary" id="detect" style="width:100%">Определить мой голос</button>
         <div class="settings">
           <div class="seg-label">Тембр голоса</div>
@@ -72,7 +72,7 @@ export function renderVoice(app, mic, tracker, { onDone, onExit, canSkip = false
         <div class="game-top"><button class="icon-btn" id="back">‹ Назад</button></div>
         <div class="brand"><h1>Определим голос</h1></div>
         <div class="card">
-          <p class="blurb">Сначала споёшь свою самую низкую удобную ноту, потом — самую высокую (без напряжения!). По диапазону подскажу твой тип.</p>
+          <p class="blurb">Сначала споёшь свою самую низкую удобную ноту, потом — самую высокую (без напряжения!). По диапазону подскажу твой тембр.</p>
           <p class="how mech"><b>Как.</b> Пой ровно и держи ноту — когда звук станет стабильным, пойдёт отсчёт и я её запишу. Верх <b>не форсируй</b>: бери только то, что берётся легко.</p>
         </div>
         <button class="btn btn-primary" id="go" style="width:100%">Поехали</button>

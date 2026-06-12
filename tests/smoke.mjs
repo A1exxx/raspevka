@@ -43,19 +43,22 @@ eq('scale5 ionian deg3', fiveNoteScale(60, 'ionian').notes[2].midi, 64);
 eq('scale5 aeolian deg3', fiveNoteScale(60, 'aeolian').notes[2].midi, 63);
 eq('hum3 aeolian deg3', hum3(60, 'aeolian').notes[2].midi, 63);
 eq('agility aeolian deg6', agilityRun(60, 'aeolian').notes[5].midi, 68);
-// гласные-распевки (из PDF-техники, нейтральные)
-// гласные-распевки — точная транскрипция L02 (фикс. смещения от тоники)
+// гласные-распевки — ноты по правкам музыканта (раунд 3, сверка по аудио-превью)
 eq('vowelHold full 20 notes', vowelHold(60).notes.length, 20);
-eq('vowelHold rises E->G', vowelHold(60).notes[10].midi, 63);
+eq('vowelHold rises +2 тона (б.терция)', vowelHold(60).notes[10].midi, 64);
+eq('vowelHold стаккато: gap после 1-й ноты', vowelHold(60).notes[0].gap, 0.5);
 eq('vowelScale Disco len', vowelScale(60).notes.length, 10);
-eq('vowelScale Disco peak C', vowelScale(60).notes[4].midi, 68);
+eq('vowelScale Disco peak (VI ступень)', vowelScale(60).notes[4].midi, 69);
+eq('vowelScale финал: половинка с точкой тоном ниже', vowelScale(60).notes[9].midi, 65);
 eq('vowelAgility NoBubble len', vowelAgility(60).notes.length, 13);
 eq('vowelAgility 2nd note +3', vowelAgility(60).notes[1].midi, 63);
-eq('vowelClimb HighFive len', vowelClimb(60).notes.length, 15);
+eq('vowelClimb HighFive len (2 части: вверх + зеркало)', vowelClimb(60).notes.length, 30);
 eq('vowelClimb fifth jump', vowelClimb(60).notes[1].midi, 67);
-eq('jamesCharles len', jamesCharles(60).notes.length, 14);
-eq('jamesCharles A note', jamesCharles(60).notes[2].midi, 65);
-eq('jumpToFifth jumps DOWN', jumpToFifth(60, 'ionian').notes[6].midi, 55);
+eq('vowelClimb зеркало: такт 4 кончается тоникой', vowelClimb(60).notes[29].midi, 60);
+eq('jamesCharles len', jamesCharles(60).notes.length, 21);
+eq('jamesCharles мотив тон+1.5', jamesCharles(60).notes[2].midi, 65);
+eq('jamesCharles лига на вершине (2 доли)', jamesCharles(60).notes[9].beats, 1);
+eq('jumpToFifth jumps UP (отзеркалено, раунд 3)', jumpToFifth(60, 'ionian').notes[6].midi, 67);
 eq('vibrato wide green', vibratoHold(60).greenCents, 55);
 
 // scoring
@@ -185,15 +188,16 @@ eq('resistTurn offsets (L10)', off2(resistTurn).join(','), '0,1,3,1,0,1,3,1,0,1,
 eq('resistRun offsets (L10)', off2(resistRun).join(','), '0,1,3,5,7,5,3,1,0,1,3,5,7,5,3,1,0');
 eq('новые распевки НЕ ладозависимы', [vibratoWobble, timbreVocalise, registerArp, beltScale, articStaccato, resistTurn].every((f) => f(60).modeKey === undefined), true);
 
-// === Правки музыканта: точная транскрипция L02 целыми массивами (смещения в полутонах от тоники) ===
+// === Правки музыканта (раунд 3): транскрипция L02 целыми массивами (полутоны от тоники) ===
 const offs = (fn) => fn(60).notes.map((n) => n.midi - 60);
-eq('vowelHold offsets (E×10 → G×10)', offs(vowelHold).join(','), '0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3');
-eq('vowelScale Disco offsets', offs(vowelScale).join(','), '0,1,5,7,8,7,5,1,7,5');
+eq('vowelHold offsets (тоника ×10 → +2 тона ×10)', offs(vowelHold).join(','), '0,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4');
+eq('vowelScale Disco offsets (арка + финал тоном ниже)', offs(vowelScale).join(','), '0,2,5,7,9,7,5,2,7,5');
 eq('vowelAgility NoBubble offsets', offs(vowelAgility).join(','), '0,3,1,5,3,7,5,8,7,3,5,1,0');
-eq('vowelClimb HighFive offsets (E↔B ×5 + гамма)', offs(vowelClimb).join(','), '0,7,0,7,0,7,0,7,0,7,0,1,3,5,7');
-eq('jamesCharles offsets', offs(jamesCharles).join(','), '0,1,5,0,1,5,0,1,5,8,8,7,5,1');
+eq('vowelClimb HighFive offsets (I↔V + пробежка, затем зеркало)', offs(vowelClimb).join(','),
+  '0,7,0,7,0,7,0,7,0,7,0,2,4,5,7,7,0,7,0,7,0,7,0,7,0,7,5,4,2,0');
+eq('jamesCharles offsets (мотив с паузами + спуск + лига)', offs(jamesCharles).join(','), '0,2,5,0,2,5,0,2,5,8,7,5,2,0,2,5,0,2,5,8,7');
 eq('гласные НЕ ладозависимы (modeKey undefined)', vowelHold(60).modeKey, undefined);
-eq('Скачок к V — квинта ВНИЗ (−5 полутонов)', jumpToFifth(60, 'ionian').notes[6].midi - 60, -5);
+eq('Скачок к V — квинта ВВЕРХ (+7 полутонов, раунд 3)', jumpToFifth(60, 'ionian').notes[6].midi - 60, 7);
 
 // === Логика состояния (progress.js) — со стабом localStorage/navigator ===
 globalThis.localStorage = (() => { let s = {}; return {

@@ -70,7 +70,7 @@ export function renderDashboard(app, { onExit }) {
         <p class="how" style="margin-top:6px"><b>${midiName(lowHigh.low)} – ${midiName(lowHigh.high)}</b> · ${span} полутонов${growth}</p>
         ${miniKeyboard(lowHigh.low, lowHigh.high)}
         ${rangeTimeline(rangeHist)}
-        ${vType ? `<p class="how">Тип: ${vType.name}</p>` : ''}
+        ${vType ? `<p class="how">Тембр: ${vType.name}</p>` : ''}
       </div>`;
   }
 

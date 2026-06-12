@@ -41,7 +41,7 @@ export class NoteHighway {
     this.timed = exercise.notes.map((n) => {
       const dur = n.beats * this.secPerBeat;
       const seg = { midi: n.midi, hz: midiToHz(n.midi), start: t, end: t + dur, dur };
-      t += dur;
+      t += dur + (n.gap || 0) * this.secPerBeat; // gap — пауза после ноты (стаккато/мотивы)
       return seg;
     });
     this.totalTime = t + 0.6;

@@ -356,11 +356,14 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
           <button class="btn btn-ghost" id="menu">Меню</button>
           <button class="btn btn-primary" id="again">Пройти заново</button>
         </div>
+        ${onNext ? `<button class="btn btn-ghost" id="next" style="width:100%">${nextLabel || 'Дальше'} →</button>` : ''}
       </div>`;
     const go = () => renderGame(app, mic, tracker, exercise, { ...opts, explain: false, repIndex: 0, _acc: undefined });
     wireControls(app, () => renderFailRetry(agg), mic);
     document.getElementById('menu').addEventListener('click', onExit);
     document.getElementById('again').addEventListener('click', go);
+    const nextBtn = document.getElementById('next');
+    if (nextBtn) nextBtn.addEventListener('click', onNext); // сопровождение по программе не обрывается даже при неудаче
   }
 }
 

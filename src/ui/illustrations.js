@@ -61,14 +61,14 @@ export function miniKeyboard(lowMidi, highMidi) {
 export function contourGlyph(notes) {
   if (!Array.isArray(notes) || !notes.length) return '<span class="ex-glyph"></span>';
   // Принимаем и {midi, beats}, и просто числа (beats=1) — для песен/обратной совместимости.
-  const items = notes.map((n) => (typeof n === 'number' ? { midi: n, beats: 1 } : { midi: n.midi, beats: n.beats || 1 }));
+  const items = notes.map((n) => (typeof n === 'number' ? { midi: n, beats: 1, gap: 0 } : { midi: n.midi, beats: n.beats || 1, gap: n.gap || 0 }));
   const mids = items.map((n) => n.midi);
   const min = Math.min(...mids);
   const max = Math.max(...mids);
   const rows = Math.max(1, max - min) + 1;
   // Ширина плашки ∝ длительности (как в нотах: долгая нота — длинная) — рисунок
   // передаёт и контур, и ритм распевки, а не ряд одинаковых квадратов.
-  const totalBeats = items.reduce((a, n) => a + n.beats, 0);
+  const totalBeats = items.reduce((a, n) => a + n.beats + n.gap, 0);
   const u = Math.max(5, Math.min(16, 150 / totalBeats)); // px на долю
   const rowH = 10, pad = 1.6, side = rowH - 2 * 2;
   let x = 0, body = '';
@@ -77,7 +77,7 @@ export function contourGlyph(notes) {
     const y = (max - n.midi) * rowH + 2;          // 0 сверху = самая высокая нота
     const hi = n.midi === max ? ' class="gh-hi"' : ''; // верхняя нота — акцентом
     body += `<rect${hi} x="${x.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="${side}" rx="2"/>`;
-    x += n.beats * u;
+    x += (n.beats + n.gap) * u; // пауза после ноты — пустое место в рисунке
   }
   const W = x, H = rows * rowH;
   return `<span class="ex-glyph"><svg viewBox="0 0 ${W.toFixed(0)} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Рисунок мелодии упражнения">${body}</svg></span>`;

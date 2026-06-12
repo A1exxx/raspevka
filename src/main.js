@@ -354,10 +354,9 @@ function renderMenu() {
         <h1>Распевка</h1>
         <div class="home-chips">
           <div class="energy-chip" title="Энергия — копится за точные распевки"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>${energy}/${maxE}</div>
-          ${streak > 0 ? `<div class="streak-chip">${flameSvg()} ${streak} ${dayWord(streak)}</div>` : ''}
+          ${streak > 0 ? `<div class="streak-chip" title="Стрик: ${streak} ${dayWord(streak)} подряд">${flameSvg()} ${streak}</div>` : ''}
           ${progress.getFreezes() > 0 ? `<div class="energy-chip" title="Заморозка стрика — страхует 1 пропущенный день">❄ ${progress.getFreezes()}</div>` : ''}
           ${progress.getDevMode() ? '<button class="gear-btn" data-dev aria-label="Тест-режим" title="Тест-режим">🧪</button>' : ''}
-          <button class="gear-btn" data-guide aria-label="Подсказки" title="Как тут всё устроено">💡</button>
           <button class="gear-btn" data-settings aria-label="Настройки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
         </div>
       </header>
@@ -412,6 +411,7 @@ function renderMenu() {
       </section>
       <button class="thin-item thin-cta" data-teacher style="width:100%"><span>Урок с живым педагогом</span><span class="thin-sub">бесплатный пробный →</span></button>
       <p class="hint">Темп и «подсказку тоном» настраивай прямо в упражнении — значок ⚙.</p>
+      <button class="guide-fab" data-guide aria-label="Подсказки" title="Как тут всё устроено">💡</button>
     </div>
   `;
   document.getElementById('session').addEventListener('click', () => {

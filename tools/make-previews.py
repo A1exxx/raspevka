@@ -14,7 +14,7 @@ def midi_hz(m):
 
 def synth(notes, tempo):
     spb = 60.0 / tempo
-    total = sum(n["beats"] for n in notes) * spb + 0.6
+    total = sum(n["beats"] + n.get("gap", 0) for n in notes) * spb + 0.6
     buf = [0.0] * int(total * SR)
     t = 0.25  # небольшой въезд
     for n in notes:
@@ -32,7 +32,7 @@ def synth(notes, tempo):
             idx = n0 + i
             if idx < len(buf):
                 buf[idx] += 0.24 * env * s
-        t += dur
+        t += dur + n.get("gap", 0) * spb  # пауза после ноты (стаккато/мотивы)
     # клиппинг-защита
     peak = max(1e-9, max(abs(x) for x in buf))
     k = min(1.0, 0.92 / peak)

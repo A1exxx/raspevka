@@ -404,14 +404,16 @@ canvas.trace { height: 300px; }
 
 /* ============ Домашний экран ============ */
 .home { gap: 16px; }
-.home-head { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-.home-head h1 { font-size: 26px; font-weight: 800; letter-spacing: -.01em; }
+.home-head { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px; }
+.home-head h1 { font-size: 23px; font-weight: 800; letter-spacing: -.01em; white-space: nowrap; }
+/* Чипы шапки: единый компактный размер и одинаковые отступы (ОС музыканта, раунд 3) */
 .streak-chip {
-  display: inline-flex; align-items: center; gap: 6px;
+  display: inline-flex; align-items: center; gap: 4px; height: 30px; box-sizing: border-box;
   background: rgba(240,192,101,.12); border: 1px solid var(--gold); color: var(--gold);
-  padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums;
+  padding: 0 10px; border-radius: 999px; font-weight: 700; font-size: 12.5px; font-variant-numeric: tabular-nums;
+  white-space: nowrap; flex-shrink: 0;
 }
-.streak-chip svg { width: 15px; height: 15px; }
+.streak-chip svg { width: 13px; height: 13px; }
 
 .hero-card {
   position: relative; width: 100%; text-align: left; cursor: pointer; overflow: hidden;
@@ -607,13 +609,14 @@ canvas.fs-canvas { height: 320px; }
 .energy-pips { display: flex; gap: 5px; }
 .en-pip { width: 22px; height: 8px; border-radius: 999px; background: var(--line); transition: background .2s; }
 .en-pip.on { background: linear-gradient(90deg, var(--gold), var(--amber)); }
-.home-chips { display: flex; align-items: center; gap: 8px; }
+.home-chips { display: flex; align-items: center; gap: 6px; }
 .energy-chip {
-  display: inline-flex; align-items: center; gap: 5px;
+  display: inline-flex; align-items: center; gap: 4px; height: 30px; box-sizing: border-box;
   background: rgba(196,136,10,.12); border: 1px solid var(--gold); color: var(--gold);
-  padding: 6px 11px; border-radius: 999px; font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums;
+  padding: 0 10px; border-radius: 999px; font-weight: 700; font-size: 12.5px; font-variant-numeric: tabular-nums;
+  white-space: nowrap; flex-shrink: 0;
 }
-.energy-chip svg { width: 14px; height: 14px; }
+.energy-chip svg { width: 13px; height: 13px; }
 
 /* ============ Пикер ладов ============ */
 .mode-item {
@@ -672,13 +675,25 @@ canvas.fs-canvas { height: 320px; }
 /* ============ Шестерёнка + экран настроек ============ */
 .gear-btn {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 38px; height: 38px; border-radius: 999px;
+  width: 30px; height: 30px; border-radius: 999px; font-size: 14px;
   background: var(--surface); border: 1px solid var(--line); color: var(--text);
   cursor: pointer; transition: background .15s, border-color .15s, transform .15s;
 }
 .gear-btn:hover { border-color: var(--accent); color: var(--accent); }
 .gear-btn:active { transform: rotate(35deg); }
-.gear-btn svg { width: 20px; height: 20px; }
+.gear-btn svg { width: 17px; height: 17px; }
+
+/* Лампочка-гид — плавающая в нижнем ЛЕВОМ углу (правый занят кнопкой микрофона) */
+.guide-fab {
+  position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 60;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 999px; font-size: 19px;
+  background: var(--surface); border: 1px solid var(--line);
+  cursor: pointer; box-shadow: var(--shadow);
+  transition: transform .15s, border-color .2s, box-shadow .2s;
+}
+.guide-fab:hover { border-color: var(--accent); }
+.guide-fab:active { transform: scale(.94); }
 
 .settings-screen .card.settings { display: block; }
 .settings-screen .set-row {

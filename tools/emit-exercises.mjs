@@ -10,7 +10,7 @@ const LIST = [
   ['03', 'L02-3 James Charles Warm Up', () => jamesCharles(64)],
   ['04', 'L02-4 High Five', () => vowelClimb(64)],
   ['05', 'L02-5 No Bubble Gum', () => vowelAgility(64)],
-  ['06', 'Скачок к V (вниз)', () => jumpToFifth(64, 'ionian')],
+  ['06', 'Скачок к V (вверх)', () => jumpToFifth(64, 'ionian')],
   ['07', 'L04 Раскачка вибрато', () => vibratoWobble(71)],
   ['08', 'L05 Тёплый тон', () => timbreVocalise(64)],
   ['09', 'L05 Ровный тон на двух', () => timbreShift(62)],
@@ -35,7 +35,7 @@ const out = LIST.map(([num, label, make]) => {
   const ex = make();
   return {
     num, label, tempo: ex.tempo,
-    notes: ex.notes.map((n) => ({ midi: n.midi, beats: n.beats })),
+    notes: ex.notes.map((n) => ({ midi: n.midi, beats: n.beats, gap: n.gap || 0 })),
   };
 });
 writeFileSync(new URL('./note-previews.json', import.meta.url), JSON.stringify(out, null, 2));
