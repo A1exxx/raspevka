@@ -1,7 +1,7 @@
 [
   {
     "num": "01",
-    "label": "L02-1 Calm Down Vowels",
+    "label": "Пять гласных (L02-1)",
     "tempo": 78,
     "notes": [
       {
@@ -108,7 +108,7 @@
   },
   {
     "num": "02",
-    "label": "L02-2 Disco Vowels",
+    "label": "Лесенка гласных (L02-2)",
     "tempo": 124,
     "notes": [
       {
@@ -165,7 +165,7 @@
   },
   {
     "num": "03",
-    "label": "L02-3 James Charles Warm Up",
+    "label": "Волна гласных (L02-3)",
     "tempo": 130,
     "notes": [
       {
@@ -277,7 +277,7 @@
   },
   {
     "num": "04",
-    "label": "L02-4 High Five",
+    "label": "Качели на квинте (L02-4)",
     "tempo": 92,
     "notes": [
       {
@@ -434,7 +434,7 @@
   },
   {
     "num": "05",
-    "label": "L02-5 No Bubble Gum",
+    "label": "Зигзаг (L02-5)",
     "tempo": 100,
     "notes": [
       {
@@ -728,51 +728,31 @@
   {
     "num": "09",
     "label": "L05 Ровный тон на двух",
-    "tempo": 80,
+    "tempo": 72,
     "notes": [
       {
         "midi": 62,
-        "beats": 1,
-        "gap": 0
-      },
-      {
-        "midi": 62,
-        "beats": 1,
-        "gap": 0
-      },
-      {
-        "midi": 62,
-        "beats": 1,
+        "beats": 2,
         "gap": 0
       },
       {
         "midi": 57,
-        "beats": 1,
-        "gap": 0
-      },
-      {
-        "midi": 57,
-        "beats": 1,
+        "beats": 2,
         "gap": 0
       },
       {
         "midi": 62,
-        "beats": 1,
+        "beats": 2,
+        "gap": 0
+      },
+      {
+        "midi": 57,
+        "beats": 2,
         "gap": 0
       },
       {
         "midi": 62,
-        "beats": 1,
-        "gap": 0
-      },
-      {
-        "midi": 57,
-        "beats": 1,
-        "gap": 0
-      },
-      {
-        "midi": 57,
-        "beats": 1,
+        "beats": 4,
         "gap": 0
       }
     ]
@@ -784,52 +764,37 @@
     "notes": [
       {
         "midi": 64,
-        "beats": 0.6,
+        "beats": 1,
         "gap": 0
       },
       {
-        "midi": 67,
-        "beats": 0.6,
+        "midi": 69,
+        "beats": 3,
         "gap": 0
       },
       {
         "midi": 64,
-        "beats": 0.6,
+        "beats": 1,
         "gap": 0
       },
       {
         "midi": 71,
-        "beats": 0.6,
+        "beats": 3,
         "gap": 0
       },
       {
         "midi": 64,
-        "beats": 0.6,
+        "beats": 1,
         "gap": 0
       },
       {
         "midi": 76,
-        "beats": 0.6,
+        "beats": 3,
         "gap": 0
       },
       {
         "midi": 64,
-        "beats": 0.6,
-        "gap": 0
-      },
-      {
-        "midi": 71,
-        "beats": 0.6,
-        "gap": 0
-      },
-      {
-        "midi": 64,
-        "beats": 0.6,
-        "gap": 0
-      },
-      {
-        "midi": 67,
-        "beats": 0.6,
+        "beats": 4,
         "gap": 0
       }
     ]
@@ -837,26 +802,66 @@
   {
     "num": "11",
     "label": "L06 Октавная связка",
-    "tempo": 76,
+    "tempo": 84,
     "notes": [
       {
         "midi": 64,
-        "beats": 1.5,
+        "beats": 2,
         "gap": 0
       },
       {
         "midi": 76,
-        "beats": 1.5,
+        "beats": 2,
         "gap": 0
       },
       {
         "midi": 64,
-        "beats": 1.5,
+        "beats": 4,
+        "gap": 0
+      },
+      {
+        "midi": 64,
+        "beats": 2,
         "gap": 0
       },
       {
         "midi": 76,
-        "beats": 1.5,
+        "beats": 2,
+        "gap": 0
+      },
+      {
+        "midi": 64,
+        "beats": 4,
+        "gap": 0
+      },
+      {
+        "midi": 64,
+        "beats": 2,
+        "gap": 0
+      },
+      {
+        "midi": 76,
+        "beats": 2,
+        "gap": 0
+      },
+      {
+        "midi": 64,
+        "beats": 4,
+        "gap": 0
+      },
+      {
+        "midi": 64,
+        "beats": 2,
+        "gap": 0
+      },
+      {
+        "midi": 76,
+        "beats": 2,
+        "gap": 0
+      },
+      {
+        "midi": 64,
+        "beats": 4,
         "gap": 0
       }
     ]
@@ -868,97 +873,97 @@
     "notes": [
       {
         "midi": 64,
-        "beats": 0.6,
+        "beats": 0.5,
         "gap": 0
       },
       {
-        "midi": 65,
-        "beats": 0.6,
+        "midi": 66,
+        "beats": 0.5,
         "gap": 0
       },
       {
-        "midi": 67,
-        "beats": 0.6,
+        "midi": 68,
+        "beats": 0.5,
         "gap": 0
       },
       {
         "midi": 69,
-        "beats": 0.6,
+        "beats": 0.5,
         "gap": 0
       },
       {
         "midi": 71,
-        "beats": 0.6,
+        "beats": 1,
         "gap": 0
       },
       {
         "midi": 69,
-        "beats": 0.6,
+        "beats": 0.5,
         "gap": 0
       },
       {
-        "midi": 67,
-        "beats": 0.6,
+        "midi": 68,
+        "beats": 0.5,
         "gap": 0
       },
       {
-        "midi": 65,
-        "beats": 0.6,
+        "midi": 66,
+        "beats": 0.5,
         "gap": 0
       },
       {
         "midi": 64,
-        "beats": 0.6,
+        "beats": 2,
         "gap": 0
       }
     ]
   },
   {
     "num": "13",
-    "label": "L07 Белт — октава",
+    "label": "Белт-арпеджио",
     "tempo": 100,
     "notes": [
       {
         "midi": 64,
-        "beats": 0.8,
+        "beats": 0.5,
+        "gap": 0
+      },
+      {
+        "midi": 68,
+        "beats": 0.5,
+        "gap": 0
+      },
+      {
+        "midi": 71,
+        "beats": 0.5,
         "gap": 0
       },
       {
         "midi": 76,
-        "beats": 0.8,
+        "beats": 2,
+        "gap": 0
+      },
+      {
+        "midi": 71,
+        "beats": 0.5,
+        "gap": 0
+      },
+      {
+        "midi": 68,
+        "beats": 0.5,
         "gap": 0
       },
       {
         "midi": 64,
-        "beats": 0.8,
-        "gap": 0
-      },
-      {
-        "midi": 76,
-        "beats": 0.8,
-        "gap": 0
-      },
-      {
-        "midi": 64,
-        "beats": 0.8,
-        "gap": 0
-      },
-      {
-        "midi": 76,
-        "beats": 0.8,
-        "gap": 0
-      },
-      {
-        "midi": 64,
-        "beats": 0.8,
+        "beats": 2,
         "gap": 0
       }
     ]
   },
   {
     "num": "14",
-    "label": "L08 Чёткое стаккато",
-    "tempo": 132,
+    "label": "Стаккато-арпеджио",
+    "tempo": 126,
     "notes": [
       {
         "midi": 76,
@@ -966,7 +971,17 @@
         "gap": 0.5
       },
       {
-        "midi": 76,
+        "midi": 80,
+        "beats": 0.5,
+        "gap": 0.5
+      },
+      {
+        "midi": 83,
+        "beats": 0.5,
+        "gap": 0.5
+      },
+      {
+        "midi": 80,
         "beats": 0.5,
         "gap": 0.5
       },
@@ -981,17 +996,17 @@
         "gap": 0.5
       },
       {
-        "midi": 76,
+        "midi": 80,
         "beats": 0.5,
         "gap": 0.5
       },
       {
-        "midi": 76,
+        "midi": 83,
         "beats": 0.5,
         "gap": 0.5
       },
       {
-        "midi": 76,
+        "midi": 80,
         "beats": 0.5,
         "gap": 0.5
       },
@@ -1004,7 +1019,7 @@
   },
   {
     "num": "15",
-    "label": "L08 Слоги по группам",
+    "label": "Слоги по группам",
     "tempo": 120,
     "notes": [
       {
@@ -1013,7 +1028,17 @@
         "gap": 0
       },
       {
-        "midi": 76,
+        "midi": 78,
+        "beats": 0.5,
+        "gap": 0
+      },
+      {
+        "midi": 80,
+        "beats": 0.5,
+        "gap": 0
+      },
+      {
+        "midi": 78,
         "beats": 0.5,
         "gap": 0
       },
@@ -1023,47 +1048,27 @@
         "gap": 0.5
       },
       {
-        "midi": 71,
-        "beats": 0.5,
-        "gap": 0
-      },
-      {
-        "midi": 71,
-        "beats": 0.5,
-        "gap": 0
-      },
-      {
-        "midi": 71,
-        "beats": 0.5,
-        "gap": 0.5
-      },
-      {
         "midi": 76,
         "beats": 0.5,
         "gap": 0
       },
       {
-        "midi": 76,
+        "midi": 78,
+        "beats": 0.5,
+        "gap": 0
+      },
+      {
+        "midi": 80,
+        "beats": 0.5,
+        "gap": 0
+      },
+      {
+        "midi": 78,
         "beats": 0.5,
         "gap": 0
       },
       {
         "midi": 76,
-        "beats": 0.5,
-        "gap": 0.5
-      },
-      {
-        "midi": 71,
-        "beats": 0.5,
-        "gap": 0
-      },
-      {
-        "midi": 71,
-        "beats": 0.5,
-        "gap": 0
-      },
-      {
-        "midi": 71,
         "beats": 0.5,
         "gap": 0.5
       }
@@ -1071,7 +1076,7 @@
   },
   {
     "num": "16",
-    "label": "L10 Стамина-фигура",
+    "label": "Фигура-волчок",
     "tempo": 116,
     "notes": [
       {
@@ -1144,45 +1149,140 @@
   {
     "num": "17",
     "label": "L10 Выносливая гамма",
-    "tempo": 126,
+    "tempo": 92,
     "notes": [
       {
         "midi": 64,
-        "beats": 0.5,
+        "beats": 0.25,
         "gap": 0
       },
       {
-        "midi": 65,
-        "beats": 0.5,
+        "midi": 66,
+        "beats": 0.25,
         "gap": 0
       },
       {
-        "midi": 67,
-        "beats": 0.5,
+        "midi": 68,
+        "beats": 0.25,
         "gap": 0
       },
       {
         "midi": 69,
-        "beats": 0.5,
+        "beats": 0.25,
         "gap": 0
       },
       {
         "midi": 71,
-        "beats": 0.5,
+        "beats": 0.25,
         "gap": 0
       },
       {
         "midi": 69,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 68,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 66,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 64,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 66,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 68,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 69,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 71,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 69,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 68,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 66,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 64,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 66,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 68,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 69,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 71,
+        "beats": 1.25,
+        "gap": 0
+      },
+      {
+        "midi": 69,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 68,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 66,
+        "beats": 0.25,
+        "gap": 0
+      },
+      {
+        "midi": 64,
+        "beats": 1,
+        "gap": 0
+      },
+      {
+        "midi": 64,
         "beats": 0.5,
         "gap": 0
       },
       {
-        "midi": 67,
-        "beats": 0.5,
-        "gap": 0
-      },
-      {
-        "midi": 65,
+        "midi": 68,
         "beats": 0.5,
         "gap": 0
       },
@@ -1192,37 +1292,7 @@
         "gap": 0
       },
       {
-        "midi": 65,
-        "beats": 0.5,
-        "gap": 0
-      },
-      {
-        "midi": 67,
-        "beats": 0.5,
-        "gap": 0
-      },
-      {
-        "midi": 69,
-        "beats": 0.5,
-        "gap": 0
-      },
-      {
         "midi": 71,
-        "beats": 0.5,
-        "gap": 0
-      },
-      {
-        "midi": 69,
-        "beats": 0.5,
-        "gap": 0
-      },
-      {
-        "midi": 67,
-        "beats": 0.5,
-        "gap": 0
-      },
-      {
-        "midi": 65,
         "beats": 0.5,
         "gap": 0
       },
@@ -1230,6 +1300,16 @@
         "midi": 64,
         "beats": 0.5,
         "gap": 0
+      },
+      {
+        "midi": 76,
+        "beats": 1.5,
+        "gap": 0
+      },
+      {
+        "midi": 64,
+        "beats": 3,
+        "gap": 1
       }
     ]
   },
@@ -1447,11 +1527,6 @@
     "tempo": 84,
     "notes": [
       {
-        "midi": 76,
-        "beats": 2,
-        "gap": 0
-      },
-      {
         "midi": 64,
         "beats": 2,
         "gap": 0
@@ -1463,6 +1538,11 @@
       },
       {
         "midi": 64,
+        "beats": 2,
+        "gap": 0
+      },
+      {
+        "midi": 76,
         "beats": 2,
         "gap": 0
       }
@@ -1505,6 +1585,11 @@
       },
       {
         "midi": 75,
+        "beats": 1,
+        "gap": 0
+      },
+      {
+        "midi": 76,
         "beats": 1,
         "gap": 0
       },

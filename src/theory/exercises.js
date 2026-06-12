@@ -19,7 +19,7 @@ const beat = (midi, beats = 1, gap = 0) => (gap ? { midi, beats, gap } : { midi,
 export function vowelHold(rootMidi) {
   const N = (o, b, g = 0) => beat(rootMidi + o, b, g);
   return {
-    id: 'vhold', name: 'Calm Down Vowels', syllable: 'И-Э-А-О-У', tempo: 78, kind: 'vowel', root: rootMidi, grooveStyle: 'soft',
+    id: 'vhold', name: 'Пять гласных', syllable: 'И-Э-А-О-У', tempo: 78, kind: 'vowel', root: rootMidi, grooveStyle: 'soft',
     greenCents: 25,
     desc: 'Унификация гласных: держим позицию, меняем только гласную «И-Э-А-О-У».',
     how: 'Пой «И-Э-А-О-У» ровно, без «прыжков» голосом при смене гласной. Сначала стаккато с паузами, потом строка повторяется выше — позиция единая.',
@@ -41,7 +41,7 @@ export function vowelHold(rootMidi) {
 export function vowelScale(rootMidi) {
   const N = (o, b) => beat(rootMidi + o, b);
   return {
-    id: 'vscale', name: 'Disco Vowels', syllable: 'И-Э-А-О-У', tempo: 124, kind: 'scale', root: rootMidi, grooveStyle: 'pop',
+    id: 'vscale', name: 'Лесенка гласных', syllable: 'И-Э-А-О-У', tempo: 124, kind: 'scale', root: rootMidi, grooveStyle: 'pop',
     desc: 'Точность высоты при смене гласной — каждая гласная ведёт по двум нотам.',
     how: 'Пой «И-Э-А-О-У» легко и точно, попадая в каждую ноту слига. Не зажимайся.',
     notes: [
@@ -57,7 +57,7 @@ export function vowelScale(rootMidi) {
 export function vowelAgility(rootMidi) {
   const offs = [0, 3, 1, 5, 3, 7, 5, 8, 7, 3, 5, 1, 0];
   return {
-    id: 'vagil', name: 'No Bubble Gum', syllable: 'И-Э-И-А-И-О-И-У', tempo: 100, kind: 'agility', root: rootMidi, grooveStyle: 'funk',
+    id: 'vagil', name: 'Зигзаг', syllable: 'И-Э-И-А-И-О-И-У', tempo: 100, kind: 'agility', root: rootMidi, grooveStyle: 'funk',
     desc: 'Беглость и точность: зигзаг по ступеням вверх и обратно.',
     how: 'Лёгко и быстро веди голос по нотам зигзагом вверх, не зажимаясь. Гласные чёткие.',
     notes: offs.map((o) => beat(rootMidi + o, 0.5)),
@@ -69,7 +69,7 @@ export function vowelAgility(rootMidi) {
 export function vowelClimb(rootMidi) {
   const N = (o, b) => beat(rootMidi + o, b);
   return {
-    id: 'vclimb', name: 'High Five', syllable: 'И-Э-А-О-У', tempo: 92, kind: 'jump', root: rootMidi, grooveStyle: 'soft',
+    id: 'vclimb', name: 'Качели на квинте', syllable: 'И-Э-А-О-У', tempo: 92, kind: 'jump', root: rootMidi, grooveStyle: 'soft',
     desc: 'Гибкость и точность интервала: скачки на квинту вверх и зеркально вниз.',
     how: 'Чисто бери скачок на квинту (без зажима), пробежку пой ровно. Вторая половина — то же зеркально вниз. Опора дыханием.',
     notes: [
@@ -90,7 +90,7 @@ export function vowelClimb(rootMidi) {
 export function jamesCharles(rootMidi) {
   const N = (o, b, g = 0) => beat(rootMidi + o, b, g);
   return {
-    id: 'jcharles', name: 'James Charles Warm Up', syllable: 'И-Э-А-О-У', tempo: 130, kind: 'agility', root: rootMidi, grooveStyle: 'swing',
+    id: 'jcharles', name: 'Волна гласных', syllable: 'И-Э-А-О-У', tempo: 130, kind: 'agility', root: rootMidi, grooveStyle: 'swing',
     desc: 'Гибкость и позиция гласных: повторяющийся мотив, затем плавный спуск.',
     how: 'Лёгко веди гласные по мотиву, в конце мягко спустись. Без зажима, позиция единая.',
     notes: [
@@ -131,7 +131,8 @@ export function jumpToFifth(rootMidi, modeKey = 'ionian') {
 
 /** Ладовая вокализация «ЯМ» (7 ступеней вверх-вниз) в выбранном ЛАДУ (по ТЗ Игоря). */
 export function ladVocalise(rootMidi, modeKey = 'ionian') {
-  const degrees = [1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1];
+  // Раунд 4: вершину (тоника октавой выше) повторяем дважды, потом спуск.
+  const degrees = [1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1];
   const offs = degreesToSemitones(degrees, modeKey);
   return {
     id: 'lad', name: 'Ладовая «ЯМ»', syllable: 'Ям', tempo: 100, kind: 'scale', root: rootMidi, modeKey, drone: true, grooveStyle: 'march',
@@ -189,82 +190,92 @@ export function timbreVocalise(rootMidi) {
   };
 }
 
-/** Опора тембра на двух звуках (L05) — ровность при смене высоты на кварту. */
+/** Ровный тон на двух высотах — кварта вниз и обратно, длинные ноты
+ *  (раунд 4: прежняя версия была неузнаваема — упрощено до классической фигуры). */
 export function timbreShift(rootMidi) {
-  const offs = [0, 0, 0, -5, -5, 0, 0, -5, -5];
+  const N = (o, b) => beat(rootMidi + o, b);
   return {
-    id: 'timbre2', name: 'Ровный тон на двух', syllable: 'А', tempo: 80, kind: 'sustain', root: rootMidi, grooveStyle: 'ballad',
+    id: 'timbre2', name: 'Ровный тон на двух', syllable: 'А', tempo: 72, kind: 'sustain', root: rootMidi, grooveStyle: 'ballad',
     desc: 'Единый тембр при переходе между двумя высотами (вниз на кварту и обратно).',
     how: 'Держи одинаковый округлый звук на обеих нотах — не «бели» нижнюю и не зажимай верхнюю.',
-    notes: offs.map((o) => beat(rootMidi + o, 1)),
+    notes: [N(0, 2), N(-5, 2), N(0, 2), N(-5, 2), N(0, 4)],
   };
 }
 
-/** Арпеджио через регистры (L06) — соединение грудного/головного через опорные тоны. */
+/** Через регистры — по нотам музыканта (раунд 4): четверть на тонике, половинка
+ *  с точкой всё выше (кварта → квинта → октава), финал — целая тоника. */
 export function registerArp(rootMidi) {
-  const offs = [0, 3, 0, 7, 0, 12, 0, 7, 0, 3];
+  const N = (o, b) => beat(rootMidi + o, b);
   return {
     id: 'regarp', name: 'Через регистры', syllable: 'Но', tempo: 92, kind: 'jump', root: rootMidi, grooveStyle: 'soft',
-    desc: 'Плавный переход (passaggio): соединяем нижний и верхний регистр через опорные тоны аккорда.',
-    how: 'Пой «Но», возвращаясь к тонике и беря всё выше (терция → квинта → октава). Без «слома» на переходе — мягко.',
-    notes: offs.map((o) => beat(rootMidi + o, 0.6)),
+    desc: 'Плавный переход (passaggio): с тоники всё выше — кварта, квинта, октава.',
+    how: 'Пой «Но», возвращаясь к тонике и беря всё выше (кварта → квинта → октава). Без «слома» на переходе — мягко.',
+    notes: [
+      N(0, 1), N(5, 3),   // такт 1: четверть + половинка с точкой на кварту выше
+      N(0, 1), N(7, 3),   // такт 2: …на квинту выше
+      N(0, 1), N(12, 3),  // такт 3: …на октаву выше
+      N(0, 4),            // такт 4: целая тоника
+    ],
   };
 }
 
-/** Октавная связка (L06) — ровный переход через регистровый «мост». */
+/** Октавная связка — по нотам музыканта (раунд 4): половинка + половинка октавой
+ *  выше, затем целая тоника — и так 4 раза (8 тактов). */
 export function registerOctave(rootMidi) {
-  const offs = [0, 12, 0, 12];
+  const N = (o, b) => beat(rootMidi + o, b);
   return {
-    id: 'regoct', name: 'Октавная связка', syllable: 'А', tempo: 76, kind: 'jump', root: rootMidi, grooveStyle: 'soft',
+    id: 'regoct', name: 'Октавная связка', syllable: 'А', tempo: 84, kind: 'jump', root: rootMidi, grooveStyle: 'soft',
     desc: 'Связка регистров на октаве — без резкого «переключения» голоса.',
-    how: 'Спокойно прыгай на октаву вверх и обратно, целься в центр ноты. Верх не криком, а на опоре и резонансе.',
-    notes: offs.map((o) => beat(rootMidi + o, 1.5)),
+    how: 'Спокойно прыгай на октаву вверх и возвращайся на долгую тонику. Верх не криком, а на опоре и резонансе.',
+    notes: Array.from({ length: 4 }).flatMap(() => [N(0, 2), N(12, 2), N(0, 4)]),
   };
 }
 
-/** Белтинг — 5-нотная гамма (L07), яркая опёртая подача. */
+/** Белтинг — классическая мажорная 5-нотная гамма вверх-вниз с долгой вершиной
+ *  (раунд 4: прежняя версия была неузнаваема — заменена классикой). */
 export function beltScale(rootMidi) {
-  const offs = [0, 1, 3, 5, 7, 5, 3, 1, 0];
+  const N = (o, b) => beat(rootMidi + o, b);
   return {
     id: 'belt', name: 'Белтинг — гамма', syllable: 'Эй', tempo: 112, kind: 'scale', root: rootMidi, grooveStyle: 'drive',
     desc: 'Яркая опёртая подача (белтинг) на пятинотной гамме — мощно, но без зажима.',
     how: 'Пой «Эй» ярко и звонко, опираясь дыханием. Звук вперёд (в маску), горло свободно. Не дави на верхних нотах.',
-    notes: offs.map((o) => beat(rootMidi + o, 0.6)),
+    notes: [N(0, 0.5), N(2, 0.5), N(4, 0.5), N(5, 0.5), N(7, 1), N(5, 0.5), N(4, 0.5), N(2, 0.5), N(0, 2)],
   };
 }
 
-/** Октавный белт (L07) — мощная атака верха через октаву. */
+/** Белт-арпеджио — мажорное арпеджио вверх с долгой вершиной и спуском
+ *  (раунд 4: прежняя версия была неузнаваема — заменена классикой). */
 export function beltOctave(rootMidi) {
-  const offs = [0, 12, 0, 12, 0, 12, 0];
+  const N = (o, b) => beat(rootMidi + o, b);
   return {
-    id: 'beltoct', name: 'Белт — октава', syllable: 'Эй', tempo: 100, kind: 'jump', root: rootMidi, grooveStyle: 'drive',
-    desc: 'Опёртая атака верхней ноты через октаву — энергично и безопасно.',
-    how: 'Бери октаву вверх ярко и точно, на опоре. Не тянись горлом — звук на дыхании и в резонаторах.',
-    notes: offs.map((o) => beat(rootMidi + o, 0.8)),
+    id: 'beltoct', name: 'Белт-арпеджио', syllable: 'Эй', tempo: 100, kind: 'jump', root: rootMidi, grooveStyle: 'drive',
+    desc: 'Опёртая атака верха через арпеджио до октавы — энергично и безопасно.',
+    how: 'Поднимайся по арпеджио ярко и точно, на опоре. Верхнюю ноту не тяни горлом — звук на дыхании и в резонаторах.',
+    notes: [N(0, 0.5), N(4, 0.5), N(7, 0.5), N(12, 2), N(7, 0.5), N(4, 0.5), N(0, 2)],
   };
 }
 
-/** Артикуляция — стаккато на одной ноте (L08), чёткие согласные.
- *  Стаккато = отрывисто: после каждой восьмушки — восьмая пауза (как в Calm Down). */
+/** Стаккато-арпеджио — классика: I-III-V-III-I отрывисто, с паузой после каждого
+ *  слога (раунд 4: одна нота была неузнаваема — заменено классическим арпеджио). */
 export function articStaccato(rootMidi) {
-  const offs = [0, 0, 0, 0, 0, 0, 0, 0];
+  const offs = [0, 4, 7, 4, 0, 0, 4, 7, 4, 0];
   return {
-    id: 'artic', name: 'Чёткое стаккато', syllable: 'Та', tempo: 132, kind: 'agility', root: rootMidi, grooveStyle: 'funk',
-    desc: 'Чёткая артикуляция и точная атака: одна нота, быстрые ясные слоги.',
-    how: 'Пой «Та-Та-Та» коротко и чётко на одной высоте, с паузой после каждого слога. Согласная ясная, звук не «расползается».',
+    id: 'artic', name: 'Стаккато-арпеджио', syllable: 'Та', tempo: 126, kind: 'agility', root: rootMidi, grooveStyle: 'funk',
+    desc: 'Чёткая артикуляция и точная атака: арпеджио отрывистыми ясными слогами.',
+    how: 'Пой «Та-Та-Та» коротко и чётко по арпеджио вверх-вниз, с паузой после каждого слога. Согласная ясная, звук не «расползается».',
     notes: offs.map((o) => beat(rootMidi + o, 0.5, 0.5)),
   };
 }
 
-/** Артикуляция группами (L08) — слоги на двух высотах (вниз на кварту).
- *  После каждой тройки слогов — восьмая пауза (вдох/перенос на новую высоту). */
+/** Слоги по группам — трихорд I-II-III-II-I чёткими слогами, пауза между группами
+ *  (раунд 4: прежняя версия была неузнаваема — заменена классическим трихордом). */
 export function articGroups(rootMidi) {
-  const offs = [0, 0, 0, -5, -5, -5, 0, 0, 0, -5, -5, -5];
+  const offs = [0, 2, 4, 2, 0, 0, 2, 4, 2, 0];
   return {
     id: 'artic2', name: 'Слоги по группам', syllable: 'Та-Ка', tempo: 120, kind: 'agility', root: rootMidi, grooveStyle: 'funk',
-    desc: 'Дикция при смене высоты: чёткие слоги группами на двух нотах.',
-    how: 'Пой «Та-Ка-Та» группами, чисто меняя высоту вниз и обратно. Каждый слог ясный, ритм ровный.',
-    notes: offs.map((o, i) => beat(rootMidi + o, 0.5, i % 3 === 2 ? 0.5 : 0)),
+    desc: 'Дикция в движении: чёткие слоги группами по соседним ступеням.',
+    how: 'Пой «Та-Ка-Та-Ка-Та» по нотам вверх-вниз, между группами — короткая пауза на вдох. Каждый слог ясный, ритм ровный.',
+    notes: offs.map((o, i) => beat(rootMidi + o, 0.5, i % 5 === 4 ? 0.5 : 0)),
   };
 }
 
@@ -272,21 +283,32 @@ export function articGroups(rootMidi) {
 export function resistTurn(rootMidi) {
   const offs = [0, 1, 3, 1, 0, 1, 3, 1, 0, 1, 3, 1, 0];
   return {
-    id: 'resist', name: 'Стамина-фигура', syllable: 'Ма', tempo: 116, kind: 'agility', root: rootMidi, grooveStyle: 'march',
+    id: 'resist', name: 'Фигура-волчок', syllable: 'Ма', tempo: 116, kind: 'agility', root: rootMidi, grooveStyle: 'march',
     desc: 'Выносливость и ровность: устойчивый мотив-«волчок» много раз без потери опоры.',
     how: 'Пой «Ма» по фигуре вверх-вниз ровно и не уставая. Дыхание ровное, опора держится до конца.',
     notes: offs.map((o) => beat(rootMidi + o, 0.5)),
   };
 }
 
-/** Сопротивление — выносливая гамма (L10), длинный пробег. */
+/** Выносливая гамма — полная версия по нотам музыканта (раунд 4): два такта
+ *  шестнадцатых пробегов, лига на квинте, взлёт к октаве и долгая тоника. */
 export function resistRun(rootMidi) {
-  const offs = [0, 1, 3, 5, 7, 5, 3, 1, 0, 1, 3, 5, 7, 5, 3, 1, 0];
+  const N = (o, b, g = 0) => beat(rootMidi + o, b, g);
+  const run = [0, 2, 4, 5, 7, 5, 4, 2]; // I-II-III-IV V-IV-III-II шестнадцатыми
   return {
-    id: 'resist2', name: 'Выносливая гамма', syllable: 'Ма', tempo: 126, kind: 'agility', root: rootMidi, grooveStyle: 'march',
+    id: 'resist2', name: 'Выносливая гамма', syllable: 'Ма', tempo: 92, kind: 'agility', root: rootMidi, grooveStyle: 'march',
     desc: 'Дыхательная выносливость: длинный ровный пробег по гамме без добора воздуха.',
-    how: 'Пой «Ма» по гамме вверх-вниз дважды на одном дыхании, ровно и точно. Распредели воздух до конца.',
-    notes: offs.map((o) => beat(rootMidi + o, 0.5)),
+    how: 'Пой «Ма» шестнадцатыми ровно и точно на одном дыхании; в конце — взлёт к октаве и долгая тоника. Распредели воздух до конца.',
+    notes: [
+      // Такт 1: пробег I-II-III-IV V-IV-III-II — дважды
+      ...run.map((o) => N(o, 0.25)), ...run.map((o) => N(o, 0.25)),
+      // Такт 2: подъём, четверть на V (с лигой в шестнадцатую), спуск, четверть на I
+      N(0, 0.25), N(2, 0.25), N(4, 0.25), N(5, 0.25), N(7, 1.25), N(5, 0.25), N(4, 0.25), N(2, 0.25), N(0, 1),
+      // Такт 3: I-III, I-V восьмушками, I и четверть с точкой на октаве
+      N(0, 0.5), N(4, 0.5), N(0, 0.5), N(7, 0.5), N(0, 0.5), N(12, 1.5),
+      // Такт 4: половинка с точкой на тонике, четвертная пауза
+      N(0, 3, 1),
+    ],
   };
 }
 
@@ -330,7 +352,8 @@ export function octaveJump(rootMidi) {
     id: 'jump', name: 'Октавный скачок', syllable: 'А', tempo: 84, kind: 'jump', root: rootMidi, grooveStyle: 'drive',
     desc: 'Учит координации между нижним и верхним регистром голоса.',
     how: 'Пой «А», точно прыгая на октаву вверх и обратно вниз. Целься в центр ноты.',
-    notes: [beat(rootMidi + 12, 2), beat(rootMidi, 2), beat(rootMidi + 12, 2), beat(rootMidi, 2)],
+    // Раунд 4: первая нота нижняя, вторая верхняя (по правке музыканта)
+    notes: [beat(rootMidi, 2), beat(rootMidi + 12, 2), beat(rootMidi, 2), beat(rootMidi + 12, 2)],
   };
 }
 

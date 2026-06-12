@@ -36,7 +36,8 @@ eq('scale5 root', fiveNoteScale(60).notes[0].midi, 60);
 eq('agility len', agilityRun(60).notes.length, 11);
 eq('agility fast beats', agilityRun(60).notes[0].beats, 0.5);
 eq('sustain 1 note', sustain(60, 8).notes.length, 1);
-eq('octaveJump top', octaveJump(60).notes[0].midi, 72);
+eq('octaveJump: первая нота нижняя (раунд 4)', octaveJump(60).notes[0].midi, 60);
+eq('octaveJump: вторая нота верхняя', octaveJump(60).notes[1].midi, 72);
 eq('refFreqs len', referenceFreqs(fiveNoteScale(60)).length, 9);
 // лад реально меняет гаммовые упражнения: III ступень в миноре = +3 полутона (мажор = +4)
 eq('scale5 ionian deg3', fiveNoteScale(60, 'ionian').notes[2].midi, 64);
@@ -177,18 +178,23 @@ eq('block7 открыт после b6', blockUnlocked(6, ['b1','b2','b3','b4','b
 const off2 = (fn) => fn(60).notes.map((n) => n.midi - 60);
 eq('vibratoWobble offsets (L04)', off2(vibratoWobble).join(','), '0,1,0,1,0,1,0,5,6,5,6,5,6,5');
 eq('timbreVocalise offsets (L05)', off2(timbreVocalise).join(','), '0,1,3,0,1,3,1,0,0,1,3,5,7,5');
-eq('timbreShift offsets (L05)', off2(timbreShift).join(','), '0,0,0,-5,-5,0,0,-5,-5');
-eq('registerArp offsets (L06)', off2(registerArp).join(','), '0,3,0,7,0,12,0,7,0,3');
-eq('registerOctave offsets (L06)', off2(registerOctave).join(','), '0,12,0,12');
-eq('beltScale offsets (L07)', off2(beltScale).join(','), '0,1,3,5,7,5,3,1,0');
-eq('beltOctave offsets (L07)', off2(beltOctave).join(','), '0,12,0,12,0,12,0');
-eq('articStaccato одна нота ×8 (L08)', off2(articStaccato).join(','), '0,0,0,0,0,0,0,0');
+eq('timbreShift: кварта вниз и обратно, длинные ноты (раунд 4)', off2(timbreShift).join(','), '0,-5,0,-5,0');
+eq('registerArp: кварта→квинта→октава (раунд 4)', off2(registerArp).join(','), '0,5,0,7,0,12,0');
+eq('registerArp ритм: четверть + половинка с точкой', registerArp(60).notes[1].beats, 3);
+eq('registerOctave: (низ-верх-целая)×4 (раунд 4)', off2(registerOctave).join(','), '0,12,0,0,12,0,0,12,0,0,12,0');
+eq('registerOctave ритм: целая тоника', registerOctave(60).notes[2].beats, 4);
+eq('beltScale: классическая 5-нотная гамма (раунд 4)', off2(beltScale).join(','), '0,2,4,5,7,5,4,2,0');
+eq('beltOctave: арпеджио до октавы (раунд 4)', off2(beltOctave).join(','), '0,4,7,12,7,4,0');
+eq('articStaccato: стаккато-арпеджио I-III-V (раунд 4)', off2(articStaccato).join(','), '0,4,7,4,0,0,4,7,4,0');
 eq('articStaccato — отрывисто: пауза после каждого слога', articStaccato(60).notes[0].gap, 0.5);
-eq('articGroups offsets (L08)', off2(articGroups).join(','), '0,0,0,-5,-5,-5,0,0,0,-5,-5,-5');
-eq('articGroups — пауза после тройки', articGroups(60).notes[2].gap, 0.5);
-eq('articGroups — внутри тройки пауз нет', articGroups(60).notes[1].gap || 0, 0);
+eq('articGroups: трихорд группами (раунд 4)', off2(articGroups).join(','), '0,2,4,2,0,0,2,4,2,0');
+eq('articGroups — пауза после группы', articGroups(60).notes[4].gap, 0.5);
+eq('articGroups — внутри группы пауз нет', articGroups(60).notes[1].gap || 0, 0);
 eq('resistTurn offsets (L10)', off2(resistTurn).join(','), '0,1,3,1,0,1,3,1,0,1,3,1,0');
-eq('resistRun offsets (L10)', off2(resistRun).join(','), '0,1,3,5,7,5,3,1,0,1,3,5,7,5,3,1,0');
+eq('resistRun: полная версия по нотам музыканта (раунд 4)', off2(resistRun).join(','),
+  '0,2,4,5,7,5,4,2,0,2,4,5,7,5,4,2,0,2,4,5,7,5,4,2,0,0,4,0,7,0,12,0');
+eq('resistRun: лига на квинте (четверть+шестнадцатая)', resistRun(60).notes[20].beats, 1.25);
+eq('resistRun: финал — половинка с точкой + пауза', resistRun(60).notes[31].beats + (resistRun(60).notes[31].gap || 0), 4);
 eq('новые распевки НЕ ладозависимы', [vibratoWobble, timbreVocalise, registerArp, beltScale, articStaccato, resistTurn].every((f) => f(60).modeKey === undefined), true);
 
 // === Правки музыканта (раунд 3): транскрипция L02 целыми массивами (полутоны от тоники) ===

@@ -27,7 +27,7 @@ export const BLOCKS = [
   },
   {
     id: 'b2', title: 'Ясность гласных', sub: 'Выравнивание гласных и точность',
-    items: [ex('vhold', 'Calm Down Vowels'), ex('vscale', 'Disco Vowels'), ex('jcharles', 'James Charles Warm Up'), ex('vclimb', 'High Five'), ex('vagil', 'No Bubble Gum')],
+    items: [ex('vhold', 'Пять гласных'), ex('vscale', 'Лесенка гласных'), ex('jcharles', 'Волна гласных'), ex('vclimb', 'Качели на квинте'), ex('vagil', 'Зигзаг')],
     exam: { exId: 'vscale', pass: 0.6 },
   },
   {
@@ -57,17 +57,17 @@ export const BLOCKS = [
   },
   {
     id: 'b8', title: 'Белтинг', sub: 'Яркая опёртая подача верха',
-    items: [ex('belt', 'Белтинг — гамма'), ex('beltoct', 'Белт — октава')],
+    items: [ex('belt', 'Белтинг — гамма'), ex('beltoct', 'Белт-арпеджио')],
     exam: { exId: 'belt', pass: 0.55 },
   },
   {
     id: 'b9', title: 'Артикуляция', sub: 'Чёткая дикция и атака',
-    items: [ex('artic', 'Чёткое стаккато'), ex('artic2', 'Слоги по группам')],
+    items: [ex('artic', 'Стаккато-арпеджио'), ex('artic2', 'Слоги по группам')],
     exam: { exId: 'artic', pass: 0.6 },
   },
   {
     id: 'b10', title: 'Сопротивление', sub: 'Выносливость и опора',
-    items: [ex('resist', 'Стамина-фигура'), ex('resist2', 'Выносливая гамма')],
+    items: [ex('resist', 'Фигура-волчок'), ex('resist2', 'Выносливая гамма')],
     exam: { exId: 'resist2', pass: 0.5 },
   },
 ];

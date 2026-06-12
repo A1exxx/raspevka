@@ -1,7 +1,7 @@
-// rhythm.js — ритмические распевки на «с»/«ш»: метроном + подложка-дрон тоники.
+// rhythm.js — ритмические распевки на «с»/«ш»: метроном + мелодическая подложка.
 // Питч не интонируется (согласные) — упражнение ведётся метрономом и визуальным
 // пульсом; цель — ровный выдох и артикуляция в такт + вдохи носом между подходами.
-import { playClick, playDrone } from '../audio/reference-tone.js';
+import { playClick, playTone } from '../audio/reference-tone.js';
 
 const N = (s, b) => ({ s, b });
 function rep(arr, n) { const out = []; for (let i = 0; i < n; i++) out.push(...arr.map((x) => ({ ...x }))); return out; }
@@ -29,21 +29,27 @@ export const RHYTHM = {
 
 const LABEL = { 'с': 'С-с-с', 'ш': 'Ш-ш-ш', 'вдох': 'Вдох носом', 'rest': '·' };
 
+// Подложка-мелодия: спокойная пентатоника четвертями, СТРОГО по долям — клики
+// метронома совпадают с нотами (правка музыканта: «одна нота вместо мелодии»).
+const PAD_LOOP = [0, 4, 7, 9, 12, 9, 7, 4]; // до-ми-соль-ля-до'-ля-соль-ми
+
 export function renderRhythm(app, mic, root, exercise, { onExit, onComplete } = {}) {
-  let rafId = null, drone = null, pausedAbort = false;
+  let rafId = null, pausedAbort = false;
+  let pad = []; // хэндлы нот подложки (остановить при выходе)
   const timers = [];
   const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
 
+  function stopPad() { pad.forEach((h) => h && h.stop && h.stop()); pad = []; }
   function cleanup() {
     if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
     timers.forEach(clearTimeout); timers.length = 0;
-    if (drone) { drone.stop(); drone = null; }
+    stopPad();
     document.removeEventListener('visibilitychange', onVisibility);
   }
   function onVisibility() {
     if (document.hidden) {
       if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-      if (drone) { drone.stop(); drone = null; }
+      stopPad();
       pausedAbort = true;
     } else if (pausedAbort) { pausedAbort = false; explain(); }
   }
@@ -92,7 +98,13 @@ export function renderRhythm(app, mic, root, exercise, { onExit, onComplete } = 
     const beat = document.getElementById('beat');
     const prog = document.getElementById('prog');
 
-    drone = playDrone(mic.ctx, root, totalSec + 0.4);
+    // Мелодическая подложка: мягкая нота на каждую долю (та же сетка, что у кликов,
+    // поэтому метроном и мелодия совпадают). Тихо — фон, а не солист.
+    for (let bi = 0; bi < Math.ceil(totalBeats); bi++) {
+      const midi = root + PAD_LOOP[bi % PAD_LOOP.length];
+      const hz = 440 * Math.pow(2, (midi - 69) / 12);
+      pad.push(playTone(mic.ctx, hz, spb * 0.9, bi * spb, 0.07, 'soft'));
+    }
     const startPerf = performance.now();
     let lastBeat = -1, finished = false;
 
