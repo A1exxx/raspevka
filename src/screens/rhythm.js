@@ -2,6 +2,7 @@
 // Питч не интонируется (согласные) — упражнение ведётся метрономом и визуальным
 // пульсом; цель — ровный выдох и артикуляция в такт + вдохи носом между подходами.
 import { playClick, playTone } from '../audio/reference-tone.js';
+import * as progress from '../state/progress.js';
 
 const N = (s, b) => ({ s, b });
 function rep(arr, n) { const out = []; for (let i = 0; i < n; i++) out.push(...arr.map((x) => ({ ...x }))); return out; }
@@ -85,7 +86,10 @@ export function renderRhythm(app, mic, root, exercise, { onExit, onComplete, ski
 
     app.innerHTML = `
       <div class="screen breathe">
-        <div class="game-top"><button class="icon-btn" id="quit">‹ Прервать</button></div>
+        <div class="game-top">
+          <button class="icon-btn" id="quit">‹ Прервать</button>
+          <button class="icon-btn" id="padtgl">♪ подложка ${progress.getRhythmPad() ? 'вкл' : 'выкл'}</button>
+        </div>
         <div class="rhythm-stage">
           <div class="rhythm-beat" id="beat"></div>
           <div class="rhythm-label" id="lbl">Приготовься…</div>
@@ -99,12 +103,21 @@ export function renderRhythm(app, mic, root, exercise, { onExit, onComplete, ski
     const prog = document.getElementById('prog');
 
     // Мелодическая подложка: мягкая нота на каждую долю (та же сетка, что у кликов,
-    // поэтому метроном и мелодия совпадают). Тихо — фон, а не солист.
-    for (let bi = 0; bi < Math.ceil(totalBeats); bi++) {
-      const midi = root + PAD_LOOP[bi % PAD_LOOP.length];
-      const hz = 440 * Math.pow(2, (midi - 69) / 12);
-      pad.push(playTone(mic.ctx, hz, spb * 0.9, bi * spb, 0.07, 'soft'));
+    // поэтому метроном и мелодия совпадают). Тихо — фон, а не солист. Тумблер ♪ отключает.
+    if (progress.getRhythmPad()) {
+      for (let bi = 0; bi < Math.ceil(totalBeats); bi++) {
+        const midi = root + PAD_LOOP[bi % PAD_LOOP.length];
+        const hz = 440 * Math.pow(2, (midi - 69) / 12);
+        pad.push(playTone(mic.ctx, hz, spb * 0.9, bi * spb, 0.07, 'soft'));
+      }
     }
+    const padBtn = document.getElementById('padtgl');
+    if (padBtn) padBtn.addEventListener('click', () => {
+      const on = !progress.getRhythmPad();
+      progress.setRhythmPad(on);
+      if (!on) stopPad(); // выключение действует сразу; включение — со следующего запуска
+      padBtn.textContent = on ? '♪ подложка вкл' : '♪ подложка выкл';
+    });
     const startPerf = performance.now();
     let lastBeat = -1, finished = false;
 

@@ -58,6 +58,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
         <summary>Темп и подсказка тоном</summary>
         ${controlsBlock()}
       </details>
+      ${(reps && reps.length > 1) ? '<button class="btn btn-ghost btn-skip" id="endearly">Закончить на этом повторе → итог</button>' : ''}
     </div>
   `;
 
@@ -90,6 +91,15 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   const noBleed = progress.getHeadphones() || progress.getRouteKey() !== 'speaker';
   let grooveHandle = null;
   let raf = null, startPerf = 0, lastPerf = 0, finished = false, pausedAbort = false, lastVoicedMs = 0, lastHapticIndex = -1;
+  // «Закончить на этом повторе»: длинная распевка по всему диапазону (до 25 повторов)
+  // не держит в заложниках — допеваешь текущий проход и сразу итог.
+  let endEarly = false;
+  const endBtn = document.getElementById('endearly');
+  if (endBtn) endBtn.addEventListener('click', () => {
+    endEarly = true;
+    endBtn.textContent = 'Хорошо — после этого повтора итог ✓';
+    endBtn.disabled = true;
+  });
   const guideHandles = [];
   const timers = [];
   const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
@@ -283,7 +293,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     const acc = opts._acc || [];
     acc.push(res);
     // Ещё есть повторы (транспозиция) — продолжаем выше/ниже, итог не показываем.
-    if (reps && reps.length > 1 && repIndex < reps.length - 1) {
+    if (!endEarly && reps && reps.length > 1 && repIndex < reps.length - 1) {
       renderGame(app, mic, tracker, exercise, { ...opts, repIndex: repIndex + 1, _acc: acc });
       return;
     }

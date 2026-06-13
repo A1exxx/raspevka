@@ -867,4 +867,31 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   });
 }
 
+// ---------- Проверка новой версии ----------
+// version.json штампуется при каждой сборке. Телефон тестировщика однажды залип
+// на старом бандле — теперь приложение само предлагает обновиться.
+let _liveVer = null;
+async function checkAppVersion() {
+  try {
+    const r = await fetch(`${import.meta.env.BASE_URL}version.json?_=${Date.now()}`, { cache: 'no-store' });
+    if (!r.ok) return;
+    const v = String((await r.json()).v || '');
+    if (!v || v === '0') return;
+    if (_liveVer == null) { _liveVer = v; return; }
+    if (v !== _liveVer && !document.getElementById('updbar')) {
+      const bar = document.createElement('div');
+      bar.id = 'updbar';
+      bar.className = 'update-banner';
+      bar.innerHTML = '<span>Доступна новая версия</span><button class="btn btn-primary" id="updgo">Обновить</button>';
+      document.body.appendChild(bar);
+      document.getElementById('updgo').addEventListener('click', () => location.reload());
+    }
+  } catch (e) { /* офлайн — молчим */ }
+}
+if (import.meta.env.PROD) {
+  checkAppVersion();
+  setInterval(checkAppVersion, 5 * 60 * 1000);
+  window.addEventListener('focus', checkAppVersion);
+}
+
 renderSplash();

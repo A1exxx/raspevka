@@ -324,6 +324,10 @@ export function setLatencyManual(sec) {
 export function getDarkStage() { return load().darkStage === true; }
 export function setDarkStage(on) { const p = load(); p.darkStage = !!on; save(p); return p.darkStage; }
 
+/** Мелодическая подложка в ритм-упражнениях «с/ш». По умолчанию ВКЛ. */
+export function getRhythmPad() { return load().rhythmPad !== false; }
+export function setRhythmPad(on) { const p = load(); p.rhythmPad = !!on; save(p); return p.rhythmPad; }
+
 /** Авто-усиление микрофона (AGC). По умолчанию ВЫКЛ — стабильнее детекция высоты
  *  (AGC создан для голосовой связи, «пампит» амплитуду и мешает MPM). Вкл — для очень тихих микрофонов. */
 export function getMicAGC() { return load().micAGC === true; }

@@ -6,7 +6,7 @@
   "description": "Игровой вокальный тренажёр: распевки и упражнения с детекцией высоты тона в реальном времени",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "build": "vite build && node tools/stamp-version.mjs",
     "preview": "vite preview --host",
     "test": "node tests/smoke.mjs"
   },
