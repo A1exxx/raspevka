@@ -7,6 +7,7 @@ import { hum3, lipTrill, transposePlan } from '../theory/exercises.js';
 import { getVoiceType } from '../theory/voice-types.js';
 import * as progress from '../state/progress.js';
 import { celebrate, haptic } from '../ui/celebrate.js';
+import { logEvent } from '../state/analytics.js';
 
 export function renderSession(app, mic, tracker, { onExit }) {
   // Корневой тон из центра типа голоса (иначе C4).
@@ -65,6 +66,7 @@ export function renderSession(app, mic, tracker, { onExit }) {
     const avgPct = scored.length ? scored.reduce((a, r) => a + r.pct, 0) / scored.length : 1;
     const stars = avgPct >= 0.85 ? 3 : avgPct >= 0.6 ? 2 : avgPct >= 0.35 ? 1 : 0;
     const { streak, freezeSpent } = progress.recordSession({ pct: avgPct, stars });
+    logEvent('session_done', { pct: Math.round(avgPct * 100), stars }); // полная распевка пройдена
     celebrate(2); haptic(30); // полная распевка завершена — всегда праздник
     const starStr = '★'.repeat(stars) + '☆'.repeat(3 - stars);
     const pct = Math.round(avgPct * 100);

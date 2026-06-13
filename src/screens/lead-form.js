@@ -7,8 +7,10 @@ import * as progress from '../state/progress.js';
 import { getVoiceType, midiName } from '../theory/voice-types.js';
 import { sendLeadToTelegram } from '../state/lead-config.js';
 import { celebrate } from '../ui/celebrate.js';
+import { logEvent } from '../state/analytics.js';
 
 export function renderLeadForm(app, { onExit }) {
+  logEvent('lead_open'); // открыл форму заявки — цель воронки
   const v = progress.getVoice();
   const vt = v && getVoiceType(v.key);
   const range = progress.getRange();
@@ -68,6 +70,7 @@ export function renderLeadForm(app, { onExit }) {
       btn.textContent = 'Отправляю…';
       const lead = { name, contact, pref, goal, stats };
       progress.saveLead(lead);                  // локально — сразу, не потеряется
+      logEvent('lead_sent', { pref });          // заявка отправлена — главная цель воронки
       await sendLeadToTelegram(lead);           // педагогу в TG (если настроен бот)
       done(name);
     });

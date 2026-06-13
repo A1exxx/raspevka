@@ -1,7 +1,8 @@
 // game.js — экран упражнения: слушаем эталон → отсчёт → проход по хайвею → итог.
 import { Scorer } from '../game/scoring.js';
 import { NoteHighway } from '../game/note-highway.js';
-import { playMelody, playClick, playTone, playChord, playDrone, setOutputVolume } from '../audio/reference-tone.js';
+import { playMelody, playClick, playTone, playChord, playDrone, playSuccess, setOutputVolume } from '../audio/reference-tone.js';
+import { shareResult } from '../ui/share.js';
 import { startGroove } from '../audio/backing.js';
 import { hzToNoteInfo, centsOff } from '../theory/note-map.js';
 import * as progress from '../state/progress.js';
@@ -325,8 +326,9 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   }
 
   function renderSummary(agg) {
-    // Празднование: 2★ — скромно, 3★ — ярко (+haptic). Уважает reduced-motion.
+    // Празднование: 2★ — скромно, 3★ — ярко (+haptic +звук успеха). Уважает reduced-motion.
     if (agg.stars >= 2) { celebrate(agg.stars >= 3 ? 2 : 1); haptic(agg.stars >= 3 ? 30 : 15); }
+    if (agg.stars >= 3) { try { playSuccess(mic.ctx); } catch (e) { /* ok */ } }
     const stars = '★'.repeat(agg.stars) + '☆'.repeat(3 - agg.stars);
     const pct = Math.round(agg.pct * 100);
     const verdict = agg.stars >= 3 ? 'Отлично!' : agg.stars === 2 ? 'Хорошо!' : agg.stars === 1 ? 'Неплохо' : 'Ещё разок';
@@ -346,6 +348,7 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
           <button class="btn btn-ghost" id="menu">Меню</button>
           <button class="btn ${onNext ? 'btn-ghost' : 'btn-primary'}" id="again">Ещё раз</button>
         </div>
+        ${agg.stars >= 2 ? '<button class="btn btn-ghost btn-skip" id="share">Поделиться результатом</button>' : ''}
       </div>
     `;
     wireControls(app, () => renderSummary(agg), mic);
@@ -353,6 +356,8 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     document.getElementById('menu').addEventListener('click', onExit);
     const nextBtn = document.getElementById('next');
     if (nextBtn) nextBtn.addEventListener('click', onNext);
+    const shareBtn = document.getElementById('share');
+    if (shareBtn) shareBtn.addEventListener('click', () => shareResult({ name: exercise.name, pct, stars: agg.stars }));
   }
 
   // <40% нот → разбор и предложение пройти заново (энергия уже списана). Выбор за пользователем,

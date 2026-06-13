@@ -31,6 +31,10 @@ import { getMode } from './theory/modes.js';
 import { contourGlyph } from './ui/illustrations.js';
 import * as progress from './state/progress.js';
 import * as clock from './state/clock.js';
+import { initMetrika } from './state/analytics-config.js';
+import { logEvent } from './state/analytics.js';
+
+initMetrika(); // подключит Я.Метрику, если в analytics-config вписан номер счётчика
 
 const app = document.getElementById('app');
 const mic = new MicEngine({ fftSize: 2048 });
@@ -273,6 +277,7 @@ function renderMicGate(retry) {
       <div class="card">
         <p class="hint" style="margin-bottom:16px">Нажми кнопку и выбери «Разрешить». Микрофон можно выключить в любой момент кнопкой внизу экрана.</p>
         <button class="btn btn-primary" id="grant" style="width:100%">Разрешить микрофон</button>
+        <p class="hint" style="margin-top:14px">🔒 Звук обрабатывается прямо на твоём устройстве и никуда не отправляется — мы ничего не записываем и не храним.</p>
       </div>
     </div>
   `;
@@ -893,5 +898,33 @@ if (import.meta.env.PROD) {
   setInterval(checkAppVersion, 5 * 60 * 1000);
   window.addEventListener('focus', checkAppVersion);
 }
+
+// ---------- «Добавить на главный экран» (PWA install) ----------
+// Ловим beforeinstallprompt → показываем мягкий чип внизу. Возвраты с домашнего
+// экрана выше, чем из вкладки браузера. Чип не мозолит: одна попытка, можно скрыть.
+let _deferredInstall = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _deferredInstall = e;
+  if (localStorage.getItem('raspevka.installDismissed') === '1') return;
+  if (document.getElementById('installchip')) return;
+  const chip = document.createElement('div');
+  chip.id = 'installchip';
+  chip.className = 'install-chip';
+  chip.innerHTML = '<span>📲 Добавить «Распевку» на экран</span><button id="instyes">Добавить</button><button id="instno" aria-label="Скрыть">✕</button>';
+  document.body.appendChild(chip);
+  document.getElementById('instyes').addEventListener('click', async () => {
+    chip.remove();
+    if (!_deferredInstall) return;
+    _deferredInstall.prompt();
+    const { outcome } = await _deferredInstall.userChoice;
+    if (outcome === 'accepted') logEvent('app_install');
+    _deferredInstall = null;
+  });
+  document.getElementById('instno').addEventListener('click', () => {
+    chip.remove();
+    localStorage.setItem('raspevka.installDismissed', '1');
+  });
+});
 
 renderSplash();

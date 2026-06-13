@@ -124,6 +124,16 @@ export function playClick(ctx, when = 0, accent = false) {
   osc.stop(t + 0.1);
 }
 
+/** Короткий приятный аккорд успеха (UI-звук на 3★). Восходящее арпеджио мажорного
+ *  трезвучия + октава, мягкое «пиано». Не для рекламы — живой WebAudio, не ffmpeg. */
+export function playSuccess(ctx, rootMidi = 72) {
+  const steps = [0, 4, 7, 12];
+  steps.forEach((s, i) => {
+    const hz = 440 * Math.pow(2, (rootMidi + s - 69) / 12);
+    playTone(ctx, hz, 0.5, i * 0.085, 0.16, 'piano');
+  });
+}
+
 /** Подложка-дрон (тоника: основа + квинта + октава), тихо, на всё упражнение.
  *  Возвращает хэндл со stop(). */
 export function playDrone(ctx, rootMidi, dur, gain = 0.05) {
