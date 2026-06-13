@@ -59,7 +59,9 @@ eq('vowelClimb зеркало: такт 4 кончается тоникой', vo
 eq('jamesCharles len', jamesCharles(60).notes.length, 21);
 eq('jamesCharles мотив тон+1.5', jamesCharles(60).notes[2].midi, 65);
 eq('jamesCharles лига на вершине (2 доли)', jamesCharles(60).notes[9].beats, 1);
-eq('jumpToFifth jumps UP (отзеркалено, раунд 3)', jumpToFifth(60, 'ionian').notes[6].midi, 67);
+eq('jumpToFifth: квинта ВНИЗ (раунд 4 финал)', jumpToFifth(60, 'ionian').notes[6].midi, 55);
+eq('jumpToFifth: V держится две ноты', jumpToFifth(60, 'ionian').notes[7].midi, 55);
+eq('jumpToFifth len = 13', jumpToFifth(60, 'ionian').notes.length, 13);
 eq('vibrato wide green', vibratoHold(60).greenCents, 55);
 
 // scoring
@@ -177,7 +179,8 @@ eq('block7 открыт после b6', blockUnlocked(6, ['b1','b2','b3','b4','b
 // === Распевки L04–L10 (точные офсеты из PDF, не ладозависимы) ===
 const off2 = (fn) => fn(60).notes.map((n) => n.midi - 60);
 eq('vibratoWobble offsets (L04)', off2(vibratoWobble).join(','), '0,1,0,1,0,1,0,5,6,5,6,5,6,5');
-eq('timbreVocalise offsets (L05)', off2(timbreVocalise).join(','), '0,1,3,0,1,3,1,0,0,1,3,5,7,5');
+eq('timbreVocalise: полная фигура 4 такта (раунд 4)', off2(timbreVocalise).join(','), '0,2,4,0,2,4,2,0,0,2,4,5,7,5,4,2,7,5,4,2,7,5,4,2,0,7,0');
+eq('timbreVocalise: восьмая пауза во 2-м такте', timbreVocalise(60).notes[7].gap, 0.5);
 eq('timbreShift: кварта вниз и обратно, длинные ноты (раунд 4)', off2(timbreShift).join(','), '0,-5,0,-5,0');
 eq('registerArp: кварта→квинта→октава (раунд 4)', off2(registerArp).join(','), '0,5,0,7,0,12,0');
 eq('registerArp ритм: четверть + половинка с точкой', registerArp(60).notes[1].beats, 3);
@@ -206,7 +209,7 @@ eq('vowelClimb HighFive offsets (I↔V + пробежка, затем зерка
   '0,7,0,7,0,7,0,7,0,7,0,2,4,5,7,7,0,7,0,7,0,7,0,7,0,7,5,4,2,0');
 eq('jamesCharles offsets (мотив с паузами + спуск + лига)', offs(jamesCharles).join(','), '0,2,5,0,2,5,0,2,5,8,7,5,2,0,2,5,0,2,5,8,7');
 eq('гласные НЕ ладозависимы (modeKey undefined)', vowelHold(60).modeKey, undefined);
-eq('Скачок к V — квинта ВВЕРХ (+7 полутонов, раунд 3)', jumpToFifth(60, 'ionian').notes[6].midi - 60, 7);
+eq('Скачок к V — квинта ВНИЗ (−5 полутонов, раунд 4 финал)', jumpToFifth(60, 'ionian').notes[6].midi - 60, -5);
 
 // === Логика состояния (progress.js) — со стабом localStorage/navigator ===
 globalThis.localStorage = (() => { let s = {}; return {
