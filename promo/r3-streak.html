@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Распевка — промо: привычка</title>
+<style>
+  :root { --bg0:#0d1219; --bg1:#0a0e14; --teal:#2dd4bf; --teal-glow:#3de5c9;
+    --green:#3ee6a8; --gold:#ffc24d; --flame:#ff8a3d; --ink:#ecf1f7; --dim:#93a0b2; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  [data-composition-id="root"] {
+    position:relative; width:1080px; height:1920px; overflow:hidden;
+    background:radial-gradient(140% 90% at 50% 10%, #16100a 0%, var(--bg1) 60%);
+    font-family:'Inter',system-ui,sans-serif; color:var(--ink); }
+  canvas#fx { position:absolute; inset:0; }
+  .b1 { position:absolute; top:180px; left:84px; right:84px; }
+  .eyebrow { font-size:26px; font-weight:700; letter-spacing:.22em; color:var(--gold); margin-bottom:26px; }
+  .b1 h1 { font-size:118px; font-weight:800; line-height:1.03; letter-spacing:-.02em; }
+  .b1 .sub { margin-top:24px; font-size:50px; font-weight:700; color:var(--dim); }
+  .b1 .sub b { color:var(--ink); }
+  /* центр — пламя + число стрика */
+  .flame { position:absolute; left:0; right:0; top:720px; text-align:center; }
+  .flame .emo { font-size:240px; line-height:1; filter:drop-shadow(0 0 60px rgba(255,138,61,.6)); }
+  .flame .num { font-size:300px; font-weight:800; letter-spacing:-.04em; line-height:.9;
+    background:linear-gradient(180deg,#ffd07a,var(--flame)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .flame .lab { font-size:48px; font-weight:700; color:var(--dim); margin-top:8px; }
+  /* звёзды */
+  .stars { position:absolute; left:0; right:0; top:1330px; text-align:center; font-size:96px; letter-spacing:18px; }
+  .stars .s { color:rgba(255,255,255,.16); }
+  .stars .s.on { color:var(--gold); text-shadow:0 0 36px rgba(255,194,77,.7); }
+  .b4 { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:30px; text-align:center; }
+  .b4-bg { position:absolute; inset:0; background:radial-gradient(90% 60% at 50% 45%, rgba(13,18,25,.55), rgba(10,14,20,.94)); }
+  .eq { display:flex; gap:14px; align-items:flex-end; height:130px; position:relative; }
+  .eq i { width:26px; border-radius:13px; background:linear-gradient(180deg,var(--teal-glow),var(--teal)); box-shadow:0 0 44px rgba(45,212,191,.55); }
+  .eq i:nth-child(1){height:42%} .eq i:nth-child(2){height:74%} .eq i:nth-child(3){height:100%}
+  .eq i:nth-child(4){height:60%} .eq i:nth-child(5){height:32%}
+  .b4 h2 { position:relative; font-size:152px; font-weight:800; letter-spacing:-.02em; }
+  .b4 .tag { position:relative; font-size:46px; font-weight:700; color:var(--dim); }
+</style>
+</head>
+<body>
+<div data-composition-id="root" data-width="1080" data-height="1920" data-start="0" data-duration="14">
+  <canvas id="fx" width="1080" height="1920"></canvas>
+
+  <div class="b1" id="b1">
+    <div class="eyebrow" id="b1-eye">РАСПЕВКА · ПО 5 МИНУТ В ДЕНЬ</div>
+    <h1 id="b1-h">Бросаешь<br/>через неделю?</h1>
+    <div class="sub" id="b1-sub">Со <b>стриком</b> — не бросишь.</div>
+  </div>
+
+  <div class="flame" id="flame">
+    <div class="emo" id="fl-emo">🔥</div>
+    <div class="num" id="fl-num">12</div>
+    <div class="lab" id="fl-lab">дней подряд</div>
+  </div>
+
+  <div class="stars" id="stars">
+    <span class="s" id="s1">★</span><span class="s" id="s2">★</span><span class="s" id="s3">★</span>
+  </div>
+
+  <div class="b4" id="b4">
+    <div class="b4-bg" id="b4-bg"></div>
+    <div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i></div>
+    <h2 id="b4-h">Распевка</h2>
+    <div class="tag" id="b4-tag">Привычка, которая ставит голос</div>
+  </div>
+
+  <script src="gsap.min.js"></script>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const DUR = 14;
+    const tl = gsap.timeline({ paused: true });
+
+    // ===== Канвас: кольцо прогресса дня + восходящие искры (детерминированно) =====
+    const cv = document.getElementById('fx'), cx = cv.getContext('2d');
+    const W = 1080, H = 1920, CXp = 540, CYp = 900, R = 250;
+    const RING_FROM = 1.0, RING_TO = 6.2;
+    function ringP(t){ if(t<RING_FROM)return 0; if(t>RING_TO)return 1;
+      const u=(t-RING_FROM)/(RING_TO-RING_FROM); return u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2; }
+    function draw(t){
+      cx.clearRect(0,0,W,H);
+      const fade = t < 9.6 ? 1 : Math.max(0, 1-(t-9.6)/0.8); // гаснет к финалу
+      cx.globalAlpha = fade;
+      // фоновое кольцо
+      cx.strokeStyle='rgba(255,255,255,.08)'; cx.lineWidth=26;
+      cx.beginPath(); cx.arc(CXp,CYp,R,0,Math.PI*2); cx.stroke();
+      // прогресс
+      const p = ringP(t);
+      const grad = cx.createLinearGradient(CXp-R,CYp-R,CXp+R,CYp+R);
+      grad.addColorStop(0,'#ffd07a'); grad.addColorStop(1,'#ff8a3d');
+      cx.strokeStyle=grad; cx.lineWidth=26; cx.lineCap='round';
+      cx.shadowColor='rgba(255,138,61,.6)'; cx.shadowBlur=30;
+      cx.beginPath(); cx.arc(CXp,CYp,R,-Math.PI/2,-Math.PI/2+p*Math.PI*2); cx.stroke();
+      cx.shadowBlur=0;
+      // восходящие искры (детерминированы по индексу/времени)
+      for(let i=0;i<26;i++){
+        const seed=i*97.13, sp=0.6+((i*53)%40)/40*0.9;
+        const cyc=((t*sp+seed)%3)/3;                 // 0..1 цикл подъёма
+        const x=CXp+Math.sin(seed*1.7)* (R+40+(i%5)*30);
+        const y=CYp+R - cyc*900;
+        const a=(1-cyc)*0.7*fade;
+        if(a<=0) continue;
+        cx.globalAlpha=a; cx.fillStyle=i%3? '#ff8a3d':'#ffd07a';
+        cx.beginPath(); cx.arc(x,y,3+(1-cyc)*4,0,Math.PI*2); cx.fill();
+      }
+      cx.globalAlpha=1;
+    }
+    const P={t:0};
+    tl.to(P,{t:DUR,duration:DUR,ease:'none',onUpdate:()=>draw(P.t)},0);
+    draw(0);
+
+    // ===== Текст =====
+    tl.fromTo('#b1-eye',{opacity:0,letterSpacing:'.5em'},{opacity:1,letterSpacing:'.22em',duration:.7,ease:'expo.out'},0.25);
+    tl.fromTo('#b1-h',{opacity:0,y:80},{opacity:1,y:0,duration:.8,ease:'power4.out'},0.4);
+    tl.fromTo('#b1-sub',{opacity:0,x:-50},{opacity:1,x:0,duration:.55,ease:'back.out(1.4)'},1.0);
+    tl.to('#b1',{opacity:0,y:-40,duration:.4,ease:'power2.in'},5.6);
+    tl.set('#b1',{visibility:'hidden'},6.0);
+
+    // число стрика «считается» вверх 1.0→6.0
+    gsap.set('#flame',{opacity:0});
+    tl.to('#flame',{opacity:1,duration:.6,ease:'power2.out'},1.0);
+    const C={n:0};
+    tl.to(C,{n:12,duration:4.6,ease:'power1.out',onUpdate:()=>{document.getElementById('fl-num').textContent=Math.round(C.n);}},1.2);
+    tl.to('#fl-emo',{scale:1.12,yoyo:true,repeat:6,duration:.42,ease:'sine.inOut',transformOrigin:'center bottom'},1.2);
+
+    // звёзды зажигаются 6.4→7.6
+    const star=(id,at)=>{ tl.fromTo(id,{scale:.4},{scale:1,duration:.4,ease:'back.out(2.4)',onStart:()=>document.querySelector(id).classList.add('on')},at); };
+    tl.fromTo('#stars',{opacity:0,y:30},{opacity:1,y:0,duration:.4,ease:'power2.out'},6.2);
+    star('#s1',6.5); star('#s2',6.8); star('#s3',7.1);
+
+    // увод центра к финалу
+    tl.to(['#flame','#stars'],{opacity:0,y:-30,duration:.5,ease:'power2.in'},9.7);
+    tl.set(['#flame','#stars'],{visibility:'hidden'},10.2);
+
+    // бренд-финал
+    gsap.set('#b4',{visibility:'hidden'}); gsap.set('#b4-bg',{opacity:0});
+    tl.set('#b4',{visibility:'visible'},10.2);
+    tl.fromTo('#b4-bg',{opacity:0},{opacity:1,duration:.8,ease:'sine.inOut'},10.2);
+    tl.fromTo('#eq',{opacity:0,scale:.6},{opacity:1,scale:1,duration:.6,ease:'back.out(1.8)'},10.5);
+    tl.fromTo('#eq i',{scaleY:.4},{scaleY:1,duration:.5,ease:'elastic.out(1,.55)',stagger:.07,transformOrigin:'bottom'},10.55);
+    tl.fromTo('#b4-h',{opacity:0,y:60},{opacity:1,y:0,duration:.7,ease:'power4.out'},10.8);
+    tl.fromTo('#b4-tag',{opacity:0,letterSpacing:'.04em'},{opacity:1,letterSpacing:'.14em',duration:.7,ease:'expo.out'},11.2);
+    tl.to('#eq',{scale:1.05,yoyo:true,repeat:3,duration:.5,ease:'sine.inOut'},11.8);
+
+    window.__timelines['root']=tl;
+  </script>
+</div>
+</body>
+</html>

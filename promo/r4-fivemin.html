@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Распевка — промо: 5 минут</title>
+<style>
+  :root { --bg0:#0d1219; --bg1:#0a0e14; --teal:#2dd4bf; --teal-glow:#3de5c9;
+    --green:#3ee6a8; --ink:#ecf1f7; --dim:#93a0b2; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  [data-composition-id="root"] {
+    position:relative; width:1080px; height:1920px; overflow:hidden;
+    background:radial-gradient(140% 90% at 50% 0%, var(--bg0) 0%, var(--bg1) 70%);
+    font-family:'Inter',system-ui,sans-serif; color:var(--ink); }
+  canvas#fx { position:absolute; inset:0; }
+  .glow-top { position:absolute; top:-380px; left:50%; transform:translateX(-50%);
+    width:1400px; height:800px; border-radius:50%;
+    background:radial-gradient(closest-side, rgba(45,212,191,.16), transparent 70%); }
+  .b1 { position:absolute; top:180px; left:84px; right:84px; }
+  .eyebrow { font-size:26px; font-weight:700; letter-spacing:.22em; color:var(--teal-glow); margin-bottom:26px; }
+  .b1 h1 { font-size:120px; font-weight:800; line-height:1.02; letter-spacing:-.02em; }
+  .b1 .sub { margin-top:24px; font-size:50px; font-weight:700; color:var(--dim); }
+  .b1 .sub b { color:var(--ink); }
+  /* таймер-подпись сверху от зоны */
+  .timer { position:absolute; left:0; right:0; top:560px; text-align:center;
+    font-size:130px; font-weight:800; letter-spacing:.02em; font-variant-numeric:tabular-nums; }
+  .timer span { font-size:44px; color:var(--dim); font-weight:700; display:block; letter-spacing:.16em; margin-bottom:6px; }
+  /* «чисто %» под зоной */
+  .clean { position:absolute; left:0; right:0; bottom:430px; text-align:center; }
+  .clean .pct { font-size:180px; font-weight:800; color:var(--green); text-shadow:0 0 50px rgba(62,230,168,.5); line-height:1; }
+  .clean .lab { font-size:50px; font-weight:700; color:var(--dim); margin-top:6px; }
+  .b4 { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:30px; text-align:center; }
+  .b4-bg { position:absolute; inset:0; background:radial-gradient(90% 60% at 50% 45%, rgba(13,18,25,.55), rgba(10,14,20,.94)); }
+  .eq { display:flex; gap:14px; align-items:flex-end; height:130px; position:relative; }
+  .eq i { width:26px; border-radius:13px; background:linear-gradient(180deg,var(--teal-glow),var(--teal)); box-shadow:0 0 44px rgba(45,212,191,.55); }
+  .eq i:nth-child(1){height:42%} .eq i:nth-child(2){height:74%} .eq i:nth-child(3){height:100%}
+  .eq i:nth-child(4){height:60%} .eq i:nth-child(5){height:32%}
+  .b4 h2 { position:relative; font-size:152px; font-weight:800; letter-spacing:-.02em; }
+  .b4 .tag { position:relative; font-size:46px; font-weight:700; color:var(--dim); }
+</style>
+</head>
+<body>
+<div data-composition-id="root" data-width="1080" data-height="1920" data-start="0" data-duration="13">
+  <canvas id="fx" width="1080" height="1920"></canvas>
+  <div class="glow-top"></div>
+
+  <div class="b1" id="b1">
+    <div class="eyebrow" id="b1-eye">РАСПЕВКА · БЕЗ ЗАПИСИ В ШКОЛУ</div>
+    <h1 id="b1-h">Нет времени<br/>на вокал?</h1>
+    <div class="sub" id="b1-sub"><b>5 минут</b> в день — хватит.</div>
+  </div>
+
+  <div class="timer" id="timer"><span>РАСПЕВКА ДНЯ</span>5:00</div>
+  <div class="clean" id="clean"><div class="pct" id="cl-pct">98%</div><div class="lab">в ноту · чисто</div></div>
+
+  <div class="b4" id="b4">
+    <div class="b4-bg" id="b4-bg"></div>
+    <div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i></div>
+    <h2 id="b4-h">Распевка</h2>
+    <div class="tag" id="b4-tag">Голос звучит — за 5 минут в день</div>
+  </div>
+
+  <script src="gsap.min.js"></script>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const DUR = 13;
+    const tl = gsap.timeline({ paused: true });
+
+    // ===== Канвас: зелёная зона + нота-шар оседает в неё (детерминированно) =====
+    const cv = document.getElementById('fx'), cx = cv.getContext('2d');
+    const W = 1080, H = 1920;
+    const ZONE_Y = 1010, ZONE_H = 150;           // центральная «зелёная зона»
+    function ballY(t){
+      // справа влетает, гуляет выше/ниже до 3.6с, затем плавно оседает в центр зоны
+      if(t<1.0) return ZONE_Y - 320;
+      if(t<3.6){ return ZONE_Y + Math.sin(t*3.2)*220 - 40; }
+      const u=Math.min(1,(t-3.6)/1.4); const e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
+      const from=ZONE_Y + Math.sin(3.6*3.2)*220 - 40;
+      return from + (ZONE_Y - from)*e + Math.sin(t*9)*6*(1-e);
+    }
+    function inZone(t){ return Math.abs(ballY(t)-ZONE_Y) < ZONE_H/2; }
+    function draw(t){
+      cx.clearRect(0,0,W,H);
+      const fade = t<8.8?1:Math.max(0,1-(t-8.8)/0.7);
+      cx.globalAlpha=fade;
+      // зелёная зона (горизонтальная полоса)
+      const zg=cx.createLinearGradient(0,ZONE_Y-ZONE_H/2,0,ZONE_Y+ZONE_H/2);
+      zg.addColorStop(0,'rgba(62,230,168,0)'); zg.addColorStop(.5,'rgba(62,230,168,.16)'); zg.addColorStop(1,'rgba(62,230,168,0)');
+      cx.fillStyle=zg; cx.fillRect(0,ZONE_Y-ZONE_H/2,W,ZONE_H);
+      cx.strokeStyle='rgba(62,230,168,.5)'; cx.lineWidth=3; cx.setLineDash([18,16]);
+      cx.beginPath(); cx.moveTo(0,ZONE_Y); cx.lineTo(W,ZONE_Y); cx.stroke(); cx.setLineDash([]);
+      // след шара (из функции)
+      const y0=ballY(t), hit=inZone(t);
+      const col = hit ? '#3ee6a8' : '#ffc24d';
+      for(let k=46;k>=0;k--){ const tt=t-k*0.02; if(tt<1.0)continue;
+        const x=540-k*7, y=ballY(tt);
+        cx.globalAlpha=(0.1+(1-k/46)*0.6)*fade; cx.fillStyle = inZone(tt)?'#3ee6a8':'#ffc24d';
+        cx.beginPath(); cx.arc(x,y,k===0?0:4.5,0,Math.PI*2); cx.fill(); }
+      // сам шар
+      cx.globalAlpha=fade; cx.fillStyle=col; cx.shadowColor=col; cx.shadowBlur=40;
+      cx.beginPath(); cx.arc(540,y0,26,0,Math.PI*2); cx.fill(); cx.shadowBlur=0;
+      // кольцо-вспышка при попадании (около 5.0с)
+      const dt=t-5.0; if(dt>0&&dt<0.6){ cx.strokeStyle=`rgba(62,230,168,${(1-dt/0.6)*.9*fade})`; cx.lineWidth=6;
+        cx.beginPath(); cx.arc(540,ZONE_Y,30+dt*260,0,Math.PI*2); cx.stroke(); }
+      cx.globalAlpha=1;
+    }
+    const P={t:0};
+    tl.to(P,{t:DUR,duration:DUR,ease:'none',onUpdate:()=>draw(P.t)},0);
+    draw(0);
+
+    // ===== Текст =====
+    tl.fromTo('#b1-eye',{opacity:0,letterSpacing:'.5em'},{opacity:1,letterSpacing:'.22em',duration:.7,ease:'expo.out'},0.25);
+    tl.fromTo('#b1-h',{opacity:0,y:80},{opacity:1,y:0,duration:.8,ease:'power4.out'},0.4);
+    tl.fromTo('#b1-sub',{opacity:0,x:-50},{opacity:1,x:0,duration:.55,ease:'back.out(1.4)'},1.0);
+    tl.to('#b1',{opacity:0,y:-40,duration:.4,ease:'power2.in'},4.4);
+    tl.set('#b1',{visibility:'hidden'},4.8);
+
+    // таймер обратного отсчёта 5:00 → виден весь проход
+    gsap.set('#timer',{opacity:0});
+    tl.to('#timer',{opacity:1,duration:.5,ease:'power2.out'},1.0);
+    const T={s:300};
+    tl.to(T,{s:0,duration:6.6,ease:'none',onUpdate:()=>{ const s=Math.max(0,Math.round(T.s)); const m=Math.floor(s/60); const ss=String(s%60).padStart(2,'0'); document.getElementById('timer').lastChild.textContent=`${m}:${ss}`; }},1.2);
+
+    // «чисто %» — появляется на попадании 5.0
+    gsap.set('#clean',{opacity:0});
+    tl.fromTo('#clean',{opacity:0,scale:.7,y:20},{opacity:1,scale:1,y:0,duration:.6,ease:'back.out(2)'},5.0);
+    const CL={p:90};
+    tl.to(CL,{p:98,duration:1.2,ease:'power1.out',onUpdate:()=>{document.getElementById('cl-pct').textContent=Math.round(CL.p)+'%';}},5.1);
+
+    // увод к финалу
+    tl.to(['#timer','#clean'],{opacity:0,y:-30,duration:.5,ease:'power2.in'},8.9);
+    tl.set(['#timer','#clean'],{visibility:'hidden'},9.4);
+
+    // бренд-финал
+    gsap.set('#b4',{visibility:'hidden'}); gsap.set('#b4-bg',{opacity:0});
+    tl.set('#b4',{visibility:'visible'},9.4);
+    tl.fromTo('#b4-bg',{opacity:0},{opacity:1,duration:.8,ease:'sine.inOut'},9.4);
+    tl.fromTo('#eq',{opacity:0,scale:.6},{opacity:1,scale:1,duration:.6,ease:'back.out(1.8)'},9.7);
+    tl.fromTo('#eq i',{scaleY:.4},{scaleY:1,duration:.5,ease:'elastic.out(1,.55)',stagger:.07,transformOrigin:'bottom'},9.75);
+    tl.fromTo('#b4-h',{opacity:0,y:60},{opacity:1,y:0,duration:.7,ease:'power4.out'},10.0);
+    tl.fromTo('#b4-tag',{opacity:0,letterSpacing:'.04em'},{opacity:1,letterSpacing:'.12em',duration:.7,ease:'expo.out'},10.4);
+    tl.to('#eq',{scale:1.05,yoyo:true,repeat:3,duration:.5,ease:'sine.inOut'},11.0);
+
+    window.__timelines['root']=tl;
+  </script>
+</div>
+</body>
+</html>

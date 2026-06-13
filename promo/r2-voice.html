@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Распевка — промо: узнай свой голос</title>
+<style>
+  :root {
+    --bg0:#0d1219; --bg1:#0a0e14; --teal:#2dd4bf; --teal-glow:#3de5c9;
+    --green:#3ee6a8; --amber:#ffc24d; --ink:#ecf1f7; --dim:#93a0b2;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  [data-composition-id="root"] {
+    position:relative; width:1080px; height:1920px; overflow:hidden;
+    background:radial-gradient(140% 90% at 50% 0%, var(--bg0) 0%, var(--bg1) 70%);
+    font-family:'Inter',system-ui,sans-serif; color:var(--ink);
+  }
+  canvas#kb { position:absolute; inset:0; }
+  .glow-top { position:absolute; top:-380px; left:50%; transform:translateX(-50%);
+    width:1400px; height:800px; border-radius:50%;
+    background:radial-gradient(closest-side, rgba(45,212,191,.18), transparent 70%); }
+  .b1 { position:absolute; top:170px; left:84px; right:84px; }
+  .eyebrow { font-size:26px; font-weight:700; letter-spacing:.22em; color:var(--teal-glow); margin-bottom:26px; }
+  .b1 h1 { font-size:120px; font-weight:800; line-height:1.02; letter-spacing:-.02em; }
+  .b1 .sub { margin-top:24px; font-size:50px; font-weight:700; color:var(--dim); }
+  /* результат-плашка тембра */
+  .res { position:absolute; left:84px; right:84px; top:560px; text-align:center; }
+  .res .lab { font-size:34px; font-weight:700; letter-spacing:.16em; color:var(--dim); }
+  .res .type { font-size:170px; font-weight:800; letter-spacing:-.02em;
+    background:linear-gradient(180deg,var(--teal-glow),var(--teal)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .res .range { margin-top:14px; font-size:46px; font-weight:800; color:var(--ink); }
+  .res .range span { color:var(--dim); font-weight:600; }
+  .b4 { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:30px; text-align:center; }
+  .b4-bg { position:absolute; inset:0; background:radial-gradient(90% 60% at 50% 45%, rgba(13,18,25,.55), rgba(10,14,20,.94)); }
+  .eq { display:flex; gap:14px; align-items:flex-end; height:130px; position:relative; }
+  .eq i { width:26px; border-radius:13px; background:linear-gradient(180deg,var(--teal-glow),var(--teal)); box-shadow:0 0 44px rgba(45,212,191,.55); }
+  .eq i:nth-child(1){height:42%} .eq i:nth-child(2){height:74%} .eq i:nth-child(3){height:100%}
+  .eq i:nth-child(4){height:60%} .eq i:nth-child(5){height:32%}
+  .b4 h2 { position:relative; font-size:152px; font-weight:800; letter-spacing:-.02em; }
+  .b4 .tag { position:relative; font-size:46px; font-weight:700; color:var(--dim); }
+</style>
+</head>
+<body>
+<div data-composition-id="root" data-width="1080" data-height="1920" data-start="0" data-duration="14">
+  <canvas id="kb" width="1080" height="1920"></canvas>
+  <div class="glow-top"></div>
+
+  <div class="b1" id="b1">
+    <div class="eyebrow" id="b1-eye">РАСПЕВКА · ЗА 1 МИНУТУ</div>
+    <h1 id="b1-h">Какой<br/>у тебя голос?</h1>
+    <div class="sub" id="b1-sub">Спой низ и верх — узнаем.</div>
+  </div>
+
+  <div class="res" id="res">
+    <div class="lab" id="res-lab">ТВОЙ ТЕМБР</div>
+    <div class="type" id="res-type">Баритон</div>
+    <div class="range" id="res-range">E2 – E4 <span>· 2 октавы</span></div>
+  </div>
+
+  <div class="b4" id="b4">
+    <div class="b4-bg" id="b4-bg"></div>
+    <div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i></div>
+    <h2 id="b4-h">Распевка</h2>
+    <div class="tag" id="b4-tag">Игровой тренажёр голоса</div>
+  </div>
+
+  <script src="gsap.min.js"></script>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const DUR = 14;
+    const tl = gsap.timeline({ paused: true });
+
+    // ===== Канвас: клавиатура пианино + бегущий маркер диапазона (детерминированно из t) =====
+    const cv = document.getElementById('kb'), cx = cv.getContext('2d');
+    const W = 1080, H = 1920;
+    const KB_Y = 1180, KB_H = 320;          // клавиатура внизу средней зоны
+    const N_WHITE = 14;                       // белых клавиш
+    const KW = (W - 120) / N_WHITE, KX0 = 60;
+    // паттерн чёрных клавиш в октаве (после индекса белой): C D E F G A B
+    const BLACK_AFTER = [0,1,3,4,5];          // позиции, где справа есть чёрная (в пределах 7)
+    // Фаза «прогона диапазона»: маркер едет слева(низ)→направо(верх) с 1.2 до 6.5с
+    const SCAN_FROM = 1.2, SCAN_TO = 6.6;
+    function scanPos(t) {
+      if (t < SCAN_FROM) return 0;
+      if (t > SCAN_TO) return 1;
+      const u = (t - SCAN_FROM) / (SCAN_TO - SCAN_FROM);
+      return u < .5 ? 2*u*u : 1 - Math.pow(-2*u+2,2)/2; // easeInOut
+    }
+    function draw(t) {
+      cx.clearRect(0,0,W,H);
+      const pos = scanPos(t);
+      const litX = KX0 + pos * (N_WHITE * KW);
+      // белые клавиши
+      for (let i=0;i<N_WHITE;i++) {
+        const x = KX0 + i*KW;
+        const center = x + KW/2;
+        const near = Math.max(0, 1 - Math.abs(center - litX)/(KW*1.6));
+        cx.fillStyle = `rgba(${236-near*120},${241-near*30},${247-near*10},${0.10+near*0.9})`;
+        if (near>0.5){ cx.shadowColor='rgba(61,229,201,.8)'; cx.shadowBlur=40*near; }
+        roundRect(x+3, KB_Y, KW-6, KB_H, 12); cx.fill(); cx.shadowBlur=0;
+      }
+      // чёрные клавиши
+      for (let oct=0; oct<2; oct++) {
+        for (const b of BLACK_AFTER) {
+          const wi = oct*7 + b;
+          if (wi >= N_WHITE-1) continue;
+          const x = KX0 + (wi+1)*KW - KW*0.32;
+          const center = x + KW*0.32;
+          const near = Math.max(0, 1 - Math.abs(center - litX)/(KW*1.4));
+          cx.fillStyle = near>0.5 ? 'rgba(45,212,191,.95)' : 'rgba(8,12,18,.96)';
+          if (near>0.5){ cx.shadowColor='rgba(61,229,201,.9)'; cx.shadowBlur=44*near; }
+          roundRect(x, KB_Y, KW*0.64, KB_H*0.62, 9); cx.fill(); cx.shadowBlur=0;
+        }
+      }
+      // дуга диапазона над клавиатурой (растёт по мере скана)
+      if (pos>0) {
+        cx.strokeStyle='rgba(61,229,201,.85)'; cx.lineWidth=10; cx.lineCap='round';
+        cx.shadowColor='rgba(61,229,201,.6)'; cx.shadowBlur=24;
+        cx.beginPath();
+        const ax0=KX0+KW*0.5, ax1=KX0+KW*0.5 + pos*(N_WHITE-1)*KW, ay=KB_Y-70;
+        cx.moveTo(ax0,ay); cx.quadraticCurveTo((ax0+ax1)/2, ay-120*Math.min(1,pos*1.3), ax1, ay);
+        cx.stroke(); cx.shadowBlur=0;
+        // концевые точки
+        for (const px of [ax0, ax1]) { cx.fillStyle='#3de5c9'; cx.beginPath(); cx.arc(px,ay,13,0,Math.PI*2); cx.fill(); }
+      }
+    }
+    function roundRect(x,y,w,h,r){ const rr=Math.min(r,h/2,w/2); cx.beginPath(); cx.moveTo(x+rr,y);
+      cx.arcTo(x+w,y,x+w,y+h,rr); cx.arcTo(x+w,y+h,x,y+h,rr); cx.arcTo(x,y+h,x,y,rr); cx.arcTo(x,y,x+w,y,rr); cx.closePath(); }
+    const P={t:0};
+    tl.to(P,{t:DUR,duration:DUR,ease:'none',onUpdate:()=>draw(P.t)},0);
+    draw(0);
+
+    // ===== Текстовые биты =====
+    // Хук 0.25–6.6 (живёт во время скана)
+    tl.fromTo('#b1-eye',{opacity:0,letterSpacing:'.5em'},{opacity:1,letterSpacing:'.22em',duration:.7,ease:'expo.out'},0.25);
+    tl.fromTo('#b1-h',{opacity:0,y:80},{opacity:1,y:0,duration:.8,ease:'power4.out'},0.4);
+    tl.fromTo('#b1-sub',{opacity:0,x:-50},{opacity:1,x:0,duration:.55,ease:'back.out(1.4)'},1.0);
+    tl.to('#b1',{opacity:0,y:-40,duration:.4,ease:'power2.in'},6.5);
+    tl.set('#b1',{visibility:'hidden'},6.9);
+
+    // Результат 6.8–10.6: лейбл → тембр (pop) → диапазон
+    gsap.set('#res',{visibility:'hidden'});
+    tl.set('#res',{visibility:'visible'},6.8);
+    tl.fromTo('#res-lab',{opacity:0,y:30},{opacity:1,y:0,duration:.5,ease:'expo.out'},6.8);
+    tl.fromTo('#res-type',{opacity:0,scale:.6},{opacity:1,scale:1,duration:.7,ease:'back.out(2)'},7.0);
+    tl.fromTo('#res-range',{opacity:0,y:30},{opacity:1,y:0,duration:.55,ease:'power3.out'},7.6);
+    tl.to('#res',{opacity:0,y:-30,duration:.4,ease:'power2.in'},10.3);
+    tl.set('#res',{visibility:'hidden'},10.7);
+
+    // Бренд-финал 10.7–14
+    gsap.set('#b4',{visibility:'hidden'}); gsap.set('#b4-bg',{opacity:0});
+    tl.set('#b4',{visibility:'visible'},10.7);
+    tl.fromTo('#b4-bg',{opacity:0},{opacity:1,duration:.8,ease:'sine.inOut'},10.7);
+    tl.fromTo('#eq',{opacity:0,scale:.6},{opacity:1,scale:1,duration:.6,ease:'back.out(1.8)'},11.0);
+    tl.fromTo('#eq i',{scaleY:.4},{scaleY:1,duration:.5,ease:'elastic.out(1,.55)',stagger:.07,transformOrigin:'bottom'},11.05);
+    tl.fromTo('#b4-h',{opacity:0,y:60},{opacity:1,y:0,duration:.7,ease:'power4.out'},11.3);
+    tl.fromTo('#b4-tag',{opacity:0,letterSpacing:'.04em'},{opacity:1,letterSpacing:'.16em',duration:.7,ease:'expo.out'},11.7);
+    tl.to('#eq',{scale:1.05,yoyo:true,repeat:3,duration:.5,ease:'sine.inOut'},12.2);
+
+    window.__timelines['root']=tl;
+  </script>
+</div>
+</body>
+</html>
