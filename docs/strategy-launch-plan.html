@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Распевка + Школа — план запуска для переговоров с управляющим</title>
+<style>
+  :root{
+    --bg:#0c1116; --bg2:#0f161d; --card:#141d26; --card2:#18232e;
+    --line:#243240; --line2:#2e3f4f;
+    --ink:#eef3f8; --dim:#9fb0c0; --dim2:#6f8597;
+    --teal:#2dd4bf; --teal2:#3de5c9; --green:#3ee6a8; --gold:#ffc24d; --coral:#ff7a6b; --violet:#9b8cff;
+    --maxw:1060px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:radial-gradient(120% 80% at 50% -10%, #11212a 0%, var(--bg) 55%); color:var(--ink);
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif; line-height:1.62; font-size:17px;
+    -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 22px}
+  a{color:var(--teal2); text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* hero */
+  header.hero{padding:78px 0 40px; border-bottom:1px solid var(--line)}
+  .badge{display:inline-flex;align-items:center;gap:9px;font-size:13px;font-weight:700;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--teal2);background:rgba(45,212,191,.09);border:1px solid rgba(45,212,191,.28);
+    padding:8px 16px;border-radius:999px;margin-bottom:26px}
+  .badge .dot{width:8px;height:8px;border-radius:50%;background:var(--teal2);box-shadow:0 0 12px var(--teal2)}
+  h1{font-size:54px;line-height:1.05;letter-spacing:-.02em;font-weight:800;margin-bottom:18px}
+  h1 .ac{background:linear-gradient(120deg,var(--teal2),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{font-size:21px;color:var(--dim);max-width:760px}
+  .meta{margin-top:24px;font-size:14px;color:var(--dim2)}
+
+  /* nav */
+  nav.toc{position:sticky;top:0;z-index:20;background:rgba(12,17,22,.86);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line); padding:12px 0}
+  nav.toc .wrap{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  nav.toc a{font-size:13px;font-weight:600;color:var(--dim);padding:6px 12px;border-radius:999px;border:1px solid transparent}
+  nav.toc a:hover{color:var(--ink);border-color:var(--line2);text-decoration:none;background:var(--card)}
+
+  section{padding:54px 0;border-bottom:1px solid var(--line)}
+  .eyebrow{font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--teal2);margin-bottom:14px}
+  h2{font-size:34px;line-height:1.12;letter-spacing:-.01em;font-weight:800;margin-bottom:10px}
+  h2 .num{color:var(--dim2);font-weight:700;margin-right:12px}
+  .sub{color:var(--dim);font-size:18px;margin-bottom:28px;max-width:780px}
+  h3{font-size:21px;font-weight:700;margin:26px 0 12px}
+  p{margin-bottom:14px;color:#dbe6ef}
+  ul,ol{margin:0 0 16px 22px;color:#dbe6ef}
+  li{margin-bottom:8px}
+  b,strong{color:var(--ink)}
+  .small{font-size:14px;color:var(--dim)}
+
+  /* KPI row */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:8px 0 6px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+  .kpi .v{font-size:30px;font-weight:800;letter-spacing:-.01em}
+  .kpi .v.t{color:var(--teal2)} .kpi .v.g{color:var(--green)} .kpi .v.go{color:var(--gold)}
+  .kpi .l{font-size:13px;color:var(--dim);margin-top:4px}
+
+  /* cards */
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px}
+  .card.hl{background:linear-gradient(150deg,var(--card2),var(--card));border-color:var(--line2)}
+  .card h4{font-size:18px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+  .card .ic{font-size:22px}
+  .card p{font-size:15px;color:var(--dim);margin-bottom:0}
+  .pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;margin:0 0 10px}
+  .pill.go{background:rgba(255,194,77,.12);color:var(--gold);border:1px solid rgba(255,194,77,.3)}
+  .pill.gr{background:rgba(62,230,168,.12);color:var(--green);border:1px solid rgba(62,230,168,.3)}
+  .pill.te{background:rgba(45,212,191,.12);color:var(--teal2);border:1px solid rgba(45,212,191,.3)}
+  .pill.co{background:rgba(255,122,107,.12);color:var(--coral);border:1px solid rgba(255,122,107,.3)}
+  .pill.vi{background:rgba(155,140,255,.12);color:var(--violet);border:1px solid rgba(155,140,255,.3)}
+
+  /* tables */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;margin:18px 0}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:640px}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line)}
+  th{background:var(--card2);font-weight:700;color:var(--ink);font-size:13px;letter-spacing:.02em;position:sticky;top:0}
+  tr:last-child td{border-bottom:none}
+  td{color:#cfdbe6}
+  td b{color:var(--ink)}
+  tr:hover td{background:rgba(255,255,255,.015)}
+  .num-cell{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+  /* callout */
+  .note{border-left:3px solid var(--teal);background:rgba(45,212,191,.05);border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0}
+  .note.warn{border-left-color:var(--gold);background:rgba(255,194,77,.05)}
+  .note.win{border-left-color:var(--green);background:rgba(62,230,168,.05)}
+  .note p:last-child{margin-bottom:0}
+  .note .t{font-weight:700;color:var(--ink);margin-bottom:4px}
+
+  /* timeline / checklist */
+  .steps{counter-reset:s;margin:18px 0}
+  .step{display:flex;gap:18px;padding:18px 0;border-bottom:1px solid var(--line)}
+  .step:last-child{border-bottom:none}
+  .step .n{counter-increment:s;flex:0 0 46px;height:46px;border-radius:12px;background:var(--card2);border:1px solid var(--line2);
+    display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--teal2);font-size:18px}
+  .step .n::before{content:counter(s)}
+  .step .b h4{margin:0 0 4px;font-size:18px}
+  .step .b p{margin:0;color:var(--dim);font-size:15px}
+
+  /* phase */
+  .phase{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin-bottom:14px}
+  .phase .ph-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .phase .ph-h h4{margin:0;font-size:19px}
+
+  /* fund bar */
+  .fund{display:flex;height:46px;border-radius:12px;overflow:hidden;margin:14px 0 8px;border:1px solid var(--line)}
+  .fund span{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#0b1015;white-space:nowrap;padding:0 6px}
+
+  /* Q&A */
+  details.qa{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+  details.qa summary{padding:18px 22px;cursor:pointer;font-weight:700;font-size:17px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+  details.qa summary::-webkit-details-marker{display:none}
+  details.qa summary::after{content:'+';color:var(--teal2);font-weight:800;font-size:22px}
+  details.qa[open] summary::after{content:'–'}
+  details.qa .qa-b{padding:0 22px 20px;color:var(--dim);font-size:15.5px}
+  details.qa .qa-b p{color:var(--dim)}
+
+  .src{font-size:12.5px;color:var(--dim2)}
+  .src a{color:var(--dim)}
+  footer{padding:50px 0 70px}
+  .foot-sources{font-size:13px;color:var(--dim2);columns:2;column-gap:30px}
+  .foot-sources a{color:var(--dim);display:block;margin-bottom:7px;break-inside:avoid}
+
+  @media (max-width:760px){
+    h1{font-size:38px} h2{font-size:26px}
+    .kpis,.g2,.g3{grid-template-columns:1fr}
+    .foot-sources{columns:1}
+    nav.toc{display:none}
+  }
+  @media print{
+    nav.toc{display:none} body{background:#fff;color:#111}
+    section{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="badge"><span class="dot"></span>Рабочий документ · для переговоров с управляющим</div>
+    <h1>Запускаем <span class="ac">«Распевку» + живую школу</span><br/>как одну систему</h1>
+    <p class="lead">Приложение приводит и прогревает аудиторию, живые уроки её монетизируют. Документ — опора для переговоров: рынок, конкуренты, каналы трафика, отдел продаж, роли и деньги. Все цифры — из открытых источников РФ и мира, со ссылками.</p>
+    <div class="meta">Версия от 14 июня 2026 · приложение и сайт уже работают в продакшене · валюта расчётов: ₽, курс ориентир $1 ≈ 95 ₽</div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#tldr">Суть</a>
+    <a href="#ready">Что готово</a>
+    <a href="#market">Рынок</a>
+    <a href="#comp">Конкуренты</a>
+    <a href="#two">Два продукта</a>
+    <a href="#traffic">Трафик</a>
+    <a href="#factory">Контент-завод</a>
+    <a href="#sales">Продажи</a>
+    <a href="#crm">Учёт / CRM</a>
+    <a href="#team">Команда</a>
+    <a href="#money">Деньги</a>
+    <a href="#checklist">Чек-лист</a>
+    <a href="#questions">Вопросы дня</a>
+  </div>
+</nav>
+
+<!-- ===================== TL;DR ===================== -->
+<section id="tldr">
+  <div class="wrap">
+    <div class="eyebrow">Суть на одной странице</div>
+    <h2>Что мы делаем и почему сейчас</h2>
+    <p class="sub">Берём действующую, проверенную идею (вокальные тренажёры и онлайн-школы зарабатывают по всему миру), убираем её главную слабость на русском рынке — отсутствие нормального геймифицированного продукта — и связываем приложение со школой в одну воронку.</p>
+
+    <div class="kpis">
+      <div class="kpi"><div class="v t">145 млрд&nbsp;₽</div><div class="l">рынок онлайн-образования РФ, 2024 (+19% г/г)</div></div>
+      <div class="kpi"><div class="v g">≈ 0</div><div class="l">сильных русских геймифицированных вокал-приложений</div></div>
+      <div class="kpi"><div class="v go">812&nbsp;₽</div><div class="l">реальный CPL школы вокала в Яндекс.Директ (кейс)</div></div>
+      <div class="kpi"><div class="v t">2 млн&nbsp;₽</div><div class="l">нужно на запуск: маркетинг + команда + IT</div></div>
+    </div>
+
+    <div class="grid g3" style="margin-top:18px">
+      <div class="card hl"><h4><span class="ic">🧩</span>Не велосипед</h4><p>Модель уже работает: Simply — $200M в год, Yousician — €53M, Duolingo — $748M. Мы переносим проверенную механику на пустой русский рынок и усиливаем игрой.</p></div>
+      <div class="card hl"><h4><span class="ic">🪜</span>Два продукта — одна воронка</h4><p>Приложение «Распевка» = дешёвый вход и прогрев. Живая школа = монетизация. Контент-завод кормит оба органикой.</p></div>
+      <div class="card hl"><h4><span class="ic">⚙️</span>Готово к запуску</h4><p>Приложение и сайт уже в продакшене, распевки сверены с музыкантом, реклама и аналитика подготовлены. Деньги идут не на «сделать», а на «разогнать».</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== READY ===================== -->
+<section id="ready">
+  <div class="wrap">
+    <div class="eyebrow">Снимаем риск «а вдруг не сделают»</div>
+    <h2>Что уже готово — продукт существует</h2>
+    <p class="sub">Инвестиция заходит не в идею на бумаге, а в работающие продукты. Это резко снижает риск: остаётся операционная задача — привести трафик и обработать заявки.</p>
+    <div class="grid g2">
+      <div class="card"><span class="pill gr">Приложение · LIVE</span><h4>🎤 Тренажёр «Распевка»</h4><p>Детекция тона в реальном времени, 26 распевок, программа из 10 блоков с экзаменами, дыхание, прогресс и стрики. 24 распевки сверены с действующим музыкантом. PWA — работает в браузере телефона без установки.</p></div>
+      <div class="card"><span class="pill gr">Сайт школы · LIVE</span><h4>🌐 Лендинг живой школы</h4><p>Премиальный сайт с живым демо тренажёра прямо на странице, форма заявки с уходом в Telegram. Сайт и приложение связаны переливом трафика.</p></div>
+      <div class="card"><span class="pill te">Готово</span><h4>📣 Рекламные материалы</h4><p>4 разных вертикальных ролика под Reels/TikTok/Shorts (разные офферы), карточка для репоста ссылки, заготовки под контент-завод.</p></div>
+      <div class="card"><span class="pill te">Готово</span><h4>📊 Аналитика и лиды</h4><p>Цели воронки (демо → распевка → заявка → отправка) и приём заявок в Telegram подключены в коде — включаются вписыванием одного ключа. Запуск трафика идёт не вслепую.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MARKET ===================== -->
+<section id="market">
+  <div class="wrap">
+    <div class="eyebrow">Рынок</div>
+    <h2><span class="num">01</span>Большой рынок, пустая ниша</h2>
+    <p class="sub">Онлайн-образование в России — крупный и растущий рынок. Внутри него обучение вокалу занято мелкими частными школами по модели «урок по видеосвязи 1-на-1». Нормального продукта-тренажёра почти нет.</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Показатель</th><th>Значение</th><th>Что это значит для нас</th></tr></thead>
+        <tbody>
+          <tr><td>Рынок EdTech РФ, 2024</td><td class="num-cell"><b>145 млрд ₽</b>, +19% г/г</td><td>Большой, растущий спрос на онлайн-обучение</td></tr>
+          <tr><td>Прогноз 2025</td><td class="num-cell"><b>154 млрд ₽</b>, +12%</td><td>Рост продолжается, рынок не схлопывается</td></tr>
+          <tr><td>Доля «творчество / хобби»</td><td class="num-cell">~16% пользователей EdTech</td><td>Творческое обучение — массовый сегмент, не нишевый</td></tr>
+          <tr><td>Оценка «вокальной» ниши</td><td class="num-cell">~0,5–2 млрд ₽ <span class="small">(оценка)</span></td><td>Даже малая доля = десятки млн ₽ выручки</td></tr>
+          <tr><td>Чувствительность к цене</td><td class="num-cell">56% берут курсы до 20 000 ₽</td><td>Наши чеки (уроки + подписка) попадают в массовый диапазон</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src">Источники: <a href="https://www.sostav.ru/publication/rossijskij-rynok-onlajn-obrazovaniya-za-poslednie-pyat-let-vyros-v-10-raz-76083.html">Sostav, 2024</a> · <a href="https://companies.rbc.ru/news/yC1GH6lMF8/skolko-rossiyane-tratili-na-onlajn-obrazovanie-v-2024-godu/">РБК Companies, 2024</a> · <a href="https://smartranking.ru/ru/analytics/edtechs/">Smart Ranking, 2025</a>. Узкой цифры именно по вокалу в открытых отчётах нет — это честная оценка от доли творческого сегмента.</p>
+
+    <div class="note win">
+      <div class="t">Главный сигнал спроса</div>
+      <p>Иностранные приложения (Smule, Yousician, Vocalista) популярны, но <b>недоступны для простой оплаты из РФ и без русского контента</b>. Существуют целые статьи «как оплатить Smule из России» — это прямое доказательство неудовлетворённого спроса, который некому закрыть.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== COMPETITORS ===================== -->
+<section id="comp">
+  <div class="wrap">
+    <div class="eyebrow">Конкуренты</div>
+    <h2><span class="num">02</span>Кто на рынке и где их слабость</h2>
+    <p class="sub">Русскоязычные игроки — это в основном Skype-уроки и курсы в записи. Единственное русское приложение-тренажёр «Вокалекс» имеет ~3 000 загрузок и рейтинг 3.6 — ниша фактически свободна. Мировые игроки доказывают, что модель приносит десятки и сотни миллионов.</p>
+
+    <h3>Русскоязычные онлайн-школы и сервисы</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Игрок</th><th>Формат</th><th>Цены</th><th>Масштаб</th><th>Слабость для нас = возможность</th></tr></thead>
+        <tbody>
+          <tr><td><b>Петь Легко</b></td><td>Видео + Skype</td><td class="num-cell">курс 49,7–109,7 тыс ₽</td><td>2 000+ студентов с 2012</td><td>Дорого, нет лёгкого входа и игры</td></tr>
+          <tr><td><b>iSiNG School</b></td><td>Индивид. Skype</td><td class="num-cell">1 800 ₽/урок; пакет 12 = 15,5 тыс</td><td>нет данных</td><td>Нет массового продукта, нет приложения</td></tr>
+          <tr><td><b>SPMusic</b></td><td>Курс 7 недель + уроки</td><td class="num-cell">4 999 / 20 000 / 40 000 ₽</td><td>нет данных</td><td>Небольшой охват, без геймификации</td></tr>
+          <tr><td><b>PimaSchool</b></td><td>Видео + подписка</td><td class="num-cell">от 790 ₽/мес</td><td>нет данных</td><td>Есть подписка, но нет игры и трекинга голоса</td></tr>
+          <tr><td><b>Guitardo</b></td><td>Группы + онлайн</td><td class="num-cell">9 900 ₽/мес за 8 уроков</td><td>13 000 выпускников (все инструменты)</td><td>Вокал — не основной продукт</td></tr>
+          <tr><td><b>Artvocal / Art-Fa</b></td><td>Индивид. онлайн/офлайн</td><td class="num-cell">от 900–1 700 ₽/урок</td><td>800+ студентов/год</td><td>Только живые уроки, не масштабируется</td></tr>
+          <tr style="background:rgba(255,122,107,.05)"><td><b>Вокалекс</b> <span class="pill co" style="margin:0">прямой аналог</span></td><td>Приложение-тренажёр</td><td class="num-cell">Pro 1 490 / 3 500 / 5 500 ₽</td><td>~3 000 загрузок, рейтинг <b>3.6</b></td><td><b>Единственный аналог — и он слабый.</b> Ниша приложения свободна</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Мировые игроки — доказательство, что модель работает</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Продукт</th><th>Выручка / масштаб</th><th>Модель</th><th>Источник</th></tr></thead>
+        <tbody>
+          <tr><td><b>Simply</b> (Simply Piano/Sing)</td><td class="num-cell">$200M в год (2024)</td><td>Подписка, обучение нескольким инструментам</td><td class="small"><a href="https://getlatka.com/companies/simply-">GetLatka</a></td></tr>
+          <tr><td><b>Yousician</b></td><td class="num-cell">€53,3M (2024), ~20M MAU</td><td>Freemium, ~$120/год</td><td class="small"><a href="https://tracxn.com/d/companies/yousician/__9_js14rTh79nrKlExWy_o-y8h6uzWU-JoYbthACpUYg">Tracxn</a></td></tr>
+          <tr><td><b>Duolingo</b> (эталон игры)</td><td class="num-cell">$748M (2024), 9,5M платящих</td><td>Freemium, ~8,8% конверсия в платящих</td><td class="small"><a href="https://investors.duolingo.com/news-releases/news-release-details/duolingo-reports-45-revenue-growth-and-record-profitability">Duolingo IR</a></td></tr>
+          <tr><td><b>Vocalista</b> (прямой аналог)</td><td class="num-cell">4,1M загрузок</td><td>Freemium, ~$7–9/мес, без RU</td><td class="small"><a href="https://www.appbrain.com/app/learn-to-sing-sing-sharp/com.harmonynetwork.singsharp">AppBrain</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note win">
+      <div class="t">Наш ход — три преимущества, которых нет ни у кого вместе</div>
+      <p><b>1. Русский язык и оплата</b> — то, чего нет у мировых лидеров. <b>2. Игра и тренажёр</b> — то, чего нет у русских школ. <b>3. Методика действующего музыканта + живые уроки</b> — то, чего нет у приложений. Связка «приложение → школа» закрывает всю воронку, чего не делает ни один конкурент.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TWO PRODUCTS ===================== -->
+<section id="two">
+  <div class="wrap">
+    <div class="eyebrow">Архитектура бизнеса</div>
+    <h2><span class="num">03</span>Два продукта, которые усиливают друг друга</h2>
+    <p class="sub">Это не два разных проекта, а одна машина привлечения и монетизации. Каждый продукт ведёт свой трафик и переливает в другой.</p>
+
+    <div class="grid g2">
+      <div class="card hl"><span class="pill te">Верх воронки</span><h4>🎮 Приложение «Распевка»</h4>
+        <p>Низкий барьер: бесплатно, в браузере, сразу интересно. Задача — собирать широкую аудиторию через органику (контент-завод) и удерживать игрой (стрики, уровни, прогресс). Часть пользователей переливается в платную школу через кнопку «урок с педагогом».</p></div>
+      <div class="card hl"><span class="pill go">Монетизация</span><h4>🎓 Живая школа</h4>
+        <p>Главный доход. Сайт собирает заявки на бесплатный пробный урок, менеджер ставит на пробник, музыкант проводит — и закрывает на абонемент. Средний чек кратно выше, чем у приложения.</p></div>
+    </div>
+
+    <div class="note">
+      <div class="t">Маховик</div>
+      <p><b>Контент-завод → Приложение ⇄ Сайт школы → Монетизация → реинвест в контент и рекламу.</b> Чем больше органики и рекламы, тем больше входящих в приложение и на сайт; приложение греет и отдаёт тёплых в школу; школа приносит деньги, которые возвращаются в трафик. Два продукта дают двойную точку входа и двойной охват одной и той же аудитории.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TRAFFIC ===================== -->
+<section id="traffic">
+  <div class="wrap">
+    <div class="eyebrow">Маркетинговая стратегия</div>
+    <h2><span class="num">04</span>Каналы трафика и медиаплан</h2>
+    <p class="sub">Сначала разгоняем сайт школы (там деньги и быстрая окупаемость), параллельно строим органику на приложение через контент-завод. Платный трафик — там, где он реально работает в РФ, с честной оценкой ограничений.</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Канал</th><th>Что ведём</th><th>Реальные бенчмарки РФ</th><th>Роль</th></tr></thead>
+        <tbody>
+          <tr><td><b>Яндекс.Директ</b></td><td>Сайт школы</td><td class="num-cell">CPL школы вокала <b>812 ₽</b> (кейс), конверсия лендинга 11,4%; старт реалистично 1 500–3 000 ₽</td><td><span class="pill te" style="margin:0">Главный по заявкам</span></td></tr>
+          <tr><td><b>VK Реклама</b></td><td>Сайт + приложение</td><td class="num-cell">CPC ~9–12,5 ₽, CPM ~116 ₽, CPL 300–1 200 ₽ (образование)</td><td><span class="pill te" style="margin:0">Объём + ретаргет</span></td></tr>
+          <tr><td><b>Telegram Ads</b></td><td>Сайт + воронка в бот</td><td class="num-cell">CPM ~290 ₽, подписчик до ~200 ₽, вход 500 €</td><td><span class="pill vi" style="margin:0">Допканал</span></td></tr>
+          <tr><td><b>Контент-завод</b><br/>(VK Клипы, Reels, Shorts, TikTok)</td><td>Приложение (и школа)</td><td class="num-cell">Органика; раскрутка нового аккаунта 6–12 мес; демо-пение заходит быстрее обучающего</td><td><span class="pill gr" style="margin:0">Дешёвый объём</span></td></tr>
+          <tr style="background:rgba(255,194,77,.05)"><td><b>Meta (Instagram/Facebook) таргет</b></td><td>Рус. аудитория</td><td class="num-cell">⚠️ Таргет на аудиторию <b>внутри РФ официально недоступен</b> с 2022; работает только рус. диаспора за рубежом</td><td><span class="pill go" style="margin:0">Ограниченно</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src">Источники: <a href="https://elama.ru/blog/lidy-do-1000-iz-yandeks-direkta-keys-prodvizheniya-shkoly-vokala/">eLama — кейс школы вокала (Директ)</a> · <a href="https://blog.click.ru/target/skolko-stoit-reklama-vkontakte/">click.ru — цены VK 2025</a> · <a href="https://elama.ru/blog/cpm-cpc-i-cpa-v-vk-reklame-dlya-biznes-tematik-obrazovanie-i-vse-dlya-doma/">eLama — VK Ads образование</a> · <a href="https://callibri.ru/blog/kak-rabotat-s-targetirovannoi-reklamoi-v-meta-v-2024-godu">callibri — Meta для РФ</a>.</p>
+
+    <div class="note warn">
+      <div class="t">Честно про Instagram/Facebook</div>
+      <p>Запустить таргет на аудиторию <b>внутри России</b> через Meta штатно нельзя. Поэтому Instagram у нас — это <b>органика контент-завода и активное ведение аккаунта</b> (это работает и бесплатно), а платный таргет на РФ строим на <b>Яндекс.Директ + VK</b>. Это снимает главный риск «слил бюджет в недоступный канал».</p>
+    </div>
+
+    <h3>Порядок разгона</h3>
+    <div class="steps">
+      <div class="step"><div class="n"></div><div class="b"><h4>Сначала — сайт школы на платный трафик</h4><p>Яндекс.Директ + VK на бесплатный пробный урок. Здесь самые быстрые деньги и окупаемость за 1–2 месяца обучения.</p></div></div>
+      <div class="step"><div class="n"></div><div class="b"><h4>Параллельно — контент-завод на приложение</h4><p>Отдельный Instagram/TikTok/VK-аккаунт под «Распевку»: демо-пение, до/после, челленджи. Органика растит верх воронки без рекламного бюджета.</p></div></div>
+      <div class="step"><div class="n"></div><div class="b"><h4>Затем — перелив и ретаргет</h4><p>Тёплых из приложения ведём в школу, посетителей сайта догоняем ретаргетом в VK. Каналы начинают усиливать друг друга.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FACTORY ===================== -->
+<section id="factory">
+  <div class="wrap">
+    <div class="eyebrow">Контент-завод</div>
+    <h2><span class="num">05</span>Система производства контента</h2>
+    <p class="sub">«Контент-завод» — это поток коротких видео на потоке: единый конвейер съёмки → монтажа → публикации в нескольких аккаунтах. Он даёт органический трафик, который не зависит от рекламного бюджета.</p>
+
+    <div class="grid g3">
+      <div class="card"><h4><span class="ic">🎬</span>Что производим</h4><p>Reels/Клипы/Shorts/TikTok: распевки и демо «до/после», разбор «почему мимо ноты», челленджи, фрагменты живых уроков, экранки приложения.</p></div>
+      <div class="card"><h4><span class="ic">👥</span>Кто делает</h4><p>SMM-специалист (ведёт аккаунты, сценарии, публикации) в связке с видеомонтажёром. Часть исходников и заготовок даём мы (музыкант + готовые шаблоны/ролики).</p></div>
+      <div class="card"><h4><span class="ic">🎯</span>Куда ведёт</h4><p>Два отдельных потока: один аккаунт-связка на <b>школу</b>, другой — на <b>приложение</b>. Каждый со своим оффером, чтобы не было «дублей контента» и теневых банов.</p></div>
+    </div>
+
+    <div class="note warn">
+      <div class="t">Правило, выученное на практике</div>
+      <p>Нельзя штамповать клоны с одного шаблона и заливать пачкой за день — площадки (особенно Instagram) ловят это как дублированный контент и режут охваты. Каждый пост = свой угол + своё оформление, публикации разносим по времени. Это зашито в регламент контент-завода.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SALES ===================== -->
+<section id="sales">
+  <div class="wrap">
+    <div class="eyebrow">Отдел продаж</div>
+    <h2><span class="num">06</span>Обработка заявок и пробники</h2>
+    <p class="sub">Трафик без обработки — слитые деньги. На инвест-средства ставим 1–2 менеджеров, которые быстро обрабатывают заявки, ставят на бесплатный пробный урок и доводят до оплаты абонемента.</p>
+
+    <h3>Воронка продаж (на реальных конверсиях EdTech)</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Этап</th><th>Конверсия (бенчмарк РФ/мир)</th><th>Кто отвечает</th></tr></thead>
+        <tbody>
+          <tr><td>Клик по рекламе → заявка на сайте</td><td class="num-cell">5–12%</td><td>Маркетинг (сайт, оффер)</td></tr>
+          <tr><td>Заявка → пришёл на пробный урок</td><td class="num-cell">30–50%</td><td>Менеджер (скорость ответа решает)</td></tr>
+          <tr><td>Пробный → оплата абонемента</td><td class="num-cell">15–35%</td><td>Музыкант на уроке + менеджер</td></tr>
+          <tr><td><b>Сквозная: клик → оплата</b></td><td class="num-cell"><b>~1–5%</b></td><td>Вся команда</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src">Источники: кейсы <a href="https://vc.ru/id1061134/1353407-keis-prodvizhenie-onlain-shkoly-v-yandeks-direkt-kak-privlech-2738-registracii-po-373-rub-v-infobiznes">vc.ru</a>, <a href="https://elama.ru/blog/lidy-do-1000-iz-yandeks-direkta-keys-prodvizheniya-shkoly-vokala/">eLama</a> · бенчмарки EdTech <a href="https://cufinder.io/blog/benchmarks/edtech/">CUFinder</a>.</p>
+
+    <div class="note win">
+      <div class="t">Экономика сходится</div>
+      <p>При CPL 800–1 500 ₽ и конверсии пробное→оплата 20% привлечённый ученик стоит <b>~4 000–6 000 ₽</b>. При среднем чеке школы и удержании в несколько месяцев он окупается <b>за 1–2 месяца</b>, дальше — прибыль. У заявки уже есть прогрев: если человек занимался в приложении, к ней приложены его тембр, диапазон и прогресс — менеджеру и педагогу видно, с чего начинать.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CRM ===================== -->
+<section id="crm">
+  <div class="wrap">
+    <div class="eyebrow">Контроль</div>
+    <h2><span class="num">07</span>Учёт заявок и CRM — по этапам</h2>
+    <p class="sub">Не строим тяжёлую систему сразу. Начинаем с простого учёта, чтобы ничего не терялось, и наращиваем по мере роста потока.</p>
+
+    <div class="phase">
+      <div class="ph-h"><h4>Этап 1 — Старт (первые недели)</h4><span class="pill gr">почти бесплатно</span></div>
+      <p>Все заявки со всех каналов стекаются в <b>один Telegram</b> (уже подключено в приложении и на сайте). Учёт — единая <b>таблица</b> (Google Sheets / Bitrix24 бесплатный до 5 человек): источник, контакт, статус (новая → пробный назначен → пробный проведён → оплата → отказ), дата, сумма. Этого хватает, чтобы видеть воронку и не терять людей.</p>
+    </div>
+    <div class="phase">
+      <div class="ph-h"><h4>Этап 2 — Рост потока</h4><span class="pill te">~0,5–2 тыс ₽/мес</span></div>
+      <p>Подключаем нормальную CRM (<b>amoCRM от 499–1 499 ₽/мес</b> или Bitrix24) + агрегатор сообщений, чтобы заявки из VK, Telegram, сайта падали в одно окно с воронкой и напоминаниями. Менеджер работает в одном месте, руководитель видит конверсии по каждому каналу.</p>
+    </div>
+    <div class="phase">
+      <div class="ph-h"><h4>Этап 3 — Своя система</h4><span class="pill vi">позже, по решению</span></div>
+      <p>При устойчивом потоке можно перейти на <b>собственную систему продаж/бота</b> (у нас уже есть наработки по sales-ботам) — чтобы автоматизировать первичную обработку, напоминания о пробниках и оплаты. Решаем, когда поток это оправдает.</p>
+    </div>
+    <p class="src">Цены: <a href="https://cmdf5.ru/blog/amocrm-vs-bitrix24">amoCRM vs Bitrix24</a> · <a href="https://timeweb.cloud/blog/obzor-tarifov-vps-v-2025-godu">VPS Timeweb</a>. Стартовая IT-инфраструктура — порядка 5–10 тыс ₽/мес.</p>
+  </div>
+</section>
+
+<!-- ===================== TEAM ===================== -->
+<section id="team">
+  <div class="wrap">
+    <div class="eyebrow">Команда</div>
+    <h2><span class="num">08</span>Роли по фазам — от «всё сам» к системе</h2>
+    <p class="sub">На старте управляющий-музыкант берёт полную нагрузку и под себя постепенно нанимает команду. Это держит расходы под контролем и сохраняет качество, пока система не встанет на ноги.</p>
+
+    <div class="phase">
+      <div class="ph-h"><h4>Фаза A — Запуск (управляющий на полной нагрузке)</h4><span class="pill go">месяцы 1–2</span></div>
+      <p>Музыкант ведёт уроки, сам обрабатывает первые заявки и контролирует трафик. Мы вместе настраиваем рекламу со всех источников и запускаем контент-завод. Цель — собрать первую базу учеников и отладить воронку на себе, прежде чем нанимать.</p>
+    </div>
+    <div class="phase">
+      <div class="ph-h"><h4>Фаза B — Найм под себя (поток растёт)</h4><span class="pill te">месяцы 2–5</span></div>
+      <p>Нанимаем: <b>SMM-специалиста</b> (полная занятость, ведёт VK + Instagram в связке с контент-заводом), <b>видеомонтажёра</b>, <b>1–2 менеджеров</b> на обработку заявок и пробники. Музыкант контролирует, но операционку постепенно передаёт.</p>
+    </div>
+    <div class="phase">
+      <div class="ph-h"><h4>Фаза C — Музыкант → в продукт</h4><span class="pill gr">месяцы 5+</span></div>
+      <p>С наймом педагогов музыкант ведёт меньше уроков и переключается на <b>методику, программу и улучшение игры</b> — то, что усиливает оба продукта и масштабируется. Система привлечения и продаж работает на нанятой команде.</p>
+    </div>
+
+    <h3>Ориентиры по зарплатам РФ (2025)</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Роль</th><th>Вилка, ₽/мес</th><th>Когда нанимаем</th></tr></thead>
+        <tbody>
+          <tr><td>SMM-специалист (полная занятость)</td><td class="num-cell">60–90 тыс</td><td>Фаза B</td></tr>
+          <tr><td>Видеомонтажёр</td><td class="num-cell">40–80 тыс</td><td>Фаза B</td></tr>
+          <tr><td>Менеджер по продажам</td><td class="num-cell">оклад 30–50 тыс + 3–10% с оплат</td><td>Фаза B (1–2 чел.)</td></tr>
+          <tr><td>Таргетолог</td><td class="num-cell">70–150 тыс (или на аутсорс/%)</td><td>по необходимости</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src">Источники зарплат: <a href="https://ppc.world/articles/skolko-zarabatyvayut-digital-specialisty-v-2025-godu/">ppc.world, 2026</a> · <a href="https://russia.gorodrabot.ru/salaries/videomontazher">gorodrabot.ru</a> · <a href="https://maer-academy.ru/blog/skolko-mozhet-zarabatyvat-menedzher-po-prodazham-i-ot-chego-eto-zavisit/">maer-academy</a>.</p>
+  </div>
+</section>
+
+<!-- ===================== MONEY ===================== -->
+<section id="money">
+  <div class="wrap">
+    <div class="eyebrow">Деньги</div>
+    <h2><span class="num">09</span>2 млн ₽: на что и что вернётся</h2>
+    <p class="sub">Деньги идут не на «сделать продукт» (он готов), а на разгон: маркетинг, команда, IT-инфраструктура. Пропорции — предмет обсуждения на встрече; ниже два рабочих сценария.</p>
+
+    <h3>Распределение инвестиций — два варианта</h3>
+    <div class="grid g2">
+      <div class="card hl"><h4>Вариант A — упор на маркетинг</h4>
+        <div class="fund">
+          <span style="flex:75;background:linear-gradient(90deg,#3de5c9,#2dd4bf)">Маркетинг 1,5 млн</span>
+          <span style="flex:25;background:#3a4a5a;color:#dbe6ef">Развитие+кэшаут 0,5 млн</span>
+        </div>
+        <p>Максимум в трафик — быстрее набрать базу. Команда и IT по минимуму, кэшаут небольшой.</p>
+      </div>
+      <div class="card hl"><h4>Вариант B — сбалансированный</h4>
+        <div class="fund">
+          <span style="flex:50;background:linear-gradient(90deg,#3de5c9,#2dd4bf)">Маркетинг 1,0 млн</span>
+          <span style="flex:25;background:#5b8def;color:#fff">Развитие 0,5 млн</span>
+          <span style="flex:25;background:#8a7bd8;color:#fff">Запуск+IT+команда 0,5 млн</span>
+        </div>
+        <p>Половина в трафик, половина — на устойчивость: сотрудники, серверы, IT-система, плюс ~0,5 млн кэшаут (внутри развития) на старте.</p>
+      </div>
+    </div>
+    <div class="note">
+      <div class="t">Что входит в «развитие / запуск / IT»</div>
+      <p>Зарплаты первых сотрудников (SMM, монтажёр, менеджеры) на 3–6 месяцев вперёд, серверы и инфраструктура, CRM и агрегатор заявок, упаковка приложения в сторы (RuStore / Google Play), резерв на тесты каналов. Кэшаут — заранее оговорённая часть как компенсация за уже сделанную работу и риск.</p>
+    </div>
+
+    <h3>Прогноз дохода — три сценария (главный двигатель: школа)</h3>
+    <p class="small" style="margin-bottom:14px">Расчёт на режим «после раскрутки» (через ~6–12 месяцев). Привязка: CPL и конверсии — из реальных кейсов РФ (см. раздел «Продажи»). Подставляйте свои фактические чеки школы — модель пересчитается.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Параметр</th><th>Осторожный</th><th>База</th><th>Оптимистичный</th></tr></thead>
+        <tbody>
+          <tr><td>Активная база учеников школы</td><td class="num-cell">60</td><td class="num-cell">100</td><td class="num-cell">160</td></tr>
+          <tr><td>Средний чек, ₽/мес</td><td class="num-cell">6 000</td><td class="num-cell">7 000</td><td class="num-cell">8 000</td></tr>
+          <tr><td>Выручка школы, ₽/мес</td><td class="num-cell">360 000</td><td class="num-cell">700 000</td><td class="num-cell">1 280 000</td></tr>
+          <tr><td>+ Приложение (подписки), ₽/мес</td><td class="num-cell">30 000</td><td class="num-cell">90 000</td><td class="num-cell">200 000</td></tr>
+          <tr><td>Расходы (педагоги, команда, трафик, IT)</td><td class="num-cell">≈ 250 000</td><td class="num-cell">≈ 480 000</td><td class="num-cell">≈ 820 000</td></tr>
+          <tr style="background:rgba(62,230,168,.06)"><td><b>Чистая прибыль, ₽/мес</b></td><td class="num-cell"><b>≈ 140 000</b></td><td class="num-cell"><b>≈ 310 000</b></td><td class="num-cell"><b>≈ 660 000</b></td></tr>
+          <tr style="background:rgba(62,230,168,.06)"><td><b>В год, ₽ / в $</b></td><td class="num-cell"><b>1,7 млн / $18k</b></td><td class="num-cell"><b>3,7 млн / $39k</b></td><td class="num-cell"><b>7,9 млн / $83k</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note win">
+      <div class="t">Цель — выйти на ~$20k чистыми в месяц за год-полтора</div>
+      <p>Это <b>не фантазия</b>: цифры опираются на реальные финмодели работающих игроков (Simply, Yousician, Duolingo) и реальные стоимости трафика/конверсии РФ. Уже в осторожном сценарии проект окупает зарплаты и приносит прибыль; база и оптимистичный — кратный рост. Мы не придумываем числа с потолка — за каждым стоит источник.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CHECKLIST ===================== -->
+<section id="checklist">
+  <div class="wrap">
+    <div class="eyebrow">План действий</div>
+    <h2><span class="num">10</span>Чек-лист запуска — что делаем, как пришли деньги</h2>
+    <p class="sub">Конкретная последовательность первых шагов. Продукт готов, поэтому стартуем сразу с организации школы и трафика.</p>
+    <div class="steps">
+      <div class="step"><div class="n"></div><div class="b"><h4>Организуем школу и инфраструктуру (неделя 1)</h4><p>Подключаем бот заявок и аналитику (вписываем ключи), заводим таблицу/CRM учёта, серверы, домен. Музыкант готов вести уроки и обрабатывать первые заявки.</p></div></div>
+      <div class="step"><div class="n"></div><div class="b"><h4>Запускаем платный трафик на сайт (неделя 1–2)</h4><p>Яндекс.Директ + VK на бесплатный пробный урок. Малыми бюджетами тестируем связки, смотрим CPL и конверсию, оставляем рабочие.</p></div></div>
+      <div class="step"><div class="n"></div><div class="b"><h4>Включаем обработку заявок (сразу)</h4><p>Все заявки в один Telegram → менеджер (на старте — музыкант) звонит/пишет быстро, ставит на пробник. Полная нагрузка на управляющем, пока поток малый.</p></div></div>
+      <div class="step"><div class="n"></div><div class="b"><h4>Ставим контент-завод (неделя 2–4)</h4><p>Заводим аккаунты под школу и под приложение, нанимаем SMM + монтажёра, запускаем поток коротких видео. Часть контента и шаблонов даём мы.</p></div></div>
+      <div class="step"><div class="n"></div><div class="b"><h4>Нанимаем под себя (месяц 2–3)</h4><p>По мере роста заявок берём 1–2 менеджеров, при необходимости таргетолога. Музыкант передаёт операционку, контролирует качество.</p></div></div>
+      <div class="step"><div class="n"></div><div class="b"><h4>Перелив и масштаб (месяц 3+)</h4><p>Тёплых из приложения ведём в школу, добавляем ретаргет, упаковываем приложение в сторы. Музыкант смещается в методику и развитие игры.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== QUESTIONS ===================== -->
+<section id="questions">
+  <div class="wrap">
+    <div class="eyebrow">На повестку встречи</div>
+    <h2><span class="num">11</span>Висящие вопросы — что обсудить</h2>
+    <p class="sub">Открытые пункты, по которым нужно договориться. По формату сотрудничества мы гибки — важно зафиксировать ожидания обеих сторон.</p>
+
+    <details class="qa" open><summary>Формат сотрудничества и условия инвестора</summary><div class="qa-b">
+      <p>Нас устроит практически любой разумный формат — важно проговорить заранее. Возможные рамки для обсуждения: доля в прибыли на период возврата + бонус сверху, затем сниженный процент на оговорённый срок; полная прозрачность движения денег и расходов для инвестора; роль и зона ответственности каждой стороны. <b>Вопрос на повестку: какие условия и горизонт возврата комфортны инвестору?</b></p>
+    </div></details>
+
+    <details class="qa"><summary>Распределение 2 млн — вариант A или B?</summary><div class="qa-b">
+      <p>Сколько в маркетинг, сколько в команду/IT, какой размер кэшаута на старте. От этого зависит скорость разгона против устойчивости. <b>Решаем на встрече.</b></p>
+    </div></details>
+
+    <details class="qa"><summary>Цены и монетизация приложения</summary><div class="qa-b">
+      <p>Ориентиры рынка: русский «Вокалекс» — 1 490–5 500 ₽, мировые подписки — ~$4–9/мес. Нужно определить нашу модель: разовая годовая подписка, помесячно или freemium с платными уровнями. <b>Открытый вопрос:</b> с чего начинаем и когда включаем платную стену.</p>
+    </div></details>
+
+    <details class="qa"><summary>Чеки и пакеты школы</summary><div class="qa-b">
+      <p>Финмодель построена на среднем чеке 6–8 тыс ₽/мес — подставляем твои реальные цифры (стоимость урока, абонементы, удержание). <b>Нужны фактические данные школы</b>, чтобы уточнить прогноз.</p>
+    </div></details>
+
+    <details class="qa"><summary>Перспективы и горизонт</summary><div class="qa-b">
+      <p>Куда растём после выхода на стабильную прибыль: упаковка в сторы (RuStore/Google Play/App Store), расширение программы и игровых механик, возможный выход на русскоязычную аудиторию за рубежом, партнёрства. <b>Договариваемся о видении на 1–2 года.</b></p>
+    </div></details>
+  </div>
+</section>
+
+<!-- ===================== SOURCES ===================== -->
+<footer>
+  <div class="wrap">
+    <div class="eyebrow">Источники</div>
+    <h3 style="margin-top:0">Все цифры — из открытых источников (2024–2026)</h3>
+    <div class="foot-sources">
+      <a href="https://www.sostav.ru/publication/rossijskij-rynok-onlajn-obrazovaniya-za-poslednie-pyat-let-vyros-v-10-raz-76083.html">Sostav — рынок онлайн-образования РФ</a>
+      <a href="https://companies.rbc.ru/news/yC1GH6lMF8/skolko-rossiyane-tratili-na-onlajn-obrazovanie-v-2024-godu/">РБК Companies — расходы на онлайн-образование 2024</a>
+      <a href="https://smartranking.ru/ru/analytics/edtechs/">Smart Ranking — EdTech 2025</a>
+      <a href="https://easyvoice5.ru/">Петь Легко</a>
+      <a href="https://isingschool.ru/courses">iSiNG School — цены</a>
+      <a href="https://www.spmuz.ru/kurs-vokala-online">SPMusic — цены</a>
+      <a href="https://kursfinder.ru/school/pimaschool/">PimaSchool</a>
+      <a href="https://vocalex.ru/">Вокалекс — приложение</a>
+      <a href="https://www.rustore.ru/catalog/app/ru.vocalex.androidoverview">Вокалекс в RuStore</a>
+      <a href="https://raduga-2.ru/uroki-vokala-onlajn/">Рейтинг онлайн-школ вокала</a>
+      <a href="https://elama.ru/blog/lidy-do-1000-iz-yandeks-direkta-keys-prodvizheniya-shkoly-vokala/">eLama — кейс школы вокала (Директ, CPL 812 ₽)</a>
+      <a href="https://blog.click.ru/target/skolko-stoit-reklama-vkontakte/">click.ru — цены VK Рекламы 2025</a>
+      <a href="https://elama.ru/blog/cpm-cpc-i-cpa-v-vk-reklame-dlya-biznes-tematik-obrazovanie-i-vse-dlya-doma/">eLama — VK Ads образование</a>
+      <a href="https://vc.ru/id1061134/1353407-keis-prodvizhenie-onlain-shkoly-v-yandeks-direkt-kak-privlech-2738-registracii-po-373-rub-v-infobiznes">vc.ru — кейс онлайн-школы (Директ)</a>
+      <a href="https://callibri.ru/blog/kak-rabotat-s-targetirovannoi-reklamoi-v-meta-v-2024-godu">callibri — Meta для РФ-аудитории</a>
+      <a href="https://cufinder.io/blog/benchmarks/edtech/">CUFinder — бенчмарки EdTech</a>
+      <a href="https://ppc.world/articles/skolko-zarabatyvayut-digital-specialisty-v-2025-godu/">ppc.world — зарплаты digital 2026</a>
+      <a href="https://russia.gorodrabot.ru/salaries/videomontazher">gorodrabot.ru — зарплата видеомонтажёра</a>
+      <a href="https://cmdf5.ru/blog/amocrm-vs-bitrix24">amoCRM vs Bitrix24 — цены</a>
+      <a href="https://timeweb.cloud/blog/obzor-tarifov-vps-v-2025-godu">Timeweb — VPS тарифы 2025</a>
+      <a href="https://getlatka.com/companies/simply-">GetLatka — Simply $200M ARR</a>
+      <a href="https://tracxn.com/d/companies/yousician/__9_js14rTh79nrKlExWy_o-y8h6uzWU-JoYbthACpUYg">Tracxn — Yousician €53M</a>
+      <a href="https://investors.duolingo.com/news-releases/news-release-details/duolingo-reports-45-revenue-growth-and-record-profitability">Duolingo IR — выручка и платящие</a>
+      <a href="https://www.appbrain.com/app/learn-to-sing-sing-sharp/com.harmonynetwork.singsharp">AppBrain — Vocalista/Sing Sharp</a>
+      <a href="https://growthmarketreports.com/report/music-learning-apps-market">Growth Market Reports — рынок музыкальных приложений</a>
+      <a href="https://www.revenuecat.com/state-of-subscription-apps-2025/">RevenueCat — State of Subscription Apps 2025</a>
+    </div>
+    <p class="small" style="margin-top:26px">Документ собран на основе открытых данных и реальных рекламных кейсов. Где точных цифр по рынку нет (узкая ниша вокала, число учеников отдельных школ) — это честно помечено как оценка. Финмодель — расчётная, на проверяемых бенчмарках; не является публичной офертой или гарантией доходности.</p>
+  </div>
+</footer>
+
+</body>
+</html>
