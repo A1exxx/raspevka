@@ -4,6 +4,10 @@
 //   exhale — замер длительности ровного выдоха на «с-с-с» по громкости (RMS)
 import * as progress from '../state/progress.js';
 import { bellyDiagram } from '../ui/belly-diagram.js';
+import { exerciseHero } from '../ui/illustrations.js';
+
+// Иллюстрация по типу дыхания (public/exa/).
+const BREATH_ART = { box: 'breath-box', belly: 'breath-belly', hiss: 'breath-hiss' };
 
 export const BREATHING = {
   box: {
@@ -64,7 +68,11 @@ export function renderBreathing(app, mic, key, { onExit, onNext, nextLabel, onDo
       <div class="screen breathe-intro">
         <div class="game-top"><button class="icon-btn" id="back">‹ ${onNext ? 'Назад' : 'Меню'}</button></div>
         <div class="brand"><h1>${ex.title}</h1></div>
-        <div class="card"><p class="blurb">${ex.blurb}</p>${ex.belly ? bellyDiagram() : ''}</div>
+        <div class="card exa-card">
+          ${exerciseHero(BREATH_ART[key] || 'breath-belly')}
+          <p class="exa-tip">${ex.blurb}</p>
+          ${ex.belly ? bellyDiagram() : ''}
+        </div>
         <button class="btn btn-primary" id="go" style="width:100%">Начать упражнение</button>
       </div>
     `;

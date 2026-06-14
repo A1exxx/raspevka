@@ -8,7 +8,7 @@ import { hzToNoteInfo, centsOff } from '../theory/note-map.js';
 import * as progress from '../state/progress.js';
 import { logEvent } from '../state/analytics.js';
 import { MODES, modeUnlocked } from '../theory/modes.js';
-import { contourGlyph, exerciseAnim, mouthHint } from '../ui/illustrations.js';
+import { contourGlyph, exerciseHero, artFor } from '../ui/illustrations.js';
 import { celebrate, haptic } from '../ui/celebrate.js';
 
 // Открыт ли блок «продвинутых» настроек (тембр/грув/наушники) — сохраняем между перерисовками.
@@ -473,10 +473,10 @@ function renderExplain(app, exercise, { onExit, onStart, onModeChange }) {
       <div class="brand"><h1>${exercise.name}</h1>
         <p>Слог: <b>«${exercise.syllable}»</b></p></div>
       <div class="card exa-card">
-        ${exerciseAnim(exercise.notes)}
+        ${exerciseHero(artFor(exercise))}
         ${exercise.how ? `<p class="exa-tip">${exercise.how}</p>` : (exercise.desc ? `<p class="exa-tip">${exercise.desc}</p>` : '')}
-        <div class="exa-row">
-          ${mouthHint()}
+        <div class="exa-foot">
+          <div class="exa-contour" title="Форма распевки">${contourGlyph(exercise.notes)}</div>
           <div class="exa-legend"><span class="lg lg-g">точно</span><span class="lg lg-y">почти</span><span class="lg lg-r">мимо</span> — пой так, чтобы шарик совпал с нотой</div>
         </div>
       </div>

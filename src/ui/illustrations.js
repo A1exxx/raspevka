@@ -123,6 +123,27 @@ export function exerciseAnim(notes) {
   </div>`;
 }
 
+/** Красивый герой-визуал упражнения: сгенерированная иллюстрация по теме + мягкая
+ *  анимация (Ken Burns + дыхание свечения). art — имя файла из public/exa/. */
+export function exerciseHero(art) {
+  const base = (import.meta && import.meta.env && import.meta.env.BASE_URL) || '/';
+  return `<div class="exa-hero"><img src="${base}exa/${art}.png" alt="" loading="lazy" decoding="async"/></div>`;
+}
+
+/** Категория иллюстрации по упражнению (id/kind → имя картинки в public/exa/). */
+export function artFor(exercise) {
+  const id = (exercise && exercise.id) || '';
+  const k = (exercise && exercise.kind) || '';
+  if (k === 'vibrato' || /vib|vwobble/.test(id)) return 'vib';
+  if (/artic/.test(id)) return 'artic';
+  if (/timbre|reg|belt|jump5|jump$/.test(id)) return 'reg';
+  if (k === 'vowel' || /vowel|vhold|vscale|vagil|vclimb|jcharles/.test(id)) return 'vowel';
+  if (k === 'sustain' || k === 'hum' || /hum|trill|sustain/.test(id)) return 'warm';
+  if (k === 'scale' || k === 'agility' || k === 'jump' || k === 'glide' ||
+      /scale|agility|lad|five|run|resist/.test(id)) return 'pitch';
+  return 'vowel';
+}
+
 /** Маленькая анимация артикуляции: открытый, свободный рот (челюсть не зажата). */
 export function mouthHint() {
   return `<div class="mouth-hint" aria-hidden="true">
