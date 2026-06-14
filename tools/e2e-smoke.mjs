@@ -62,13 +62,14 @@ await p.screenshot({ path: OUT + '/_e2e-explain.jpg', quality: 80, type: 'jpeg' 
 const explainText = await p.evaluate(() => document.body.innerText);
 console.log('EXPLAIN screen:', explainText.includes('Пять гласных') ? '✓ Пять гласных' : 'unexpected: ' + explainText.slice(0, 120));
 
-// 4) Старт прохода → во время образца жмём «Пропустить образец» → отсчёт/проход
+// 4) Старт прохода → тоника + пустой такт «приготовься» + образец (со SKIP) → проход.
+// Поллим до появления кнопки «Пропустить образец» (тайминг зависит от темпа упражнения).
 await p.evaluate(() => { [...document.querySelectorAll('button')].find((x) => /Начать|Поехали|Старт/.test(x.textContent))?.click(); });
-await sleep(4200); // тоника 1.65с + образец пошёл
-const skipSeen = await p.evaluate(() => !!document.getElementById('skipref'));
+let skipSeen = false;
+for (let i = 0; i < 16 && !skipSeen; i++) { await sleep(650); skipSeen = await p.evaluate(() => !!document.getElementById('skipref')); }
 console.log('GAME skip button visible:', skipSeen ? '✓' : 'MISSING');
 await p.evaluate(() => document.getElementById('skipref')?.click());
-await sleep(3500); // отсчёт 3×600мс → проход
+await sleep(3500); // пустой leadIn-такт (метроном + минусовка) → проход
 await p.screenshot({ path: OUT + '/_e2e-game.jpg', quality: 80, type: 'jpeg' });
 const gameMsg = await p.evaluate(() => document.getElementById('msg')?.textContent || document.body.innerText.slice(0, 80));
 console.log('GAME msg after skip:', gameMsg);
