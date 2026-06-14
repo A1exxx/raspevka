@@ -83,3 +83,53 @@ export function contourGlyph(notes) {
   return `<span class="ex-glyph"><svg viewBox="0 0 ${W.toFixed(0)} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Рисунок мелодии упражнения">${body}</svg></span>`;
 }
 
+/**
+ * Анимированное объяснение упражнения: светящийся шарик бежит по контуру мелодии
+ * (как в игре) — видно форму, направление и ритм БЕЗ текста. id уникален на вызов.
+ */
+let _animSeq = 0;
+export function exerciseAnim(notes) {
+  if (!Array.isArray(notes) || !notes.length) return '';
+  const items = notes.map((n) => (typeof n === 'number' ? { midi: n, beats: 1, gap: 0 } : { midi: n.midi, beats: n.beats || 1, gap: n.gap || 0 }));
+  const mids = items.map((n) => n.midi);
+  const min = Math.min(...mids), max = Math.max(...mids);
+  const rows = Math.max(1, max - min) + 1;
+  const totalBeats = items.reduce((a, n) => a + n.beats + n.gap, 0);
+  const u = Math.max(14, Math.min(40, 520 / totalBeats)); // крупнее, чем мини-глиф
+  const rowH = 26, side = 16;
+  let x = 0, body = '', pts = [];
+  for (const n of items) {
+    const w = Math.max(8, n.beats * u - 4);
+    const y = (max - n.midi) * rowH + rowH / 2;
+    const hi = n.midi === max ? ' class="exa-hi"' : '';
+    body += `<rect${hi} x="${x.toFixed(1)}" y="${(y - side / 2).toFixed(1)}" width="${w.toFixed(1)}" height="${side}" rx="6"/>`;
+    pts.push([x + w / 2, y]); // центр ноты — точка траектории шарика
+    x += (n.beats + n.gap) * u;
+  }
+  const W = x, H = rows * rowH + 8;
+  const path = 'M ' + pts.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' L ');
+  const dur = Math.max(2.4, Math.min(6, totalBeats * 0.32)); // живой цикл
+  const id = 'exap' + (++_animSeq);
+  return `<div class="exa">
+    <svg viewBox="0 0 ${W.toFixed(0)} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Как звучит и движется распевка">
+      <path id="${id}" d="${path}" fill="none" stroke="rgba(61,229,201,.28)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      ${body}
+      <circle class="exa-ball" r="9">
+        <animateMotion dur="${dur}s" repeatCount="indefinite" rotate="auto" keyPoints="0;1" keyTimes="0;1" calcMode="linear">
+          <mpath href="#${id}"/>
+        </animateMotion>
+      </circle>
+    </svg>
+  </div>`;
+}
+
+/** Маленькая анимация артикуляции: открытый, свободный рот (челюсть не зажата). */
+export function mouthHint() {
+  return `<div class="mouth-hint" aria-hidden="true">
+    <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" class="mh-face"/>
+      <ellipse cx="32" cy="38" rx="11" ry="9" class="mh-mouth"/>
+    </svg>
+    <span>Рот открыт, челюсть свободна</span>
+  </div>`;
+}
+

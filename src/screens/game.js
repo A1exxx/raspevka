@@ -8,7 +8,7 @@ import { hzToNoteInfo, centsOff } from '../theory/note-map.js';
 import * as progress from '../state/progress.js';
 import { logEvent } from '../state/analytics.js';
 import { MODES, modeUnlocked } from '../theory/modes.js';
-import { contourGlyph } from '../ui/illustrations.js';
+import { contourGlyph, exerciseAnim, mouthHint } from '../ui/illustrations.js';
 import { celebrate, haptic } from '../ui/celebrate.js';
 
 // Открыт ли блок «продвинутых» настроек (тембр/грув/наушники) — сохраняем между перерисовками.
@@ -84,7 +84,12 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   // меняешь темп на экране объяснения/итога, и следующий проход уже с ним.
   const factor = progress.difficultyFactor();
   const exRun = { ...ex, tempo: Math.max(40, Math.round(ex.tempo * factor)) };
-  const highway = new NoteHighway(canvas, exRun, { theme: progress.getDarkStage() ? 'dark' : 'light' });
+  // Единая ритм-сетка: всё (метроном, минусовка, первая нота) в темпе упражнения.
+  // leadIn = ровно ОДИН пустой такт — человек успевает приготовиться, и первая нота
+  // распевки ложится на сильную долю (начало 2-го такта), совпадая с минусовкой.
+  const spb = 60 / exRun.tempo;     // секунд на долю
+  const barSec = spb * 4;           // 4/4 — длина такта
+  const highway = new NoteHighway(canvas, exRun, { theme: progress.getDarkStage() ? 'dark' : 'light', leadIn: barSec });
   const scorer = new Scorer(ex.notes.length);
   // Компенсация задержки — из калибровки/маршрута вывода (Bluetooth опаздывает сильнее).
   const latency = progress.getLatency();
@@ -92,6 +97,8 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
   const noBleed = progress.getHeadphones() || progress.getRouteKey() !== 'speaker';
   let grooveHandle = null;
   let raf = null, startPerf = 0, lastPerf = 0, finished = false, pausedAbort = false, lastVoicedMs = 0, lastHapticIndex = -1;
+  // Накопление времени «мимо» в одну сторону → крупная подсказка + направленная вибрация.
+  let missMs = 0, missDir = 0, lastDirVibMs = 0;
   // «Закончить на этом повторе»: длинная распевка по всему диапазону (до 25 повторов)
   // не держит в заложниках — допеваешь текущий проход и сразу итог.
   let endEarly = false;
@@ -148,44 +155,40 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     document.getElementById('skipref').addEventListener('click', onSkip);
   }
   function hideSkip() { cueEl.innerHTML = ''; }
+
+  // Пустой такт-«приготовься»: метроном кликает 4 доли В ТЕМПЕ упражнения (на одном
+  // аудио-клоке ctx.currentTime), затем вызывает cb. Так отсчёт всегда совпадает с минусовкой.
+  function metronomeBar(cb) {
+    msg.textContent = 'Приготовься…';
+    for (let i = 0; i < 4; i++) playClick(mic.ctx, i * spb, i === 0);
+    later(cb, barSec * 1000 + 50);
+  }
+
   if (repIndex === 0) {
     msg.textContent = 'Слушай тонику…';
     playChord(mic.ctx, tonic, 0, 1.4, 0.14, timbre);
     later(() => {
-      msg.textContent = 'Образец…';
-      // Образец в реальном ритме упражнения (темп прохода, паузы как в нотах).
-      const ref = playMelody(mic.ctx, exRun.notes, exRun.tempo, timbre);
-      const toCount = later(() => { hideSkip(); countIn(); }, ref.dur * 1000 + 250);
-      showSkip(() => { clearTimeout(toCount); ref.stop(); hideSkip(); countIn(); });
-    }, 1650);
+      // 1) Пустой такт перед образцом — человек успевает приготовиться.
+      metronomeBar(() => {
+        msg.textContent = 'Образец…';
+        // Образец в реальном ритме упражнения (темп прохода, паузы как в нотах).
+        const ref = playMelody(mic.ctx, exRun.notes, exRun.tempo, timbre);
+        const toRun = later(() => { hideSkip(); startRun(); }, ref.dur * 1000 + 200);
+        showSkip(() => { clearTimeout(toRun); ref.stop(); hideSkip(); startRun(); });
+      });
+    }, 1400);
   } else {
-    // Повтор выше/ниже — короткое интро: новая тоника + один клик.
+    // Повтор выше/ниже — короткая тоника, затем сразу проход (его leadIn-такт = подготовка).
     msg.textContent = (step > 0 ? '↑ выше' : '↓ ниже') + ` · повтор ${repIndex + 1}/${reps.length}`;
     playChord(mic.ctx, tonic, 0, 0.8, 0.14, timbre);
-    later(() => { playClick(mic.ctx, 0, true); later(startRun, 480); }, 950);
+    later(startRun, 950);
   }
 
-  // 2) Отсчёт
-  function countIn() {
-    let n = 3;
-    const tick = () => {
-      if (n > 0) {
-        playClick(mic.ctx);
-        msg.textContent = 'Приготовься… ' + n;
-        n -= 1;
-        later(tick, 600);
-      } else {
-        startRun();
-      }
-    };
-    tick();
-  }
-
-  // 3) Проход
+  // Проход. Первый (пустой) такт = leadIn хайвея: метроном + минусовка идут синхронно,
+  // первая нота распевки ложится на сильную долю 2-го такта — совпадает с тактом минусовки.
   function startRun() {
     const mode = progress.getGuideMode();
-    msg.textContent = mode === 'continuous' ? 'Пой за подсказкой!'
-      : mode === 'prehear' ? 'Слушай тон и повторяй!' : 'Пой!';
+    msg.textContent = 'Приготовься…';
     tracker.reset();
     startPerf = performance.now();
     lastPerf = startPerf;
@@ -207,12 +210,22 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     if (ex.drone) guideHandles.push(playDrone(mic.ctx, tonic, highway.totalTime + 0.5, 0.05));
     // Грув-подложка (ритм для драйва, поднимается на полутон вместе с тоникой повтора).
     // 'auto' → своя подложка под каждую распевку (ex.grooveStyle), иначе явный выбор.
+    // Минусовка стартует СЕЙЧАС (ctx.currentTime). Её такт 0 = пустой leadIn-такт,
+    // такт 1 = первая нота распевки → ритм минусовки совпадает с тактами распевки.
     const grooveSet = progress.getGroove();
     const grooveStyle = grooveSet === 'auto' ? (ex.grooveStyle || 'pop') : grooveSet;
     if (grooveStyle && grooveStyle !== 'off') {
-      grooveHandle = startGroove(mic.ctx, { rootMidi: tonic, tempo: exRun.tempo, dur: highway.totalTime, style: grooveStyle, gain: 0.45 });
+      grooveHandle = startGroove(mic.ctx, { rootMidi: tonic, tempo: exRun.tempo, dur: highway.totalTime, style: grooveStyle, gain: 0.45, when: 0 });
       guideHandles.push(grooveHandle);
     }
+    // Метроном на первый (пустой) такт — 4 доли в темпе, на том же аудио-клоке, что и
+    // минусовка → клики и минусовка идеально совпадают. Дальше ритм ведёт минусовка.
+    for (let i = 0; i < 4; i++) playClick(mic.ctx, i * spb, i === 0);
+    // После пустого такта — меняем подсказку на «Пой!».
+    later(() => {
+      msg.textContent = mode === 'continuous' ? 'Пой за подсказкой!'
+        : mode === 'prehear' ? 'Слушай тон и повторяй!' : 'Пой!';
+    }, barSec * 1000);
     loop();
   }
 
@@ -258,13 +271,35 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
       const color = ev.zone === 'green' ? 'var(--green)' : ev.zone === 'yellow' ? 'var(--yellow)' : 'var(--coral)';
       yoursEl.style.color = active ? color : 'var(--text)';
       livebar.style.width = Math.min(100, mic.rms() * 350) + '%';
-      // Живая подсказка «выше/ниже»
+      // Живая подсказка «выше/ниже». При СТОЙКОМ промахе в одну сторону (>0.45с) —
+      // крупная подсказка и направленная вибрация: ведём в нужную сторону.
       if (active) {
         const c = centsOff(sungHz, active.seg.hz);
-        if (Math.abs(c) <= 20) { cueEl.textContent = 'в точку'; cueEl.style.color = 'var(--green)'; }
-        else if (c < 0) { cueEl.textContent = '↑ выше'; cueEl.style.color = 'var(--amber)'; }
-        else { cueEl.textContent = '↓ ниже'; cueEl.style.color = 'var(--amber)'; }
-      } else cueEl.textContent = '';
+        const dir = c < 0 ? 1 : -1; // +1 = надо выше, -1 = надо ниже
+        if (Math.abs(c) <= 20) {
+          cueEl.textContent = 'в точку'; cueEl.style.color = 'var(--green)';
+          cueEl.classList.remove('cue-big'); missMs = 0;
+        } else if (Math.abs(c) <= 45) {
+          cueEl.textContent = dir > 0 ? '↑ выше' : '↓ ниже'; cueEl.style.color = 'var(--amber)';
+          cueEl.classList.remove('cue-big'); missMs = 0;
+        } else {
+          // сильно мимо — копим время в одну сторону
+          missMs = (missDir === dir) ? missMs + dt : 0;
+          missDir = dir;
+          if (missMs > 450) {
+            cueEl.textContent = dir > 0 ? 'ПОЙ ВЫШЕ ↑' : 'ПОЙ НИЖЕ ↓';
+            cueEl.style.color = 'var(--coral)'; cueEl.classList.add('cue-big');
+            // направленная вибрация (throttle ~1.1с): выше — два коротких, ниже — один длинный
+            if (nowMs - lastDirVibMs > 1100) {
+              haptic(dir > 0 ? [45, 60, 45] : [150]);
+              lastDirVibMs = nowMs;
+            }
+          } else {
+            cueEl.textContent = dir > 0 ? '↑ выше' : '↓ ниже'; cueEl.style.color = 'var(--amber)';
+            cueEl.classList.remove('cue-big');
+          }
+        }
+      } else { cueEl.textContent = ''; cueEl.classList.remove('cue-big'); missMs = 0; }
     } else {
       yoursEl.textContent = '—';
       yoursEl.style.color = 'var(--text-dim)';
@@ -437,14 +472,16 @@ function renderExplain(app, exercise, { onExit, onStart, onModeChange }) {
       <div class="game-top"><button class="icon-btn" id="back">‹ Меню</button></div>
       <div class="brand"><h1>${exercise.name}</h1>
         <p>Слог: <b>«${exercise.syllable}»</b></p></div>
-      <div class="card">
-        ${exercise.desc ? `<p class="blurb">${exercise.desc}</p>` : ''}
-        ${exercise.how ? `<p class="how"><b>Как делать.</b> ${exercise.how}</p>` : ''}
-        <div class="ex-glyph preview-contour" title="Форма распевки: выше плашка — выше нота, длиннее — дольше">${contourGlyph(exercise.notes)}</div>
-        <p class="how mech"><b>Как устроена игра.</b> Ноты едут к вертикальной линии слева. Пой так, чтобы твой светящийся шарик совпал с нотой по высоте: <b style="color:var(--green)">зелёный</b> — точно, <b style="color:var(--amber)">жёлтый</b> — почти, <b style="color:var(--coral)">красный</b> — мимо. Сначала прозвучит <b>аккорд тоники</b> и образец мелодии — это твоя опора, чтобы попасть. «Подсказка тоном» подыгрывает нужную ноту (без наушников — коротко перед тем, как её петь).</p>
+      <div class="card exa-card">
+        ${exerciseAnim(exercise.notes)}
+        ${exercise.how ? `<p class="exa-tip">${exercise.how}</p>` : (exercise.desc ? `<p class="exa-tip">${exercise.desc}</p>` : '')}
+        <div class="exa-row">
+          ${mouthHint()}
+          <div class="exa-legend"><span class="lg lg-g">точно</span><span class="lg lg-y">почти</span><span class="lg lg-r">мимо</span> — пой так, чтобы шарик совпал с нотой</div>
+        </div>
       </div>
       ${modeSelectBlock(exercise)}
-      ${controlsBlock()}
+      <details class="more-settings exa-more"><summary>Темп, подсказка тоном, звук</summary>${controlsBlock()}</details>
       <button class="btn btn-primary" id="go" style="width:100%">Начать</button>
     </div>
   `;
@@ -472,6 +509,7 @@ function controlsBlock() {
   const gbtn = (k, l) => `<button data-groove="${k}" class="${gr === k ? 'on' : ''}">${l}</button>`;
   const vol = progress.getVolumeKey();
   const vbtn = (k, l) => `<button data-vol="${k}" class="${vol === k ? 'on' : ''}">${l}</button>`;
+  const vibro = progress.getHaptic();
   return `
     <div class="settings inline-settings">
       <div class="seg-label">Громкость подсказки</div>
@@ -489,6 +527,7 @@ function controlsBlock() {
         <div class="seg">${gbtn('off', 'Выкл')}${gbtn('auto', 'Авто')}${gbtn('pop', 'Поп')}${gbtn('funk', 'Фанк')}${gbtn('soft', 'Мягкий')}</div>
         <div class="toggle-row">
           <button class="toggle ${hp ? 'on' : ''}" data-hptoggle="1">Наушники: ${hp ? 'да' : 'нет'}</button>
+          <button class="toggle ${vibro ? 'on' : ''}" data-vibrotoggle="1">Вибрация: ${vibro ? 'вкл' : 'выкл'}</button>
         </div>
       </details>
     </div>
@@ -518,6 +557,12 @@ function wireControls(root, rerender, micEngine) {
   if (g) g.addEventListener('click', () => { progress.setGuide(!progress.getGuide()); rerender(); });
   const h = root.querySelector('[data-hptoggle]');
   if (h) h.addEventListener('click', () => { progress.setHeadphones(!progress.getHeadphones()); rerender(); });
+  const vb = root.querySelector('[data-vibrotoggle]');
+  if (vb) vb.addEventListener('click', () => {
+    const on = !progress.getHaptic(); progress.setHaptic(on);
+    if (on) haptic(40); // короткий «дзынь» при включении — подтверждение
+    rerender();
+  });
   // Запоминаем, открыт ли блок продвинутых настроек, чтобы перерисовка его не схлопывала.
   const more = root.querySelector('.more-settings');
   if (more) more.addEventListener('toggle', () => { moreSettingsOpen = more.open; });

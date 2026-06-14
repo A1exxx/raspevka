@@ -30,7 +30,9 @@ export function celebrate(level = 1) {
   setTimeout(() => wrap.remove(), 2600);
 }
 
-/** Короткая вибрация при попадании/успехе (молча игнорируется, где не поддерживается). */
-export function haptic(ms = 12) {
-  try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* ok */ }
+/** Короткая вибрация при попадании/успехе. Уважает тумблер вибро в настройках;
+ *  молча игнорируется, где не поддерживается. Принимает число (мс) или паттерн [вкл,выкл,…]. */
+import { getHaptic } from '../state/progress.js';
+export function haptic(pattern = 12) {
+  try { if (getHaptic() && navigator.vibrate) navigator.vibrate(pattern); } catch (e) { /* ok */ }
 }

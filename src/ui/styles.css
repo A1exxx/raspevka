@@ -335,7 +335,36 @@ canvas.trace { height: 300px; }
 .diagram-note b { color: var(--text); }
 
 /* ============ Живая подсказка + разбор + инлайн-настройки ============ */
-.cue { text-align: center; font-weight: 800; font-size: 17px; min-height: 1.3em; letter-spacing: .02em; transition: color .12s; }
+.cue { text-align: center; font-weight: 800; font-size: 17px; min-height: 1.3em; letter-spacing: .02em; transition: color .12s, font-size .15s, transform .15s; }
+/* Крупная подсказка-направление при стойком промахе — ведёт в нужную сторону */
+.cue.cue-big { font-size: 30px; letter-spacing: .04em; transform: scale(1.04); animation: cuePulse .9s ease-in-out infinite; }
+@keyframes cuePulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { .cue.cue-big { animation: none; } }
+
+/* ===== Анимированное объяснение упражнения ===== */
+.exa-card { display: flex; flex-direction: column; gap: 14px; }
+.exa { width: 100%; background: radial-gradient(120% 100% at 50% 0%, rgba(45,212,191,.08), transparent 70%);
+  border: 1px solid var(--line); border-radius: 16px; padding: 14px 12px; }
+.exa svg { width: 100%; height: auto; max-height: 200px; display: block; }
+.exa rect { fill: rgba(61,229,201,.30); }
+.exa rect.exa-hi { fill: rgba(61,229,201,.55); }
+.exa-ball { fill: var(--green); filter: drop-shadow(0 0 8px rgba(62,230,168,.9)); }
+.exa-tip { font-size: 15px; color: var(--text-dim); text-align: center; margin: 0; }
+.exa-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.exa-legend { flex: 1; min-width: 180px; font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+.exa-legend .lg { font-weight: 700; margin-right: 8px; }
+.lg-g { color: var(--green); } .lg-y { color: var(--amber); } .lg-r { color: var(--coral); }
+.mouth-hint { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-dim); }
+.mouth-hint svg { width: 46px; height: 46px; flex: 0 0 46px; }
+.mh-face { fill: none; stroke: var(--line2); stroke-width: 2.5; }
+.mh-mouth { fill: rgba(45,212,191,.25); stroke: var(--accent-2, #3de5c9); stroke-width: 2;
+  transform-origin: 32px 38px; animation: mhOpen 2.4s ease-in-out infinite; }
+@keyframes mhOpen { 0%,100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+.exa-more { width: 100%; }
+.exa-more > summary { font-size: 14px; color: var(--text-dim); cursor: pointer; padding: 6px 0; }
+@media (prefers-reduced-motion: reduce) {
+  .exa-ball animateMotion { display: none; } .mh-mouth { animation: none; transform: scaleY(.7); }
+}
 .inline-settings { width: 100%; }
 .tip-card { text-align: left; width: 100%; }
 .tip-card .how { margin-top: 0; }
