@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Распевка × Прояви — финансовая модель</title>
+<style>
+  :root{
+    --bg:#f4f7f9; --paper:#ffffff; --ink:#10242b; --dim:#4a5d68; --dim2:#7c8e98;
+    --line:#e2eaee; --line2:#cdd9df;
+    --teal:#0e8d7f; --teal-d:#0a6c61; --teal-bg:#e8f5f2;
+    --green:#0f9d6a; --green-bg:#e6f6ee;
+    --gold:#b8801f; --gold-bg:#fbf3e2;
+    --red:#c0492f; --red-bg:#fbece8;
+    --shadow:0 1px 2px rgba(16,36,43,.05), 0 6px 22px rgba(16,36,43,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);line-height:1.55;
+    font-family:'Inter','Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1;}
+  .num{font-variant-numeric:tabular-nums}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 22px}
+  a{color:var(--teal-d)}
+
+  header{background:linear-gradient(135deg,#0e8d7f 0%,#0a6c61 100%);color:#fff;padding:50px 0 40px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.16em;
+    text-transform:uppercase;color:#bdf0e6;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+    padding:7px 14px;border-radius:999px;margin-bottom:18px}
+  header h1{font-size:36px;line-height:1.08;letter-spacing:-.02em;font-weight:800;margin-bottom:11px}
+  header .lead{font-size:16.5px;color:#dbf2ec;max-width:820px}
+  .deal{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+  .deal .chip{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:10px 15px;font-size:13px}
+  .deal .chip b{display:block;font-size:18px;font-weight:800;margin-top:2px}
+  .anchor{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+  .anchor a{font-size:12.5px;font-weight:700;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);
+    color:#fff;padding:6px 12px;border-radius:9px;text-decoration:none}
+  .anchor a:hover{background:rgba(255,255,255,.24)}
+
+  section{padding:34px 0}
+  section + section{border-top:1px solid var(--line)}
+  .kick{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);margin-bottom:8px}
+  h2{font-size:24px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px}
+  .sub{color:var(--dim);font-size:15px;margin-bottom:20px;max-width:850px}
+
+  /* how-to */
+  .howto{background:var(--teal-bg);border:1px solid #bfe5dd;border-radius:14px;padding:15px 18px;margin-bottom:20px;font-size:14.5px;color:var(--teal-d)}
+  .howto b{color:var(--ink)}
+
+  /* scenario + currency toolbar */
+  .toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:0 0 16px}
+  .seg{display:inline-flex;border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+  .seg button{border:none;background:var(--paper);padding:9px 15px;font-weight:700;font-size:13.5px;cursor:pointer;color:var(--dim)}
+  .seg button.active{background:var(--teal);color:#fff}
+  .seg.bear button.active{background:var(--red)} .seg.bull button.active{background:var(--green)}
+  .btn{border:1px solid var(--line2);background:var(--paper);color:var(--ink);font-weight:700;font-size:13.5px;padding:9px 14px;border-radius:10px;cursor:pointer;transition:.15s}
+  .btn:hover{border-color:var(--teal);color:var(--teal-d)}
+  .tlabel{font-size:13px;color:var(--dim2);font-weight:700}
+
+  /* assumptions */
+  .assum{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .agroup{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:var(--shadow)}
+  .agroup .gh{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--teal);margin-bottom:13px;display:flex;align-items:center;gap:7px}
+  .fld{margin-bottom:11px}
+  .fld:last-child{margin-bottom:0}
+  .fld label{display:block;font-size:12.5px;color:var(--dim);margin-bottom:4px}
+  .fld .inrow{display:flex;align-items:center;gap:7px}
+  .fld input[type=number]{width:100%;padding:8px 10px;border:1px solid var(--line2);border-radius:9px;font-size:14.5px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;background:#fbfdfe}
+  .fld input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(14,141,127,.13)}
+  .fld .unit{font-size:12.5px;color:var(--dim2);font-weight:700;white-space:nowrap}
+  .fld.warn input{border-color:#e6c66a;background:var(--gold-bg)}
+  details.adv{margin-top:14px;border:1px dashed var(--line2);border-radius:12px;padding:0 16px;background:#fbfdfe}
+  details.adv[open]{padding-bottom:8px}
+  details.adv summary{cursor:pointer;font-weight:800;font-size:13.5px;color:var(--teal-d);padding:13px 0;list-style:none}
+  details.adv summary::-webkit-details-marker{display:none}
+  details.adv summary:before{content:"▸ ";color:var(--teal)}
+  details.adv[open] summary:before{content:"▾ "}
+  .advgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:6px 0 4px}
+
+  /* sliders */
+  .liveband{background:var(--teal-bg);border:1px solid #bfe5dd;border-radius:14px;padding:14px 18px;margin:18px 0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .sl{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .sl label{font-weight:800;font-size:13.5px;white-space:nowrap}
+  .sl input[type=range]{flex:1;min-width:120px;accent-color:var(--teal)}
+  .sl .val{font-weight:800;font-size:16px;color:var(--teal-d);min-width:78px;text-align:right;font-variant-numeric:tabular-nums}
+
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+  .kpi{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:16px 17px;box-shadow:var(--shadow)}
+  .kpi .k{font-size:12px;color:var(--dim);font-weight:600;margin-bottom:6px}
+  .kpi .v{font-size:23px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  .kpi .v2{font-size:12.5px;color:var(--dim2);font-weight:700;margin-top:4px}
+  .kpi.hero{background:linear-gradient(135deg,#0e8d7f,#0a6c61);color:#fff;border:none}
+  .kpi.hero .k{color:#bdf0e6} .kpi.hero .v2{color:#cdeee8}
+  .kpi.profit .v{color:var(--green)} .kpi.neg .v{color:var(--red)}
+
+  .verdict{background:#0f2027;color:#eaf6f3;border-radius:16px;padding:20px 22px;margin-top:16px;font-size:16px;line-height:1.6}
+  .verdict b{color:#5fe3cd} .verdict .big{color:#fff;font-weight:800}
+
+  /* tables */
+  .tbl-wrap{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px}
+  th,td{padding:11px 13px;text-align:right;font-variant-numeric:tabular-nums;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left;font-variant-numeric:normal}
+  thead th{background:#f0f5f7;font-size:11.5px;font-weight:800;letter-spacing:.02em;color:var(--dim);text-transform:uppercase;border-bottom:2px solid var(--line2)}
+  tbody tr:hover{background:#f7fbfc}
+  tbody tr:last-child td{border-bottom:none}
+  td.pos{color:var(--green);font-weight:800} td.negv{color:var(--red);font-weight:800} td.hl{font-weight:800;color:var(--teal-d)}
+  tr.peak td{background:var(--green-bg)}
+  .colname b{display:block} .colname span{font-size:11.5px;color:var(--dim2);font-weight:600}
+
+  /* unit + sensitivity */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .flow{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:6px 4px;box-shadow:var(--shadow)}
+  .flow .fh{font-size:13px;font-weight:800;color:var(--teal-d);padding:12px 18px 4px}
+  .flow .row{display:flex;justify-content:space-between;align-items:center;padding:9px 18px;border-bottom:1px solid var(--line);font-size:14px}
+  .flow .row:last-child{border-bottom:none}
+  .flow .row .lab{color:var(--dim)} .flow .row .am{font-weight:800;font-variant-numeric:tabular-nums}
+  .flow .row.tot{background:var(--green-bg);font-weight:800} .flow .row.tot .lab{color:var(--ink)}
+  .flow .row .am.minus{color:var(--red)}
+  .metr{display:flex;justify-content:space-between;padding:9px 18px;border-bottom:1px solid var(--line);font-size:14px}
+  .metr:last-child{border-bottom:none}.metr .lab{color:var(--dim)}.metr b{font-variant-numeric:tabular-nums}
+  .badge2{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px;margin-left:7px}
+  .badge2.ok{background:var(--green-bg);color:var(--green)} .badge2.bad{background:var(--red-bg);color:var(--red)}
+
+  .torn{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
+  .torn .trow{display:grid;grid-template-columns:160px 1fr 92px;align-items:center;gap:10px;margin-bottom:9px;font-size:13.5px}
+  .torn .tname{color:var(--dim);font-weight:600;text-align:right}
+  .torn .tbar{height:18px;border-radius:5px;background:var(--teal);opacity:.85}
+  .torn .tval{font-weight:800;font-variant-numeric:tabular-nums;color:var(--teal-d)}
+
+  /* chart */
+  .chart{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);margin-top:8px}
+  .chart svg{width:100%;height:auto;display:block}
+  .lgnd{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--dim);margin-top:10px}
+  .lgnd i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+
+  .note{border-left:4px solid var(--gold);background:var(--gold-bg);border-radius:0 12px 12px 0;padding:14px 18px;margin-top:14px}
+  .note.teal{border-color:var(--teal);background:var(--teal-bg)}
+  .note .t{font-weight:800;margin-bottom:5px;font-size:14px}
+  .note p{font-size:13.5px;color:var(--dim);margin:4px 0}
+  .src{font-size:12.5px;color:var(--dim);margin-top:12px;line-height:1.9}
+  .src a{color:var(--teal-d);text-decoration:none;border-bottom:1px solid #bfe5dd}
+  ul.clean{list-style:none;margin:8px 0 0}
+  ul.clean li{padding:6px 0 6px 24px;position:relative;font-size:14px;color:var(--dim);border-bottom:1px dashed var(--line)}
+  ul.clean li:before{content:"›";position:absolute;left:6px;color:var(--teal);font-weight:800}
+  ul.clean li b{color:var(--ink)}
+  footer{padding:30px 0 56px;color:var(--dim2);font-size:12.5px;border-top:1px solid var(--line)}
+
+  /* health strip */
+  .hstrip{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .light{flex:1;min-width:150px;background:var(--paper);border:1px solid var(--line);border-left-width:4px;border-radius:12px;padding:11px 14px;box-shadow:var(--shadow)}
+  .light .lt{font-size:12px;color:var(--dim);font-weight:600}
+  .light .lv{font-size:17px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}
+  .light.g{border-left-color:var(--green)} .light.y{border-left-color:var(--gold)} .light.r{border-left-color:var(--red)}
+  .light.g .lv{color:var(--green)} .light.y .lv{color:var(--gold)} .light.r .lv{color:var(--red)}
+  /* ROI */
+  .roi{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+  .roicard{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:17px;box-shadow:var(--shadow)}
+  .roicard.dark{background:#0f2027;color:#eaf6f3;border:none}
+  .roicard .rk{font-size:12px;color:var(--dim);font-weight:600;margin-bottom:6px}
+  .roicard.dark .rk{color:#9fc7c0}
+  .roicard .rv{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  .roicard.dark .rv{color:#fff} .roicard .rv .ac{color:#0f9d6a} .roicard.dark .rv .ac{color:#5fe3cd}
+  .roicard .rs{font-size:12.5px;color:var(--dim2);font-weight:700;margin-top:4px}
+  .roicard.dark .rs{color:#9fc7c0}
+  /* glossary */
+  .gloss{columns:2;column-gap:26px;font-size:13.5px;margin-top:6px}
+  .gloss div{break-inside:avoid;padding:7px 0;border-bottom:1px dashed var(--line);color:var(--dim)}
+  .gloss b{color:var(--ink)}
+  /* info tooltips */
+  .info{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;
+    border:1.3px solid currentColor;font-size:10px;font-weight:800;font-style:italic;line-height:1;opacity:.5;
+    cursor:help;margin-left:5px;vertical-align:middle;user-select:none;font-family:Georgia,'Times New Roman',serif}
+  .info:hover{opacity:1}
+  .tip{position:absolute;z-index:60;max-width:320px;background:#0f2027;color:#eaf6f3;border-radius:12px;
+    padding:13px 15px;font-size:13px;line-height:1.5;box-shadow:0 10px 34px rgba(0,0,0,.3);pointer-events:none}
+  .tip b{display:block;color:#5fe3cd;font-size:13.5px;margin-bottom:5px}
+  @media (max-width:980px){ .assum,.advgrid{grid-template-columns:repeat(2,1fr)} .kpis{grid-template-columns:repeat(2,1fr)} .two{grid-template-columns:1fr} .liveband{grid-template-columns:1fr} .roi{grid-template-columns:1fr 1fr} }
+  @media (max-width:560px){ .roi{grid-template-columns:1fr 1fr} .gloss{columns:1} }
+  @media (max-width:560px){ header h1{font-size:27px} .assum,.advgrid,.kpis{grid-template-columns:1fr} h2{font-size:20px} .torn .trow{grid-template-columns:120px 1fr 78px} }
+  @media print{ body{background:#fff} header{background:#0a6c61!important} .toolbar,.liveband,.anchor,details.adv summary{display:none} details.adv{padding-top:8px} details.adv[open] summary{display:block} section{padding:16px 0;break-inside:avoid} *{-webkit-print-color-adjust:exact;print-color-adjust:exact} .tbl-wrap,.kpi,.agroup,.flow,.chart,.torn{box-shadow:none} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">● Финансовая модель · обновлено 19 июня 2026</div>
+    <h1>Финансовая модель «Распевка × Прояви»</h1>
+    <p class="lead">Полноценный калькулятор для двух потоков выручки — живая школа музыки и подписочное приложение. Меняйте любую переменную (чек, отток, расходы, рост, налоги, условия сделки) — все KPI, таблицы и срок возврата инвестиций пересчитываются вживую. Суммы в рублях <b>и</b> батах. Курс ЦБ РФ 17.06.2026: 1&nbsp;฿&nbsp;=&nbsp;2,21&nbsp;₽.</p>
+    <div class="deal">
+      <div class="chip">Инвестиции<b>2 000 000 ₽</b></div>
+      <div class="chip">Инвестору до возврата<b>40% прибыли</b></div>
+      <div class="chip">После возврата<b>20% бессрочно</b></div>
+      <div class="chip">Два потока<b>школа + приложение</b></div>
+    </div>
+    <div class="anchor">
+      <a href="#calc">▶ Калькулятор</a>
+      <a href="#verdict">Итог словами</a>
+      <a href="#unit">Юнит-экономика · LTV/CAC</a>
+      <a href="#sens">Что влияет сильнее всего</a>
+      <a href="#scen">Сценарии по ученикам</a>
+      <a href="#payback">Окупаемость по месяцам</a>
+      <a href="#roi">Доход инвестора · ROI</a>
+      <a href="#compare">Сравнение сценариев</a>
+      <a href="#staff">Штат</a>
+    </div>
+  </div>
+</header>
+
+<!-- КАЛЬКУЛЯТОР -->
+<section id="calc">
+  <div class="wrap">
+    <div class="kick">Рабочий калькулятор</div>
+    <h2>Допущения — крутите любые цифры</h2>
+    <div class="howto">
+      <b>Как читать:</b> зелёным переключателем выберите режим сценария — <b>Осторожный / Базовый / Оптимистичный</b> (он согласованно меняет рост и отток в прогнозе окупаемости). Ниже — все рычаги модели по группам; редкие спрятаны в «продвинутые допущения». Двигайте ползунки «учеников» и «подписчиков», чтобы увидеть прибыль здесь и сейчас. Жёлтым подсвечены поля, где рынок отличается от заложенного.
+    </div>
+
+    <div class="toolbar">
+      <span class="tlabel">Сценарий:</span>
+      <span class="seg" id="scenseg">
+        <button data-s="bear">🐻 Осторожный</button>
+        <button data-s="base" class="active">⚖️ Базовый</button>
+        <button data-s="bull">🚀 Оптимистичный</button>
+      </span>
+      <span class="tlabel" style="margin-left:auto">Валюта таблиц:</span>
+      <span class="seg" id="curseg">
+        <button data-cur="rub" class="active">₽ рубли</button>
+        <button data-cur="thb">฿ баты</button>
+      </span>
+      <button class="btn" id="reset">↺ Сбросить</button>
+    </div>
+
+    <div class="assum">
+      <div class="agroup">
+        <div class="gh">🎓 Школа музыки</div>
+        <div class="fld"><label>Средний чек (₽ / ученик / мес)</label><div class="inrow"><input type="number" id="cheque" value="12000" step="500"></div></div>
+        <div class="fld warn"><label title="Рынок онлайн-школ 40–50%">Доля педагога от выручки</label><div class="inrow"><input type="number" id="teacherPct" value="30" step="5"><span class="unit">%</span></div></div>
+        <div class="fld"><label>Отток учеников / мес <span class="info" data-k="churn">i</span></label><div class="inrow"><input type="number" id="churnSchool" value="12" step="1"><span class="unit">%</span></div></div>
+        <div class="fld"><label>Учеников на 1 педагога</label><div class="inrow"><input type="number" id="perTeacher" value="18" step="1"></div></div>
+      </div>
+      <div class="agroup">
+        <div class="gh">📱 Приложение</div>
+        <div class="fld"><label>ARPU (₽ / подписчик / мес) <span class="info" data-k="arpu">i</span></label><div class="inrow"><input type="number" id="arpu" value="420" step="10"></div></div>
+        <div class="fld"><label>Отток подписчиков / мес <span class="info" data-k="churn">i</span></label><div class="inrow"><input type="number" id="churnApp" value="8" step="1"><span class="unit">%</span></div></div>
+        <div class="fld"><label>Инфраструктура / сервер (₽ / мес)</label><div class="inrow"><input type="number" id="server" value="10000" step="1000"></div></div>
+        <div class="fld"><label>CAC — привлечение (₽ / клиент) <span class="info" data-k="cac">i</span></label><div class="inrow"><input type="number" id="cac" value="3000" step="500"></div></div>
+      </div>
+      <div class="agroup">
+        <div class="gh">💸 Расходы / мес</div>
+        <div class="fld"><label>Маркетинг (устойчивый)</label><div class="inrow"><input type="number" id="mktSteady" value="130000" step="10000"></div></div>
+        <div class="fld"><label>SMM / контент-завод</label><div class="inrow"><input type="number" id="smm" value="60000" step="5000"></div></div>
+        <div class="fld"><label>Отдел продаж (МОП)</label><div class="inrow"><input type="number" id="sales" value="60000" step="5000"></div></div>
+        <div class="fld"><label title="Продакт, саппорт, админ школы">Команда / админ</label><div class="inrow"><input type="number" id="team" value="80000" step="10000"></div></div>
+      </div>
+    </div>
+
+    <details class="adv" id="advBox">
+      <summary>Продвинутые допущения — ещё расходы, налоги, рост, условия сделки</summary>
+      <div class="advgrid">
+        <div class="agroup" style="box-shadow:none;border:none;padding:8px 0">
+          <div class="gh">🧾 Ещё расходы и налоги</div>
+          <div class="fld"><label>Софт / сервисы (CRM, видео)</label><div class="inrow"><input type="number" id="tools" value="15000" step="1000"></div></div>
+          <div class="fld"><label>Бухгалтерия / юр</label><div class="inrow"><input type="number" id="accounting" value="15000" step="1000"></div></div>
+          <div class="fld"><label>Прочие расходы</label><div class="inrow"><input type="number" id="misc" value="20000" step="5000"></div></div>
+          <div class="fld"><label title="УСН «доходы» = 6% от оборота">Налог (% от выручки)</label><div class="inrow"><input type="number" id="taxPct" value="6" step="1"><span class="unit">%</span></div></div>
+          <div class="fld"><label>Эквайринг (приём оплат)</label><div class="inrow"><input type="number" id="acq" value="3" step="0.5"><span class="unit">%</span></div></div>
+          <div class="fld"><label>Резерв на возвраты</label><div class="inrow"><input type="number" id="refund" value="2" step="1"><span class="unit">%</span></div></div>
+        </div>
+        <div class="agroup" style="box-shadow:none;border:none;padding:8px 0">
+          <div class="gh">📈 Рост (прогноз окупаемости)</div>
+          <div class="fld"><label>Учеников на старте</label><div class="inrow"><input type="number" id="gStuStart" value="6" step="1"></div></div>
+          <div class="fld"><label>+ новых учеников / мес</label><div class="inrow"><input type="number" id="gStuAdd" value="10" step="1"></div></div>
+          <div class="fld"><label>Подписчиков на старте</label><div class="inrow"><input type="number" id="gSubStart" value="40" step="10"></div></div>
+          <div class="fld"><label>+ новых подписчиков / мес</label><div class="inrow"><input type="number" id="gSubAdd" value="150" step="10"></div></div>
+          <div class="fld"><label>Разгонный маркетинг (₽ / мес)</label><div class="inrow"><input type="number" id="mktBoost" value="300000" step="25000"></div></div>
+          <div class="fld"><label>Месяцев разгона</label><div class="inrow"><input type="number" id="boostMonths" value="3" step="1"></div></div>
+        </div>
+        <div class="agroup" style="box-shadow:none;border:none;padding:8px 0">
+          <div class="gh">🤝 Сделка и курс</div>
+          <div class="fld"><label>Инвестиции (₽)</label><div class="inrow"><input type="number" id="inv" value="2000000" step="100000"></div></div>
+          <div class="fld"><label>Доля инвестора до возврата</label><div class="inrow"><input type="number" id="invShare" value="40" step="5"><span class="unit">%</span></div></div>
+          <div class="fld"><label>Доля инвестора после возврата</label><div class="inrow"><input type="number" id="invShareAfter" value="20" step="5"><span class="unit">%</span></div></div>
+          <div class="fld"><label title="Бат за 1 рубль">Курс — ฿ за 1 ₽</label><div class="inrow"><input type="number" id="rate" value="0.45" step="0.01"></div></div>
+          <div class="fld"><label>Горизонт прогноза (мес)</label><div class="inrow"><input type="number" id="horizon" value="24" step="6"></div></div>
+        </div>
+      </div>
+    </details>
+
+    <div class="liveband">
+      <div class="sl"><label>👥 Учеников:</label><input type="range" id="stuRange" min="0" max="600" value="150" step="10"><span class="val" id="stuVal">150</span></div>
+      <div class="sl"><label>📱 Подписчиков:</label><input type="range" id="subRange" min="0" max="6000" value="500" step="100"><span class="val" id="subVal">500</span></div>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+    <div class="hstrip" id="health"></div>
+    <p class="sub" id="realism" style="margin:14px 0 0"></p>
+  </div>
+</section>
+
+<!-- ВЕРДИКТ -->
+<section id="verdict">
+  <div class="wrap">
+    <div class="kick">Итог простыми словами</div>
+    <h2>Что это значит для инвестора</h2>
+    <div class="verdict" id="verdictBox"></div>
+  </div>
+</section>
+
+<!-- ЮНИТ + МЕТРИКИ -->
+<section id="unit">
+  <div class="wrap">
+    <div class="kick">Экономика одного клиента</div>
+    <h2>Юнит-экономика и ключевые метрики</h2>
+    <p class="sub">Сколько приносит один ученик и один подписчик, и главные показатели, которые инвестор смотрит первыми: LTV (сколько клиент принесёт за всю жизнь), CAC (сколько стоит его привести), их отношение и срок окупаемости привлечения.</p>
+    <div class="two">
+      <div class="flow" id="unitFlow"></div>
+      <div class="flow" id="metrics"></div>
+    </div>
+    <div class="note teal">
+      <div class="t">💡 Как читать LTV/CAC</div>
+      <p>LTV/CAC показывает, во сколько раз клиент приносит больше, чем стоит его привлечение. <b>Норма инвестора — от 3:1</b>. Окупаемость CAC — за сколько месяцев привлечение возвращается; цель — меньше 12 месяцев.</p>
+    </div>
+    <div class="note">
+      <div class="t">⚠️ Честные оговорки</div>
+      <p><b>Доля педагога 30%</b> — план при своих педагогах; рынок 40–50%. Поставьте 45% — увидите модель по рынку. <b>Налог 6%</b> — УСН «доходы» (РФ); при работе из Таиланда режим иной — уточняется. Все суммы — прогноз на реальных бенчмарках, не гарантия.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ЧУВСТВИТЕЛЬНОСТЬ -->
+<section id="sens">
+  <div class="wrap">
+    <div class="kick">Чувствительность</div>
+    <h2>Что сильнее всего влияет на прибыль</h2>
+    <p class="sub">Каждый рычаг улучшен на 10% — насколько от этого вырастет (или упадёт) чистая прибыль в месяц. Сразу видно, на чём концентрироваться: верхние строки двигают прибыль больше всех.</p>
+    <div class="torn" id="tornado"></div>
+  </div>
+</section>
+
+<!-- СЦЕНАРИИ -->
+<section id="scen">
+  <div class="wrap">
+    <div class="kick">Главная таблица</div>
+    <h2>Чистая прибыль при разном числе учеников</h2>
+    <p class="sub">Только школа (приложение — сверху, см. следующую таблицу). После всех расходов и налога. Видно, как растёт прибыль компании и доля инвестора.</p>
+    <div class="tbl-wrap"><table id="t1"></table></div>
+    <p class="src">Доля инвестора начисляется с положительной чистой прибыли. Педагогов = ученики ÷ «учеников на педагога» (вверх).</p>
+  </div>
+</section>
+
+<!-- КОМБО -->
+<section>
+  <div class="wrap">
+    <div class="kick">Полная картина</div>
+    <h2>Школа + приложение: стадии развития</h2>
+    <p class="sub">Два потока вместе. Приложение почти без переменных расходов — каждый подписчик идёт почти целиком в прибыль и ускоряет возврат вложений.</p>
+    <div class="tbl-wrap"><table id="t2"></table></div>
+  </div>
+</section>
+
+<!-- ОКУПАЕМОСТЬ -->
+<section id="payback">
+  <div class="wrap">
+    <div class="kick">Когда вернутся деньги</div>
+    <h2>Окупаемость инвестора по месяцам</h2>
+    <p class="sub">Прогноз строится из параметров роста (раздел «продвинутые → Рост») и выбранного сценария. Первые месяцы — разгонный маркетинг и работа в минус (финансируется из вложений); затем выход в плюс, и инвестор получает свою долю прибыли, пока накопленные выплаты не вернут все вложения.</p>
+    <div class="chart" id="chartBox"></div>
+    <div class="tbl-wrap" style="margin-top:14px"><table id="t3"></table></div>
+    <div class="note teal"><div class="t" id="pbTitle"></div><p id="pbText"></p></div>
+  </div>
+</section>
+
+<!-- ДОХОД ИНВЕСТОРА -->
+<section id="roi">
+  <div class="wrap">
+    <div class="kick">Главный ответ инвестору</div>
+    <h2>Доход инвестора и запас прочности</h2>
+    <p class="sub">Сколько инвестор получит за горизонт прогноза, какая это доходность на вложенные деньги, и хватает ли вложений на разгон — когда компания сама выходит в плюс.</p>
+    <div class="roi" id="roiCards"></div>
+    <div class="note teal" id="runwayNote" style="margin-top:14px"></div>
+  </div>
+</section>
+
+<!-- СРАВНЕНИЕ СЦЕНАРИЕВ -->
+<section id="compare">
+  <div class="wrap">
+    <div class="kick">Диапазон исходов</div>
+    <h2>Сравнение трёх сценариев</h2>
+    <p class="sub">Честный разброс: как меняются ключевые итоги в осторожном, базовом и оптимистичном сценариях. Инвестор сразу видит и риск, и потенциал — это сильнее одной «средней» цифры.</p>
+    <div class="tbl-wrap"><table id="tc"></table></div>
+  </div>
+</section>
+
+<!-- ШТАТ -->
+<section id="staff">
+  <div class="wrap">
+    <div class="kick">Команда</div>
+    <h2>Сколько нужно педагогов</h2>
+    <p class="sub">Один онлайн-педагог комфортно ведёт ~18 учеников (≈20 уроков/нед). Старт — Игорь на полной загрузке; дальше нанимаем по мере роста. Оплата педагога — процент от уроков, поэтому расход растёт строго вместе с выручкой.</p>
+    <div class="tbl-wrap"><table id="t4"></table></div>
+  </div>
+</section>
+
+<!-- ИСТОЧНИКИ -->
+<section>
+  <div class="wrap">
+    <div class="kick">На чём построена модель</div>
+    <h2>Реальные данные, бенчмарки и оговорки</h2>
+    <ul class="clean">
+      <li><b>Курс:</b> 1 ฿ = 2,21 ₽ (1 ₽ ≈ 0,45 ฿) — ЦБ РФ 17.06.2026, редактируется.</li>
+      <li><b>Чек школы:</b> абонемент 4 урока ≈ 10–12 тыс ₽, 8 уроков ≈ 18–22 тыс ₽ (Москва). Средний 12 000 ₽ — консервативный blended.</li>
+      <li><b>Педагог:</b> рынок 40–50%; в модели 30% (план), редактируется.</li>
+      <li><b>Отток:</b> вокал-хобби 10–15%/мес (школа), подписочные приложения ~8–9%/мес — отраслевые бенчмарки.</li>
+      <li><b>Привлечение:</b> CAC школы 1 800–5 000 ₽; цель LTV/CAC от 3:1, окупаемость CAC &lt;12 мес.</li>
+      <li><b>Приложение:</b> подписка 690 ₽/мес или 3 990 ₽/год, blended ARPU ≈ 420 ₽/мес; trial→paid 27–46%, доля годовых 59–66% (RevenueCat 2026).</li>
+      <li><b>Налоги/комиссии:</b> УСН «доходы» 6% от оборота; эквайринг ЮKassa/CloudPayments ≈ 3%; веб-оплата вместо сторов экономит 15–30% комиссии.</li>
+      <li><b>Метрики:</b> gross margin маркетплейса с долей педагога 40–55%, приложения 70–85%; break-even = постоянные расходы ÷ маржа покрытия.</li>
+    </ul>
+    <div class="src">
+      Источники: <a href="https://www.cbr.ru/currency_base/daily/" target="_blank">ЦБ РФ</a> ·
+      <a href="https://profi.ru/repetitor/vokal/price/" target="_blank">Profi.ru</a> ·
+      <a href="https://artvocal.ru/price.php" target="_blank">Artvocal</a> ·
+      <a href="https://voca-beat.ru/pricelist/" target="_blank">Voca-Beat</a> ·
+      <a href="https://www.revenuecat.com/state-of-subscription-apps-2026-education/" target="_blank">RevenueCat 2026 (Education)</a> ·
+      <a href="https://financialmodelslab.com/blogs/kpi-metrics/online-tutoring" target="_blank">Online Tutoring KPIs</a> ·
+      <a href="https://www.feinternational.com/blog/edtech-business-valuation" target="_blank">FE International — EdTech</a> ·
+      <a href="https://businessmens.ru/article/kak-otkryt-shkolu-vokala" target="_blank">Финмодель школы вокала</a>.
+      <br>Модель — прогноз, а не гарантия: фактические показатели зависят от конверсии трафика, удержания и набора. Опорные цены, курс и комиссии — реальные, с источниками; величины «оценка/бенчмарк» — отраслевые ориентиры.
+    </div>
+    <div style="margin-top:24px">
+      <div class="kick">Словарь — простыми словами</div>
+      <div class="gloss">
+        <div><b>Выручка (MRR)</b> — сколько денег приходит за месяц. ARR — то же за год.</div>
+        <div><b>Чистая прибыль</b> — что осталось после всех расходов и налога.</div>
+        <div><b>Маржа</b> — какая доля выручки превращается в прибыль.</div>
+        <div><b>Отток (churn)</b> — сколько клиентов уходит за месяц.</div>
+        <div><b>CAC</b> — сколько стоит привести одного платящего клиента.</div>
+        <div><b>LTV</b> — сколько денег клиент принесёт за всё время, пока он с нами.</div>
+        <div><b>LTV / CAC</b> — во сколько раз клиент приносит больше, чем стоило его привлечь (норма — от 3).</div>
+        <div><b>Точка безубыточности</b> — сколько учеников нужно, чтобы выйти в ноль.</div>
+        <div><b>Окупаемость вложений</b> — за сколько месяцев инвестор вернёт вложенное.</div>
+        <div><b>Доходность (ROI)</b> — на сколько % вырастут вложенные деньги; ×N — во столько раз больше вернётся.</div>
+        <div><b>Подушка / runway</b> — хватает ли вложений на месяцы работы в минус до выхода в плюс.</div>
+        <div><b>Сценарии</b> — осторожный / базовый / оптимистичный варианты развития (разный рост и отток).</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Финансовая модель проекта «Распевка × Прояви». Документ интерактивный — меняйте допущения, всё пересчитывается. Для печати/отправки: «Печать → Сохранить как PDF».</div>
+</footer>
+
+<script>
+/* ---------- состояние ---------- */
+const DEF = { cheque:12000, teacherPct:30, churnSchool:12, perTeacher:18,
+  arpu:420, churnApp:8, server:10000, cac:3000,
+  mktSteady:130000, smm:60000, sales:60000, team:80000,
+  tools:15000, accounting:15000, misc:20000, taxPct:6, acq:3, refund:2,
+  gStuStart:6, gStuAdd:10, gSubStart:40, gSubAdd:150, mktBoost:300000, boostMonths:3,
+  inv:2000000, invShare:40, invShareAfter:20, rate:0.45, horizon:24,
+  students:150, subs:500 };
+const IDS = ['cheque','teacherPct','churnSchool','perTeacher','arpu','churnApp','server','cac',
+  'mktSteady','smm','sales','team','tools','accounting','misc','taxPct','acq','refund',
+  'gStuStart','gStuAdd','gSubStart','gSubAdd','mktBoost','boostMonths',
+  'inv','invShare','invShareAfter','rate','horizon'];
+let CUR='rub', SCEN='base';
+const SCN = { bear:{newMul:0.6,churnMul:1.4}, base:{newMul:1,churnMul:1}, bull:{newMul:1.5,churnMul:0.7} };
+
+function num(id){ const v=parseFloat(document.getElementById(id).value); return isNaN(v)?0:v; }
+function P(){ const p={}; IDS.forEach(id=>p[id]=num(id)); return p; }
+
+/* ---------- объяснения метрик (всплывают при наведении/тапе) ---------- */
+const META={
+ mrr:{t:'Выручка · MRR / ARR',d:'MRR (Monthly Recurring Revenue) — сколько денег бизнес получает за месяц со всех клиентов: школа + приложение. ARR — то же за год (MRR×12). Главный показатель размера и роста: инвестор смотрит на него первым.'},
+ net:{t:'Чистая прибыль',d:'Сколько остаётся в месяц после ВСЕХ расходов: педагоги, маркетинг, команда, сервисы, эквайринг, возвраты и налог. Именно из неё распределяется доля инвестора. Минус — работа в убыток, он покрывается вложениями.'},
+ margin:{t:'Операционная маржа',d:'Какая доля выручки превращается в чистую прибыль (прибыль ÷ выручка). Показывает эффективность бизнеса. Ориентир здорового бизнеса — выше 15%.'},
+ gross:{t:'Валовая маржа',d:'Доля выручки после ПЕРЕМЕННЫХ расходов (педагог, эквайринг, возвраты), до постоянных (маркетинг, команда). Сколько с каждого рубля идёт на покрытие постоянных расходов и прибыль. Маркетплейс: 40–55%, приложение: 70–85%.'},
+ breakeven:{t:'Точка безубыточности',d:'Сколько учеников надо набрать, чтобы выручка покрыла все постоянные расходы и компания вышла в ноль. Считается: постоянные расходы ÷ маржа покрытия одного ученика. Чем меньше — тем безопаснее бизнес.'},
+ ltv:{t:'LTV — ценность клиента',d:'Lifetime Value — сколько денег принесёт один клиент за всё время, пока он с нами. Считается: маржа с клиента в месяц × срок жизни (1 ÷ отток). Чем выше отток — тем короче жизнь и ниже LTV.'},
+ ltvapp:{t:'LTV подписчика приложения',d:'Сколько принесёт один подписчик за всё время подписки: ARPU × срок жизни (1 ÷ отток приложения). У приложения почти нет переменных затрат, поэтому LTV идёт почти целиком в прибыль.'},
+ cac:{t:'CAC — стоимость привлечения',d:'Customer Acquisition Cost — сколько в среднем тратится на рекламу и продажи, чтобы получить одного ПЛАТЯЩЕГО клиента. Связан с CPL: CAC = CPL (цена лида) ÷ конверсия лида в клиента. Кейсы вокальных школ: 1 800–5 000 ₽.'},
+ cpl:{t:'CPL — цена лида',d:'Cost Per Lead — сколько стоит один лид (заявка/контакт) из рекламы. Из лидов лишь часть становится платящими: CAC = CPL ÷ конверсия. По кейсам школ лид стоит 190–520 ₽ (VK), 400–1000 ₽ (Яндекс).'},
+ ratio:{t:'LTV / CAC',d:'Во сколько раз клиент приносит больше денег, чем стоило его привлечь. Ключевой показатель здоровья для инвестора. Норма — от 3:1: ниже 3 реклама съедает прибыль, выше 3 — масштабировать выгодно.'},
+ cacpay:{t:'Окупаемость CAC',d:'За сколько месяцев деньги, потраченные на привлечение клиента (CAC), возвращаются из его ежемесячной маржи. Цель — меньше 12 месяцев: чем быстрее, тем меньше нужно оборотных средств на рост.'},
+ churn:{t:'Отток · churn',d:'Сколько процентов клиентов перестают платить за месяц. Напрямую определяет срок жизни клиента и LTV. Ориентиры: вокал-хобби 10–15%/мес (школа), ~8–9% (приложение).'},
+ arpu:{t:'ARPU',d:'Average Revenue Per User — средняя выручка с одного подписчика в месяц с учётом того, что часть платит помесячно, часть за год со скидкой. У нас ≈ 420 ₽ (подписка 690 ₽/мес или 3 990 ₽/год).'},
+ investor:{t:'Доля инвестора',d:'Сколько из месячной чистой прибыли получает инвестор. По сделке — 40% до полного возврата вложений, затем 20% бессрочно. Начисляется только с положительной прибыли.'},
+ roi:{t:'Доходность · ROI',d:'Return On Investment — на сколько процентов вырастут вложенные деньги за горизонт прогноза: всего получено ÷ вложено − 1. ×N — во столько раз вернётся больше вложенного.'},
+ payback:{t:'Окупаемость вложений',d:'За сколько месяцев накопленные выплаты инвестору покроют всю сумму вложений. После этой точки инвестор в плюсе и дальше получает 20% прибыли бессрочно.'},
+ runway:{t:'Запас прочности · runway',d:'Хватает ли вложений на период, пока компания работает в минус (разгон). Сколько денег из вложений израсходуется до выхода в плюс и какая подушка останется на непредвиденное.'},
+ contrib:{t:'Маржа покрытия',d:'Сколько остаётся от чека одного ученика после переменных расходов (педагог, эквайринг, возвраты). Эти деньги покрывают постоянные расходы и формируют прибыль — основа расчёта безубыточности.'},
+ teachers:{t:'Педагоги',d:'Сколько преподавателей нужно для текущего числа учеников (ученики ÷ нагрузка ~18). Оплата педагога — процент от проведённых уроков, поэтому расход растёт строго вместе с выручкой.'}
+};
+function info(k){ return '<span class="info" data-k="'+k+'">i</span>'; }
+
+/* форматирование */
+function ru(n){ return Math.round(n).toLocaleString('ru-RU'); }
+function cv(rub){ return CUR==='thb'?rub*num('rate'):rub; }
+function sym(){ return CUR==='thb'?'฿':'₽'; }
+function fmt(rub){ return ru(cv(rub))+' '+sym(); }
+
+/* ---------- ядро: расчёт за месяц ---------- */
+function calc(p, students, subs, mkt){
+  const schoolRev = students*p.cheque;
+  const appRev    = subs*p.arpu;
+  const rev       = schoolRev+appRev;
+  const teacher   = schoolRev*p.teacherPct/100;
+  const acq       = rev*p.acq/100;
+  const refund    = rev*p.refund/100;
+  const variable  = teacher+acq+refund;
+  const fixed     = mkt+p.smm+p.sales+p.team+p.server+p.tools+p.accounting+p.misc;
+  const ebit      = rev-variable-fixed;
+  const tax       = rev>0 ? rev*p.taxPct/100 : 0;
+  const net       = ebit-tax;
+  const investor  = net>0 ? net*p.invShare/100 : 0;
+  const teachers  = students>0 ? Math.ceil(students/p.perTeacher) : 0;
+  const grossMargin = rev>0 ? (rev-variable)/rev*100 : 0;
+  return { schoolRev, appRev, rev, teacher, acq, refund, variable, fixed, mkt, ebit, tax, net,
+    investor, company:net-investor, teachers, margin: rev>0?net/rev*100:0, grossMargin,
+    mrr:rev, arr:rev*12 };
+}
+
+/* метрики на основе допущений */
+function metrics(p, subs){
+  const gmS = 1 - p.teacherPct/100 - p.acq/100 - p.refund/100;   // маржа покрытия ученика
+  const contribStud = p.cheque*gmS;
+  const ltS = p.churnSchool>0 ? 100/p.churnSchool : 24;
+  const ltvSchool = contribStud*ltS;
+  const ratio = p.cac>0 ? ltvSchool/p.cac : 0;
+  const cacPayback = contribStud>0 ? p.cac/contribStud : 0;
+  const gmA = 1 - p.acq/100 - p.refund/100;
+  const contribSub = p.arpu*gmA;
+  const ltA = p.churnApp>0 ? 100/p.churnApp : 18;
+  const ltvApp = contribSub*ltA;
+  // безубыточность по ученикам (операционная, до налога)
+  const fixed = p.mktSteady+p.smm+p.sales+p.team+p.server+p.tools+p.accounting+p.misc;
+  const appNet = subs*contribSub;
+  const beStud = contribStud>0 ? Math.max(0, Math.ceil((fixed-appNet)/contribStud)) : 0;
+  return { contribStud, ltS, ltvSchool, ratio, cacPayback, contribSub, ltA, ltvApp, fixed, appNet, beStud };
+}
+
+/* ---------- KPI ---------- */
+function snapshot(){ return { stu:parseInt(document.getElementById('stuRange').value,10), sub:parseInt(document.getElementById('subRange').value,10) }; }
+function renderKPIs(){
+  const p=P(), s=snapshot(), r=calc(p,s.stu,s.sub,p.mktSteady), m=metrics(p,s.sub);
+  const neg=r.net<0;
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="k">Выручка / мес (MRR)${info('mrr')}</div><div class="v">${ru(r.rev)} ₽</div><div class="v2">ARR ${ru(r.arr/1e6*10)/10} млн · ≈ ${ru(r.rev*p.rate)} ฿</div></div>
+    <div class="kpi ${neg?'neg':'profit'}"><div class="k">Чистая прибыль / мес${info('net')}</div><div class="v">${ru(r.net)} ₽</div><div class="v2">маржа ${r.margin.toFixed(0)}% · ≈ ${ru(r.net*p.rate)} ฿</div></div>
+    <div class="kpi hero"><div class="k">Инвестору (${p.invShare}%) / мес${info('investor')}</div><div class="v">${ru(r.investor)} ₽</div><div class="v2">≈ ${ru(r.investor*p.rate)} ฿</div></div>
+    <div class="kpi"><div class="k">Точка безубыточности${info('breakeven')}</div><div class="v">${m.beStud} <span style="font-size:14px">уч.</span></div><div class="v2">${m.appNet>=m.fixed?'уже покрыто приложением':'учеников чтобы выйти в ноль'}</div></div>
+    <div class="kpi"><div class="k">Валовая маржа${info('gross')}</div><div class="v">${r.grossMargin.toFixed(0)}%</div><div class="v2">до постоянных расходов</div></div>
+    <div class="kpi"><div class="k">LTV / CAC (школа)${info('ratio')}</div><div class="v">${m.ratio.toFixed(1)}:1</div><div class="v2">${m.ratio>=3?'✓ норма ≥3:1':'ниже нормы 3:1'}</div></div>
+    <div class="kpi"><div class="k">Окупаемость CAC${info('cacpay')}</div><div class="v">${m.cacPayback.toFixed(1)} <span style="font-size:14px">мес</span></div><div class="v2">${m.cacPayback<=12?'✓ быстро':'долго'}</div></div>
+    <div class="kpi"><div class="k">Нужно педагогов${info('teachers')}</div><div class="v">${r.teachers}</div><div class="v2">${s.stu} уч. · ${ru(s.sub)} подписч.</div></div>`;
+}
+
+/* ---------- вердикт словами ---------- */
+function renderVerdict(){
+  const p=P(), s=snapshot(), r=calc(p,s.stu,s.sub,p.mktSteady), m=metrics(p,s.sub);
+  const {payback}=ramp(p);
+  const pbTxt = payback ? `вложения <b>${ru(p.inv)} ₽</b> возвращаются примерно за <span class="big">${payback} месяцев</span>, после чего инвестор получает <b>${p.invShareAfter}% прибыли бессрочно</b>` :
+    `за ${p.horizon} мес вложения возвращаются частично — стоит усилить рост или снизить расходы`;
+  document.getElementById('verdictBox').innerHTML =
+    `При <span class="big">${s.stu} учениках</span> и <span class="big">${ru(s.sub)} подписчиках</span> компания делает <span class="big">${ru(r.rev)} ₽</span> выручки в месяц и <span class="big">${ru(r.net)} ₽</span> чистыми (маржа ${r.margin.toFixed(0)}%). `+
+    `Инвестору из этого — <b>${ru(r.investor)} ₽/мес</b> (≈ ${ru(r.investor*p.rate)} ฿). `+
+    `В прогнозе роста (${SCEN==='base'?'базовый':SCEN==='bull'?'оптимистичный':'осторожный'} сценарий) ${pbTxt}. `+
+    `Выйти в ноль школа может уже на <b>${m.beStud} учениках</b>, а каждый ученик окупает привлечение за <b>${m.cacPayback.toFixed(1)} мес</b> при LTV/CAC <b>${m.ratio.toFixed(1)}:1</b>.`;
+}
+
+/* ---------- юнит + метрики ---------- */
+function renderUnit(){
+  const p=P(), s=snapshot(), m=metrics(p,s.sub);
+  const t=p.cheque*p.teacherPct/100, a=p.cheque*p.acq/100, rf=p.cheque*p.refund/100;
+  document.getElementById('unitFlow').innerHTML = `
+    <div class="fh">🎓 Один ученик школы</div>
+    <div class="row"><span class="lab">Средний чек</span><span class="am">${fmt(p.cheque)}</span></div>
+    <div class="row"><span class="lab">− Педагог (${p.teacherPct}%)</span><span class="am minus">−${fmt(t)}</span></div>
+    <div class="row"><span class="lab">− Эквайринг (${p.acq}%)</span><span class="am minus">−${fmt(a)}</span></div>
+    <div class="row"><span class="lab">− Резерв возвратов (${p.refund}%)</span><span class="am minus">−${fmt(rf)}</span></div>
+    <div class="row tot"><span class="lab">= Маржа покрытия / мес${info('contrib')}</span><span class="am">${fmt(m.contribStud)}</span></div>
+    <div class="row"><span class="lab">Срок жизни (при оттоке ${p.churnSchool}%)${info('churn')}</span><span class="am">${m.ltS.toFixed(0)} мес</span></div>`;
+  const rOk = m.ratio>=3;
+  document.getElementById('metrics').innerHTML = `
+    <div class="fh">📊 Ключевые метрики</div>
+    <div class="metr"><span class="lab">LTV ученика школы${info('ltv')}</span><b>${fmt(m.ltvSchool)}</b></div>
+    <div class="metr"><span class="lab">CAC (привлечение)${info('cac')}</span><b>${fmt(p.cac)}</b></div>
+    <div class="metr"><span class="lab">LTV / CAC${info('ratio')}</span><b>${m.ratio.toFixed(1)}:1 <span class="badge2 ${rOk?'ok':'bad'}">${rOk?'норма':'низко'}</span></b></div>
+    <div class="metr"><span class="lab">Окупаемость CAC${info('cacpay')}</span><b>${m.cacPayback.toFixed(1)} мес</b></div>
+    <div class="metr"><span class="lab">LTV подписчика приложения${info('ltvapp')}</span><b>${fmt(m.ltvApp)}</b></div>
+    <div class="metr"><span class="lab">Точка безубыточности${info('breakeven')}</span><b>${m.beStud} учеников</b></div>`;
+}
+
+/* ---------- торнадо-чувствительность ---------- */
+function renderTornado(){
+  const p=P(), s=snapshot();
+  const base=calc(p,s.stu,s.sub,p.mktSteady).net;
+  const items=[
+    ['Средний чек +10%', ()=>{const q={...p,cheque:p.cheque*1.1}; return calc(q,s.stu,s.sub,q.mktSteady).net;}],
+    ['Учеников +10%',    ()=>calc(p,Math.round(s.stu*1.1),s.sub,p.mktSteady).net],
+    ['Подписчиков +10%', ()=>calc(p,s.stu,Math.round(s.sub*1.1),p.mktSteady).net],
+    ['ARPU приложения +10%', ()=>{const q={...p,arpu:p.arpu*1.1}; return calc(q,s.stu,s.sub,q.mktSteady).net;}],
+    ['Доля педагога −10%',   ()=>{const q={...p,teacherPct:p.teacherPct*0.9}; return calc(q,s.stu,s.sub,q.mktSteady).net;}],
+    ['Маркетинг −10%',       ()=>{const q={...p,mktSteady:p.mktSteady*0.9}; return calc(q,s.stu,s.sub,q.mktSteady).net;}],
+    ['Команда/админ −10%',   ()=>{const q={...p,team:p.team*0.9}; return calc(q,s.stu,s.sub,q.mktSteady).net;}],
+    ['Налог −10%',           ()=>{const q={...p,taxPct:p.taxPct*0.9}; return calc(q,s.stu,s.sub,q.mktSteady).net;}],
+  ].map(([name,fn])=>({name, d:fn()-base})).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d));
+  const maxD=Math.max(1,...items.map(i=>Math.abs(i.d)));
+  document.getElementById('tornado').innerHTML = items.map(i=>{
+    const w=Math.abs(i.d)/maxD*100, col=i.d>=0?'var(--green)':'var(--red)';
+    return `<div class="trow"><div class="tname">${i.name}</div><div><div class="tbar" style="width:${w.toFixed(0)}%;background:${col}"></div></div><div class="tval" style="color:${i.d>=0?'var(--green)':'var(--red)'}">${i.d>=0?'+':'−'}${fmt(Math.abs(i.d))}</div></div>`;
+  }).join('');
+}
+
+/* ---------- таблица 1: школа ---------- */
+function renderT1(){
+  const p=P(); const counts=[50,100,150,250,400];
+  let head=`<thead><tr><th class="colname"><b>Учеников</b></th><th>Педагогов</th><th>Выручка</th><th>Педагоги (${p.teacherPct}%)</th><th>Пост.+перем.</th><th>Налог</th><th>Чистая прибыль</th><th>Инвестору ${p.invShare}%</th></tr></thead>`;
+  let body='<tbody>';
+  counts.forEach(n=>{ const r=calc(p,n,0,p.mktSteady);
+    body+=`<tr><td><b>${n}</b></td><td>${r.teachers}</td><td>${fmt(r.rev)}</td><td>${fmt(r.teacher)}</td><td>${fmt(r.fixed+r.acq+r.refund)}</td><td>${fmt(r.tax)}</td><td class="${r.net<0?'negv':'pos'}">${fmt(r.net)}</td><td class="hl">${fmt(r.investor)}</td></tr>`; });
+  document.getElementById('t1').innerHTML=head+body+'</tbody>';
+}
+
+/* ---------- таблица 2: комбо ---------- */
+function renderT2(){
+  const p=P(); const rows=[{n:'Старт',s:'1–3 мес',st:30,su:300},{n:'База',s:'~6 мес',st:80,su:1000},{n:'Рост',s:'~12 мес',st:150,su:2000},{n:'Масштаб',s:'18+ мес',st:300,su:4000}];
+  let head=`<thead><tr><th class="colname"><b>Стадия</b></th><th>Ученики</th><th>Подписчики</th><th>Выручка школы</th><th>Выручка прилож.</th><th>Чистая прибыль</th><th>Инвестору ${p.invShare}%</th></tr></thead>`;
+  let body='<tbody>';
+  rows.forEach(x=>{ const r=calc(p,x.st,x.su,p.mktSteady);
+    body+=`<tr><td class="colname"><b>${x.n}</b><span>${x.s}</span></td><td>${x.st}</td><td>${ru(x.su)}</td><td>${fmt(r.schoolRev)}</td><td>${fmt(r.appRev)}</td><td class="${r.net<0?'negv':'pos'}">${fmt(r.net)}</td><td class="hl">${fmt(r.investor)}</td></tr>`; });
+  document.getElementById('t2').innerHTML=head+body+'</tbody>';
+}
+
+/* ---------- прогноз по месяцам ---------- */
+function ramp(p){
+  const sc=SCN[SCEN], H=Math.max(6,Math.min(60,p.horizon));
+  const chS=Math.min(0.9,p.churnSchool/100*sc.churnMul), chA=Math.min(0.9,p.churnApp/100*sc.churnMul);
+  const addS=p.gStuAdd*sc.newMul, addA=p.gSubAdd*sc.newMul;
+  let stu=p.gStuStart, sub=p.gSubStart, cumInv=0, payback=null, firstProfit=null;
+  let burn=0, peakBurn=0; let rows=[];
+  for(let m=1;m<=H;m++){
+    if(m>1){ stu=stu*(1-chS)+addS; sub=sub*(1-chA)+addA; }
+    const mkt = m<=p.boostMonths ? p.mktBoost : p.mktSteady;
+    const r=calc(p,stu,sub,mkt);
+    if(firstProfit===null && r.net>=0) firstProfit=m;
+    // доля инвестора: invShare до возврата вложений, после — invShareAfter (бессрочно)
+    const share = (payback!==null) ? p.invShareAfter : p.invShare;
+    const inv = r.net>0 ? r.net*share/100 : 0; cumInv+=inv;
+    if(payback===null && cumInv>=p.inv) payback=m;
+    if(r.net<0){ burn+=-r.net; if(burn>peakBurn) peakBurn=burn; }   // расход вложений на разгон
+    rows.push({m,stu:Math.round(stu),sub:Math.round(sub),mkt,net:r.net,inv,cumInv});
+  }
+  return {rows,payback,firstProfit,peakBurn,totalReturn:cumInv};
+}
+function renderT3(){
+  const p=P(); const {rows,payback}=ramp(p); const H=rows.length;
+  const ms=[1,3,6,9,12,15,18,21,24].filter(m=>m<=H); if(!ms.includes(H)) ms.push(H);
+  let head=`<thead><tr><th class="colname"><b>Месяц</b></th><th>Ученики</th><th>Подписчики</th><th>Маркетинг</th><th>Чистая прибыль</th><th>Инвестору ${p.invShare}%</th><th>Накоплено инвестору</th></tr></thead>`;
+  let body='<tbody>';
+  ms.forEach((m,i)=>{ const r=rows[m-1]; const prev=ms[i-1]||0; const peak=payback&&m>=payback&&prev<payback;
+    body+=`<tr class="${peak?'peak':''}"><td class="colname"><b>${m} мес</b>${m<=p.boostMonths?'<span>разгон</span>':''}</td><td>${r.stu}</td><td>${ru(r.sub)}</td><td>${fmt(r.mkt)}</td><td class="${r.net<0?'negv':'pos'}">${fmt(r.net)}</td><td class="hl">${fmt(r.inv)}</td><td><b>${fmt(r.cumInv)}</b></td></tr>`; });
+  document.getElementById('t3').innerHTML=head+body+'</tbody>';
+
+  // график
+  const W=900,Hh=300,padL=64,padR=20,padT=18,padB=34;
+  const maxV=Math.max(p.inv*1.15, rows[rows.length-1].cumInv), bw=(W-padL-padR)/rows.length;
+  const y=v=>padT+(Hh-padT-padB)*(1-v/maxV), x=i=>padL+i*bw;
+  let bars=''; rows.forEach((r,i)=>{ const done=payback&&(i+1)>=payback; const h=(Hh-padT-padB)*(r.cumInv/maxV);
+    bars+=`<rect x="${(x(i)+2).toFixed(1)}" y="${y(r.cumInv).toFixed(1)}" width="${(bw-4).toFixed(1)}" height="${Math.max(0,h).toFixed(1)}" rx="2" fill="${done?'#0f9d6a':'#7fcfc3'}"></rect>`; });
+  let ticks=''; for(let g=0;g<=4;g++){const v=maxV*g/4,yy=y(v); ticks+=`<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="#eef3f5"/><text x="${padL-8}" y="${yy+4}" text-anchor="end" font-size="11" fill="#7c8e98">${(cv(v)/1e6).toFixed(1)}M</text>`;}
+  let mlab=''; const step=Math.max(1,Math.round(rows.length/6)); for(let m=1;m<=rows.length;m+=step){ mlab+=`<text x="${(x(m-1)+bw/2).toFixed(1)}" y="${Hh-12}" text-anchor="middle" font-size="11" fill="#7c8e98">${m}</text>`; }
+  const invY=y(p.inv);
+  const pbMark=payback?`<line x1="${(x(payback-1)+bw/2).toFixed(1)}" y1="${padT}" x2="${(x(payback-1)+bw/2).toFixed(1)}" y2="${Hh-padB}" stroke="#0a6c61" stroke-dasharray="4 3"/><text x="${(x(payback-1)+bw/2).toFixed(1)}" y="${padT-4}" text-anchor="middle" font-size="11" font-weight="700" fill="#0a6c61">возврат</text>`:'';
+  document.getElementById('chartBox').innerHTML=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="График окупаемости">${ticks}${bars}<line x1="${padL}" y1="${invY.toFixed(1)}" x2="${W-padR}" y2="${invY.toFixed(1)}" stroke="#c0492f" stroke-width="2"/><text x="${W-padR}" y="${(invY-7).toFixed(1)}" text-anchor="end" font-size="12" font-weight="700" fill="#c0492f">вложения ${(cv(p.inv)/1e6).toFixed(1)}M ${sym()}</text>${pbMark}${mlab}</svg><div class="lgnd"><span><i style="background:#7fcfc3"></i>накоплено инвестору</span><span><i style="background:#0f9d6a"></i>после полного возврата</span><span><i style="background:#c0492f"></i>сумма вложений</span></div>`;
+
+  const t=document.getElementById('pbTitle'),tx=document.getElementById('pbText');
+  if(payback){ t.textContent=`⏱ Вложения возвращаются примерно на ${payback}-м месяце`;
+    tx.innerHTML=`Накопленные выплаты инвестору (${p.invShare}% прибыли) покрывают все ${ru(p.inv)} ₽ к ~${payback}-му месяцу. Дальше — <b>${p.invShareAfter}% прибыли бессрочно</b>. Первые ${p.boostMonths} мес компания в минусе (разгонный маркетинг) — он финансируется из вложений.`; }
+  else { t.textContent=`За ${rows.length} мес вложения возвращаются частично`;
+    tx.innerHTML=`Накоплено инвестору ${fmt(rows[rows.length-1].cumInv)} из ${ru(p.inv)} ₽. Увеличьте рост, чек или подписчиков либо снизьте расходы — окупаемость ускорится. Попробуйте сценарий «Оптимистичный».`; }
+}
+
+/* ---------- штат ---------- */
+function renderT4(){
+  const p=P(); const rows=[{n:18,w:'Игорь (полная загрузка)'},{n:36,w:'+1 педагог'},{n:90,w:'команда педагогов'},{n:150,w:'команда педагогов'},{n:300,w:'команда + старший'}];
+  let head=`<thead><tr><th class="colname"><b>Учеников</b></th><th>Педагогов</th><th>Уроков/мес ≈</th><th>ФОТ педагогов</th><th>Кто</th></tr></thead>`;
+  let body='<tbody>';
+  rows.forEach(x=>{ const teachers=Math.ceil(x.n/p.perTeacher), lessons=x.n*4, fot=x.n*p.cheque*p.teacherPct/100;
+    body+=`<tr><td><b>${x.n}</b></td><td>${teachers}</td><td>${ru(lessons)}</td><td>${fmt(fot)}</td><td style="text-align:left;color:var(--dim)">${x.w}</td></tr>`; });
+  document.getElementById('t4').innerHTML=head+body+'</tbody>';
+}
+
+/* ---------- светофор здоровья ---------- */
+function light(cls,label,val,key){ return `<div class="light ${cls}"><div class="lt">${label}${key?info(key):''}</div><div class="lv">${val}</div></div>`; }
+function renderHealth(){
+  const p=P(), s=snapshot(), r=calc(p,s.stu,s.sub,p.mktSteady), m=metrics(p,s.sub);
+  const {payback,peakBurn}=ramp(p);
+  const ratioCls = m.ratio>=3?'g':(m.ratio>=2?'y':'r');
+  const marginCls= r.margin>=15?'g':(r.margin>0?'y':'r');
+  const cacCls   = m.cacPayback<=12?'g':(m.cacPayback<=18?'y':'r');
+  const pbCls    = !payback?'r':(payback<=18?'g':(payback<=24?'y':'r'));
+  const runCls   = peakBurn<=p.inv*0.8?'g':(peakBurn<=p.inv?'y':'r');
+  document.getElementById('health').innerHTML =
+    light(ratioCls,'LTV / CAC', m.ratio.toFixed(1)+':1','ratio') +
+    light(marginCls,'Операц. маржа', r.margin.toFixed(0)+'%','margin') +
+    light(cacCls,'Окупаемость CAC', m.cacPayback.toFixed(1)+' мес','cacpay') +
+    light(pbCls,'Возврат вложений', payback?payback+' мес':'>'+p.horizon+' мес','payback') +
+    light(runCls,'Запас вложений', peakBurn<=p.inv?'хватает':'впритык','runway');
+}
+
+/* ---------- проверка реализма прогноза ---------- */
+function renderRealism(){
+  const p=P(), sc=SCN[SCEN];
+  const buy = p.cac>0 ? p.mktSteady/p.cac : 0;
+  const need = p.gStuAdd*sc.newMul;
+  const ok = buy>=need;
+  document.getElementById('realism').innerHTML =
+    `<b>Проверка реализма:</b> маркетинг ${ru(p.mktSteady)} ₽ ÷ CAC ${ru(p.cac)} ₽ ≈ <b>${Math.floor(buy)} новых платящих/мес</b> можно купить; в прогнозе заложен прирост <b>${need.toFixed(0)}/мес</b> — ${ok?'✅ бюджета хватает, прогноз реалистичен':'⚠️ для такого прироста бюджета маловато: поднимите маркетинг или снизьте CAC'}.`;
+}
+
+/* ---------- доход инвестора + запас прочности ---------- */
+function renderROI(){
+  const p=P(); const {payback,totalReturn,peakBurn,firstProfit,rows}=ramp(p);
+  const mult = p.inv>0 ? totalReturn/p.inv : 0; const roiPct=(mult-1)*100;
+  const yrs = (rows.length/12).toFixed(1).replace('.0','');
+  document.getElementById('roiCards').innerHTML =
+    `<div class="roicard"><div class="rk">Инвестор вложит</div><div class="rv">${ru(p.inv)} ₽</div><div class="rs">≈ ${ru(p.inv*p.rate)} ฿</div></div>
+     <div class="roicard"><div class="rk">Получит за ${rows.length} мес</div><div class="rv">${ru(totalReturn)} ₽</div><div class="rs">≈ ${ru(totalReturn*p.rate)} ฿</div></div>
+     <div class="roicard dark"><div class="rk">Доходность на вложения${info('roi')}</div><div class="rv"><span class="ac">${roiPct>=0?'+':''}${ru(roiPct)}%</span></div><div class="rs">×${mult.toFixed(1)} от вложенного за ${yrs} г.</div></div>
+     <div class="roicard"><div class="rk">Возврат вложений${info('payback')}</div><div class="rv">${payback?payback+' мес':'>'+rows.length+' мес'}</div><div class="rs">далее ${p.invShareAfter}% прибыли бессрочно</div></div>`;
+  const enough = peakBurn<=p.inv, cushion=p.inv-peakBurn;
+  const n=document.getElementById('runwayNote'); n.className='note '+(enough?'teal':'');
+  n.innerHTML = `<div class="t">${enough?'✅ Вложений хватает на разгон':'⚠️ Вложений впритык — нужен запас'}</div>`+
+    `<p>Компания выходит в операционный плюс примерно на <b>${firstProfit||'?'}-м месяце</b>. До этого работа в минус расходует из вложений около <b>${ru(peakBurn)} ₽</b>${enough?` — остаётся подушка <b>${ru(cushion)} ₽</b> на непредвиденное.`:` — это больше вложений ${ru(p.inv)} ₽. Снизьте разгонный маркетинг/расходы или ускорьте набор.`}</p>`;
+}
+
+/* ---------- сравнение трёх сценариев ---------- */
+function renderCompare(){
+  const p=P(); const order=['bear','base','bull']; const saved=SCEN;
+  const H=Math.max(6,Math.min(60,p.horizon)); const res={};
+  order.forEach(sc=>{ SCEN=sc; const r=ramp(p); const m12=r.rows[Math.min(11,r.rows.length-1)];
+    res[sc]={pb:r.payback, net12:m12.net, ret:r.totalReturn, roi:p.inv>0?(r.totalReturn/p.inv-1)*100:0, stu12:m12.stu}; });
+  SCEN=saved;
+  const head=`<thead><tr><th>Показатель</th><th>🐻 Осторожный</th><th>⚖️ Базовый</th><th>🚀 Оптимистичный</th></tr></thead>`;
+  const row=(label,fn)=>`<tr><td>${label}</td>${order.map(sc=>`<td>${fn(res[sc])}</td>`).join('')}</tr>`;
+  const body='<tbody>'
+    +row('Учеников к 12 мес', r=>r.stu12)
+    +row('Чистая прибыль на 12 мес', r=>`<span style="color:${r.net12<0?'var(--red)':'var(--green)'};font-weight:800">${fmt(r.net12)}</span>`)
+    +row('Возврат вложений', r=>r.pb?`<b class="hl">${r.pb} мес</b>`:`>${H} мес`)
+    +row(`Доход инвестора за ${H} мес`, r=>fmt(r.ret))
+    +row('Доходность на вложения', r=>`<b style="color:${r.roi>=0?'var(--green)':'var(--red)'}">${r.roi>=0?'+':''}${ru(r.roi)}%</b>`)
+    +'</tbody>';
+  document.getElementById('tc').innerHTML=head+body;
+}
+
+function renderAll(){ renderKPIs(); renderHealth(); renderRealism(); renderVerdict(); renderUnit(); renderTornado(); renderT1(); renderT2(); renderT3(); renderROI(); renderCompare(); renderT4(); }
+
+/* ---------- события ---------- */
+IDS.forEach(id=>document.getElementById(id).addEventListener('input',renderAll));
+const sr=document.getElementById('stuRange'), br=document.getElementById('subRange');
+sr.addEventListener('input',()=>{document.getElementById('stuVal').textContent=sr.value;renderAll();});
+br.addEventListener('input',()=>{document.getElementById('subVal').textContent=ru(br.value);renderAll();});
+document.getElementById('reset').addEventListener('click',()=>{ IDS.forEach(id=>document.getElementById(id).value=DEF[id]);
+  sr.value=DEF.students;document.getElementById('stuVal').textContent=DEF.students;
+  br.value=DEF.subs;document.getElementById('subVal').textContent=ru(DEF.subs); renderAll(); });
+document.querySelectorAll('#curseg button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#curseg button').forEach(x=>x.classList.remove('active'));b.classList.add('active');CUR=b.dataset.cur;renderAll();}));
+const scenseg=document.getElementById('scenseg');
+scenseg.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{scenseg.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active');SCEN=b.dataset.s;scenseg.className='seg '+(SCEN==='base'?'':SCEN);renderAll();}));
+document.getElementById('subVal').textContent=ru(DEF.subs);
+
+/* ---------- всплывающие объяснения ---------- */
+(function(){
+  const tip=document.createElement('div'); tip.className='tip'; tip.style.display='none'; document.body.appendChild(tip);
+  let pinned=null;
+  function show(el){ const m=META[el.dataset.k]; if(!m) return; tip.innerHTML='<b>'+m.t+'</b>'+m.d; tip.style.display='block';
+    const r=el.getBoundingClientRect(); const tw=Math.min(320,window.innerWidth-24); tip.style.maxWidth=tw+'px';
+    let left=r.left+window.scrollX; if(left+tw>window.scrollX+window.innerWidth-12) left=window.scrollX+window.innerWidth-tw-12;
+    tip.style.left=Math.max(12,left)+'px'; tip.style.top=(r.bottom+window.scrollY+8)+'px'; }
+  function hide(){ tip.style.display='none'; }
+  document.addEventListener('mouseover',e=>{ const el=e.target.closest('.info'); if(el&&!pinned) show(el); });
+  document.addEventListener('mouseout',e=>{ const el=e.target.closest('.info'); if(el&&!pinned) hide(); });
+  document.addEventListener('click',e=>{ const el=e.target.closest('.info'); if(el){ e.preventDefault(); e.stopPropagation();
+      if(pinned===el.dataset.k){ pinned=null; hide(); } else { pinned=el.dataset.k; show(el); } } else { pinned=null; hide(); } });
+  window.addEventListener('scroll',()=>{ if(!pinned) hide(); });
+})();
+
+renderAll();
+</script>
+</body>
+</html>

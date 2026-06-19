@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сверка распевок — Распевка</title>
+<style>
+  :root { --bg:#f6f8f9; --card:#fff; --line:#e3e8ec; --text:#1b2430; --dim:#5e6b7a;
+          --acc:#0e8d7f; --gold:#c4880a; --coral:#e0544b; }
+  * { box-sizing:border-box; margin:0; }
+  body { font:16px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); padding:18px 14px 110px; }
+  .wrap { max-width:560px; margin:0 auto; }
+  h1 { font-size:22px; margin-bottom:4px; }
+  .sub { color:var(--dim); font-size:14px; margin-bottom:18px; }
+  .item { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; margin-bottom:12px; }
+  .head { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .num { font-weight:800; color:var(--acc); font-variant-numeric:tabular-nums; }
+  .name { font-weight:700; }
+  audio { width:100%; height:38px; margin-bottom:10px; }
+  .verdict { display:flex; gap:8px; }
+  .vb { flex:1; padding:10px; border-radius:10px; border:1px solid var(--line); background:#fff; font:600 14px inherit; cursor:pointer; }
+  .vb.ok.on { background:#e7f6ef; border-color:var(--acc); color:var(--acc); }
+  .vb.bad.on { background:#fdeeed; border-color:var(--coral); color:var(--coral); }
+  .note { width:100%; margin-top:10px; padding:10px; border:1px solid var(--line); border-radius:10px; font:inherit; min-height:64px; }
+  .bar { position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid var(--line);
+         padding:12px 14px calc(12px + env(safe-area-inset-bottom)); display:flex; gap:10px; }
+  .bar button { flex:1; padding:13px; border-radius:12px; border:none; font:700 15px inherit; cursor:pointer; }
+  #copy { background:var(--acc); color:#fff; }
+  #share { background:#eef2f4; color:var(--text); }
+  .done-chip { color:var(--dim); font-size:13px; text-align:center; padding-top:6px; }
+</style></head>
+<body><div class="wrap">
+  <h1>Сверка распевок</h1>
+  <p class="sub">Слушай по порядку и отмечай: «Ок» или «Не так» (+ что именно).
+  Ответы сохраняются на этой странице — в конце нажми «Скопировать» и пришли текст.</p>
+  
+  <div class="item" data-num="01">
+    <div class="head"><span class="num">01</span><span class="name">Пять гласных (L02-1)</span></div>
+    <audio controls preload="none" src="sverka/01.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="02">
+    <div class="head"><span class="num">02</span><span class="name">Лесенка гласных (L02-2)</span></div>
+    <audio controls preload="none" src="sverka/02.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="03">
+    <div class="head"><span class="num">03</span><span class="name">Волна гласных (L02-3)</span></div>
+    <audio controls preload="none" src="sverka/03.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="04">
+    <div class="head"><span class="num">04</span><span class="name">Качели на квинте (L02-4)</span></div>
+    <audio controls preload="none" src="sverka/04.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="05">
+    <div class="head"><span class="num">05</span><span class="name">Зигзаг (L02-5)</span></div>
+    <audio controls preload="none" src="sverka/05.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="06">
+    <div class="head"><span class="num">06</span><span class="name">Скачок к V (вниз)</span></div>
+    <audio controls preload="none" src="sverka/06.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="07">
+    <div class="head"><span class="num">07</span><span class="name">Раскачка вибрато</span></div>
+    <audio controls preload="none" src="sverka/07.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="08">
+    <div class="head"><span class="num">08</span><span class="name">Тёплый тон</span></div>
+    <audio controls preload="none" src="sverka/08.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="09">
+    <div class="head"><span class="num">09</span><span class="name">Ровный тон на двух</span></div>
+    <audio controls preload="none" src="sverka/09.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="10">
+    <div class="head"><span class="num">10</span><span class="name">Через регистры</span></div>
+    <audio controls preload="none" src="sverka/10.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="11">
+    <div class="head"><span class="num">11</span><span class="name">Октавная связка</span></div>
+    <audio controls preload="none" src="sverka/11.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="12">
+    <div class="head"><span class="num">12</span><span class="name">L07 Белтинг — гамма</span></div>
+    <audio controls preload="none" src="sverka/12.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="13">
+    <div class="head"><span class="num">13</span><span class="name">Белт-арпеджио</span></div>
+    <audio controls preload="none" src="sverka/13.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="14">
+    <div class="head"><span class="num">14</span><span class="name">Стаккато-арпеджио</span></div>
+    <audio controls preload="none" src="sverka/14.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="15">
+    <div class="head"><span class="num">15</span><span class="name">Слоги по группам</span></div>
+    <audio controls preload="none" src="sverka/15.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="16">
+    <div class="head"><span class="num">16</span><span class="name">Фигура-волчок</span></div>
+    <audio controls preload="none" src="sverka/16.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="17">
+    <div class="head"><span class="num">17</span><span class="name">L10 Выносливая гамма</span></div>
+    <audio controls preload="none" src="sverka/17.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="18">
+    <div class="head"><span class="num">18</span><span class="name">Мычание по гамме</span></div>
+    <audio controls preload="none" src="sverka/18.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="19">
+    <div class="head"><span class="num">19</span><span class="name">Губной тренаж brrr</span></div>
+    <audio controls preload="none" src="sverka/19.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="20">
+    <div class="head"><span class="num">20</span><span class="name">Гамма Ма-Мэ</span></div>
+    <audio controls preload="none" src="sverka/20.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="21">
+    <div class="head"><span class="num">21</span><span class="name">Беглость Ма</span></div>
+    <audio controls preload="none" src="sverka/21.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="22">
+    <div class="head"><span class="num">22</span><span class="name">Октавный скачок</span></div>
+    <audio controls preload="none" src="sverka/22.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="23">
+    <div class="head"><span class="num">23</span><span class="name">Ладовая ЯМ (мажор)</span></div>
+    <audio controls preload="none" src="sverka/23.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <div class="item" data-num="24">
+    <div class="head"><span class="num">24</span><span class="name">Цепочка гласных</span></div>
+    <audio controls preload="none" src="sverka/24.mp3"></audio>
+    <div class="verdict">
+      <button class="vb ok" data-v="ok">Ок ✓</button>
+      <button class="vb bad" data-v="bad">Не так</button>
+    </div>
+    <textarea class="note" placeholder="что именно не так: выше/ниже, ритм, темп, фигура…" hidden></textarea>
+  </div>
+  <p class="done-chip" id="progress"></p>
+</div>
+<div class="bar">
+  <button id="share">Поделиться</button>
+  <button id="copy">Скопировать ответы</button>
+</div>
+<script>
+  const KEY = 'sverka.v1';
+  const state = JSON.parse(localStorage.getItem(KEY) || '{}');
+  const save = () => localStorage.setItem(KEY, JSON.stringify(state));
+  const items = [...document.querySelectorAll('.item')];
+  function renderItem(el) {
+    const num = el.dataset.num, st = state[num] || {};
+    el.querySelector('.ok').classList.toggle('on', st.v === 'ok');
+    el.querySelector('.bad').classList.toggle('on', st.v === 'bad');
+    const note = el.querySelector('.note');
+    note.hidden = st.v !== 'bad';
+    if (note.value !== (st.note || '')) note.value = st.note || '';
+  }
+  function renderProgress() {
+    const done = items.filter((el) => state[el.dataset.num] && state[el.dataset.num].v).length;
+    document.getElementById('progress').textContent = 'Отмечено ' + done + ' из ' + items.length;
+  }
+  items.forEach((el) => {
+    const num = el.dataset.num;
+    el.querySelectorAll('.vb').forEach((b) => b.addEventListener('click', () => {
+      state[num] = state[num] || {};
+      state[num].v = b.dataset.v;
+      save(); renderItem(el); renderProgress();
+    }));
+    el.querySelector('.note').addEventListener('input', (e) => {
+      state[num] = state[num] || {};
+      state[num].note = e.target.value;
+      save();
+    });
+    renderItem(el);
+  });
+  renderProgress();
+  function answersText() {
+    return items.map((el) => {
+      const num = el.dataset.num, st = state[num] || {};
+      if (st.v === 'ok') return num + ' — ок';
+      if (st.v === 'bad') return num + ' — не так' + (st.note ? ': ' + st.note.trim() : '');
+      return num + ' — (не отмечено)';
+    }).join('\n');
+  }
+  document.getElementById('copy').addEventListener('click', async () => {
+    const t = answersText();
+    try { await navigator.clipboard.writeText(t); document.getElementById('copy').textContent = 'Скопировано ✓'; }
+    catch (e) { prompt('Скопируй вручную:', t); }
+    setTimeout(() => { document.getElementById('copy').textContent = 'Скопировать ответы'; }, 1800);
+  });
+  document.getElementById('share').addEventListener('click', () => {
+    const t = answersText();
+    if (navigator.share) navigator.share({ text: t }).catch(() => {});
+    else prompt('Скопируй вручную:', t);
+  });
+</script></body></html>
