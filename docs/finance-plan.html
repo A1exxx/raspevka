@@ -147,7 +147,29 @@
   ul.clean li b{color:var(--ink)}
   footer{padding:30px 0 56px;color:var(--dim2);font-size:12.5px;border-top:1px solid var(--line)}
 
-  @media (max-width:980px){ .assum,.advgrid{grid-template-columns:repeat(2,1fr)} .kpis{grid-template-columns:repeat(2,1fr)} .two{grid-template-columns:1fr} .liveband{grid-template-columns:1fr} }
+  /* health strip */
+  .hstrip{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .light{flex:1;min-width:150px;background:var(--paper);border:1px solid var(--line);border-left-width:4px;border-radius:12px;padding:11px 14px;box-shadow:var(--shadow)}
+  .light .lt{font-size:12px;color:var(--dim);font-weight:600}
+  .light .lv{font-size:17px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}
+  .light.g{border-left-color:var(--green)} .light.y{border-left-color:var(--gold)} .light.r{border-left-color:var(--red)}
+  .light.g .lv{color:var(--green)} .light.y .lv{color:var(--gold)} .light.r .lv{color:var(--red)}
+  /* ROI */
+  .roi{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+  .roicard{background:var(--paper);border:1px solid var(--line);border-radius:15px;padding:17px;box-shadow:var(--shadow)}
+  .roicard.dark{background:#0f2027;color:#eaf6f3;border:none}
+  .roicard .rk{font-size:12px;color:var(--dim);font-weight:600;margin-bottom:6px}
+  .roicard.dark .rk{color:#9fc7c0}
+  .roicard .rv{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  .roicard.dark .rv{color:#fff} .roicard .rv .ac{color:#0f9d6a} .roicard.dark .rv .ac{color:#5fe3cd}
+  .roicard .rs{font-size:12.5px;color:var(--dim2);font-weight:700;margin-top:4px}
+  .roicard.dark .rs{color:#9fc7c0}
+  /* glossary */
+  .gloss{columns:2;column-gap:26px;font-size:13.5px;margin-top:6px}
+  .gloss div{break-inside:avoid;padding:7px 0;border-bottom:1px dashed var(--line);color:var(--dim)}
+  .gloss b{color:var(--ink)}
+  @media (max-width:980px){ .assum,.advgrid{grid-template-columns:repeat(2,1fr)} .kpis{grid-template-columns:repeat(2,1fr)} .two{grid-template-columns:1fr} .liveband{grid-template-columns:1fr} .roi{grid-template-columns:1fr 1fr} }
+  @media (max-width:560px){ .roi{grid-template-columns:1fr 1fr} .gloss{columns:1} }
   @media (max-width:560px){ header h1{font-size:27px} .assum,.advgrid,.kpis{grid-template-columns:1fr} h2{font-size:20px} .torn .trow{grid-template-columns:120px 1fr 78px} }
   @media print{ body{background:#fff} header{background:#0a6c61!important} .toolbar,.liveband,.anchor,details.adv summary{display:none} details.adv{padding-top:8px} details.adv[open] summary{display:block} section{padding:16px 0;break-inside:avoid} *{-webkit-print-color-adjust:exact;print-color-adjust:exact} .tbl-wrap,.kpi,.agroup,.flow,.chart,.torn{box-shadow:none} }
 </style>
@@ -172,6 +194,8 @@
       <a href="#sens">Что влияет сильнее всего</a>
       <a href="#scen">Сценарии по ученикам</a>
       <a href="#payback">Окупаемость по месяцам</a>
+      <a href="#roi">Доход инвестора · ROI</a>
+      <a href="#compare">Сравнение сценариев</a>
       <a href="#staff">Штат</a>
     </div>
   </div>
@@ -263,6 +287,8 @@
     </div>
 
     <div class="kpis" id="kpis"></div>
+    <div class="hstrip" id="health"></div>
+    <p class="sub" id="realism" style="margin:14px 0 0"></p>
   </div>
 </section>
 
@@ -339,6 +365,27 @@
   </div>
 </section>
 
+<!-- ДОХОД ИНВЕСТОРА -->
+<section id="roi">
+  <div class="wrap">
+    <div class="kick">Главный ответ инвестору</div>
+    <h2>Доход инвестора и запас прочности</h2>
+    <p class="sub">Сколько инвестор получит за горизонт прогноза, какая это доходность на вложенные деньги, и хватает ли вложений на разгон — когда компания сама выходит в плюс.</p>
+    <div class="roi" id="roiCards"></div>
+    <div class="note teal" id="runwayNote" style="margin-top:14px"></div>
+  </div>
+</section>
+
+<!-- СРАВНЕНИЕ СЦЕНАРИЕВ -->
+<section id="compare">
+  <div class="wrap">
+    <div class="kick">Диапазон исходов</div>
+    <h2>Сравнение трёх сценариев</h2>
+    <p class="sub">Честный разброс: как меняются ключевые итоги в осторожном, базовом и оптимистичном сценариях. Инвестор сразу видит и риск, и потенциал — это сильнее одной «средней» цифры.</p>
+    <div class="tbl-wrap"><table id="tc"></table></div>
+  </div>
+</section>
+
 <!-- ШТАТ -->
 <section id="staff">
   <div class="wrap">
@@ -374,6 +421,23 @@
       <a href="https://www.feinternational.com/blog/edtech-business-valuation" target="_blank">FE International — EdTech</a> ·
       <a href="https://businessmens.ru/article/kak-otkryt-shkolu-vokala" target="_blank">Финмодель школы вокала</a>.
       <br>Модель — прогноз, а не гарантия: фактические показатели зависят от конверсии трафика, удержания и набора. Опорные цены, курс и комиссии — реальные, с источниками; величины «оценка/бенчмарк» — отраслевые ориентиры.
+    </div>
+    <div style="margin-top:24px">
+      <div class="kick">Словарь — простыми словами</div>
+      <div class="gloss">
+        <div><b>Выручка (MRR)</b> — сколько денег приходит за месяц. ARR — то же за год.</div>
+        <div><b>Чистая прибыль</b> — что осталось после всех расходов и налога.</div>
+        <div><b>Маржа</b> — какая доля выручки превращается в прибыль.</div>
+        <div><b>Отток (churn)</b> — сколько клиентов уходит за месяц.</div>
+        <div><b>CAC</b> — сколько стоит привести одного платящего клиента.</div>
+        <div><b>LTV</b> — сколько денег клиент принесёт за всё время, пока он с нами.</div>
+        <div><b>LTV / CAC</b> — во сколько раз клиент приносит больше, чем стоило его привлечь (норма — от 3).</div>
+        <div><b>Точка безубыточности</b> — сколько учеников нужно, чтобы выйти в ноль.</div>
+        <div><b>Окупаемость вложений</b> — за сколько месяцев инвестор вернёт вложенное.</div>
+        <div><b>Доходность (ROI)</b> — на сколько % вырастут вложенные деньги; ×N — во столько раз больше вернётся.</div>
+        <div><b>Подушка / runway</b> — хватает ли вложений на месяцы работы в минус до выхода в плюс.</div>
+        <div><b>Сценарии</b> — осторожный / базовый / оптимистичный варианты развития (разный рост и отток).</div>
+      </div>
     </div>
   </div>
 </section>
@@ -545,16 +609,21 @@ function ramp(p){
   const sc=SCN[SCEN], H=Math.max(6,Math.min(60,p.horizon));
   const chS=Math.min(0.9,p.churnSchool/100*sc.churnMul), chA=Math.min(0.9,p.churnApp/100*sc.churnMul);
   const addS=p.gStuAdd*sc.newMul, addA=p.gSubAdd*sc.newMul;
-  let stu=p.gStuStart, sub=p.gSubStart, cumInv=0, payback=null, rows=[];
+  let stu=p.gStuStart, sub=p.gSubStart, cumInv=0, payback=null, firstProfit=null;
+  let burn=0, peakBurn=0; let rows=[];
   for(let m=1;m<=H;m++){
     if(m>1){ stu=stu*(1-chS)+addS; sub=sub*(1-chA)+addA; }
     const mkt = m<=p.boostMonths ? p.mktBoost : p.mktSteady;
     const r=calc(p,stu,sub,mkt);
-    const inv=r.net>0?r.net*p.invShare/100:0; cumInv+=inv;
+    if(firstProfit===null && r.net>=0) firstProfit=m;
+    // доля инвестора: invShare до возврата вложений, после — invShareAfter (бессрочно)
+    const share = (payback!==null) ? p.invShareAfter : p.invShare;
+    const inv = r.net>0 ? r.net*share/100 : 0; cumInv+=inv;
     if(payback===null && cumInv>=p.inv) payback=m;
+    if(r.net<0){ burn+=-r.net; if(burn>peakBurn) peakBurn=burn; }   // расход вложений на разгон
     rows.push({m,stu:Math.round(stu),sub:Math.round(sub),mkt,net:r.net,inv,cumInv});
   }
-  return {rows,payback};
+  return {rows,payback,firstProfit,peakBurn,totalReturn:cumInv};
 }
 function renderT3(){
   const p=P(); const {rows,payback}=ramp(p); const H=rows.length;
@@ -594,7 +663,70 @@ function renderT4(){
   document.getElementById('t4').innerHTML=head+body+'</tbody>';
 }
 
-function renderAll(){ renderKPIs(); renderVerdict(); renderUnit(); renderTornado(); renderT1(); renderT2(); renderT3(); renderT4(); }
+/* ---------- светофор здоровья ---------- */
+function light(cls,label,val){ return `<div class="light ${cls}"><div class="lt">${label}</div><div class="lv">${val}</div></div>`; }
+function renderHealth(){
+  const p=P(), s=snapshot(), r=calc(p,s.stu,s.sub,p.mktSteady), m=metrics(p,s.sub);
+  const {payback,peakBurn}=ramp(p);
+  const ratioCls = m.ratio>=3?'g':(m.ratio>=2?'y':'r');
+  const marginCls= r.margin>=15?'g':(r.margin>0?'y':'r');
+  const cacCls   = m.cacPayback<=12?'g':(m.cacPayback<=18?'y':'r');
+  const pbCls    = !payback?'r':(payback<=18?'g':(payback<=24?'y':'r'));
+  const runCls   = peakBurn<=p.inv*0.8?'g':(peakBurn<=p.inv?'y':'r');
+  document.getElementById('health').innerHTML =
+    light(ratioCls,'LTV / CAC', m.ratio.toFixed(1)+':1') +
+    light(marginCls,'Операц. маржа', r.margin.toFixed(0)+'%') +
+    light(cacCls,'Окупаемость CAC', m.cacPayback.toFixed(1)+' мес') +
+    light(pbCls,'Возврат вложений', payback?payback+' мес':'>'+p.horizon+' мес') +
+    light(runCls,'Запас вложений', peakBurn<=p.inv?'хватает':'впритык');
+}
+
+/* ---------- проверка реализма прогноза ---------- */
+function renderRealism(){
+  const p=P(), sc=SCN[SCEN];
+  const buy = p.cac>0 ? p.mktSteady/p.cac : 0;
+  const need = p.gStuAdd*sc.newMul;
+  const ok = buy>=need;
+  document.getElementById('realism').innerHTML =
+    `<b>Проверка реализма:</b> маркетинг ${ru(p.mktSteady)} ₽ ÷ CAC ${ru(p.cac)} ₽ ≈ <b>${Math.floor(buy)} новых платящих/мес</b> можно купить; в прогнозе заложен прирост <b>${need.toFixed(0)}/мес</b> — ${ok?'✅ бюджета хватает, прогноз реалистичен':'⚠️ для такого прироста бюджета маловато: поднимите маркетинг или снизьте CAC'}.`;
+}
+
+/* ---------- доход инвестора + запас прочности ---------- */
+function renderROI(){
+  const p=P(); const {payback,totalReturn,peakBurn,firstProfit,rows}=ramp(p);
+  const mult = p.inv>0 ? totalReturn/p.inv : 0; const roiPct=(mult-1)*100;
+  const yrs = (rows.length/12).toFixed(1).replace('.0','');
+  document.getElementById('roiCards').innerHTML =
+    `<div class="roicard"><div class="rk">Инвестор вложит</div><div class="rv">${ru(p.inv)} ₽</div><div class="rs">≈ ${ru(p.inv*p.rate)} ฿</div></div>
+     <div class="roicard"><div class="rk">Получит за ${rows.length} мес</div><div class="rv">${ru(totalReturn)} ₽</div><div class="rs">≈ ${ru(totalReturn*p.rate)} ฿</div></div>
+     <div class="roicard dark"><div class="rk">Доходность на вложения</div><div class="rv"><span class="ac">${roiPct>=0?'+':''}${ru(roiPct)}%</span></div><div class="rs">×${mult.toFixed(1)} от вложенного за ${yrs} г.</div></div>
+     <div class="roicard"><div class="rk">Возврат вложений</div><div class="rv">${payback?payback+' мес':'>'+rows.length+' мес'}</div><div class="rs">далее ${p.invShareAfter}% прибыли бессрочно</div></div>`;
+  const enough = peakBurn<=p.inv, cushion=p.inv-peakBurn;
+  const n=document.getElementById('runwayNote'); n.className='note '+(enough?'teal':'');
+  n.innerHTML = `<div class="t">${enough?'✅ Вложений хватает на разгон':'⚠️ Вложений впритык — нужен запас'}</div>`+
+    `<p>Компания выходит в операционный плюс примерно на <b>${firstProfit||'?'}-м месяце</b>. До этого работа в минус расходует из вложений около <b>${ru(peakBurn)} ₽</b>${enough?` — остаётся подушка <b>${ru(cushion)} ₽</b> на непредвиденное.`:` — это больше вложений ${ru(p.inv)} ₽. Снизьте разгонный маркетинг/расходы или ускорьте набор.`}</p>`;
+}
+
+/* ---------- сравнение трёх сценариев ---------- */
+function renderCompare(){
+  const p=P(); const order=['bear','base','bull']; const saved=SCEN;
+  const H=Math.max(6,Math.min(60,p.horizon)); const res={};
+  order.forEach(sc=>{ SCEN=sc; const r=ramp(p); const m12=r.rows[Math.min(11,r.rows.length-1)];
+    res[sc]={pb:r.payback, net12:m12.net, ret:r.totalReturn, roi:p.inv>0?(r.totalReturn/p.inv-1)*100:0, stu12:m12.stu}; });
+  SCEN=saved;
+  const head=`<thead><tr><th>Показатель</th><th>🐻 Осторожный</th><th>⚖️ Базовый</th><th>🚀 Оптимистичный</th></tr></thead>`;
+  const row=(label,fn)=>`<tr><td>${label}</td>${order.map(sc=>`<td>${fn(res[sc])}</td>`).join('')}</tr>`;
+  const body='<tbody>'
+    +row('Учеников к 12 мес', r=>r.stu12)
+    +row('Чистая прибыль на 12 мес', r=>`<span style="color:${r.net12<0?'var(--red)':'var(--green)'};font-weight:800">${fmt(r.net12)}</span>`)
+    +row('Возврат вложений', r=>r.pb?`<b class="hl">${r.pb} мес</b>`:`>${H} мес`)
+    +row(`Доход инвестора за ${H} мес`, r=>fmt(r.ret))
+    +row('Доходность на вложения', r=>`<b style="color:${r.roi>=0?'var(--green)':'var(--red)'}">${r.roi>=0?'+':''}${ru(r.roi)}%</b>`)
+    +'</tbody>';
+  document.getElementById('tc').innerHTML=head+body;
+}
+
+function renderAll(){ renderKPIs(); renderHealth(); renderRealism(); renderVerdict(); renderUnit(); renderTornado(); renderT1(); renderT2(); renderT3(); renderROI(); renderCompare(); renderT4(); }
 
 /* ---------- события ---------- */
 IDS.forEach(id=>document.getElementById(id).addEventListener('input',renderAll));
