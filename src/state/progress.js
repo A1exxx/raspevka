@@ -434,6 +434,260 @@ export function isPaywalled() {
 export function getDevMode() { return load().devMode === true; }
 export function setDevMode(on) { const p = load(); p.devMode = !!on; save(p); return p.devMode; }
 
+// ================== XP / Уровни / Ачивки / Профиль (геймификация) ==================
+
+export const LEVELS = [
+  { min: 0,     title: 'Новичок' },
+  { min: 100,   title: 'Ученик' },
+  { min: 250,   title: 'Любитель' },
+  { min: 500,   title: 'Распевающийся' },
+  { min: 850,   title: 'Уверенный' },
+  { min: 1300,  title: 'Вокалист' },
+  { min: 1900,  title: 'Артист' },
+  { min: 2700,  title: 'Солист' },
+  { min: 3700,  title: 'Виртуоз' },
+  { min: 5000,  title: 'Мастер' },
+  { min: 7000,  title: 'Маэстро' },
+  { min: 10000, title: 'Легенда' },
+];
+
+/** Получить текущие XP. */
+export function getXp() { return load().xp || 0; }
+
+/** Прибавить XP, вернуть новый total. */
+export function addXp(n) {
+  const p = load();
+  p.xp = (p.xp || 0) + Math.max(0, Math.round(n));
+  save(p);
+  return p.xp;
+}
+
+/**
+ * Вычислить уровень по значению XP.
+ * Возвращает { level (1-based), title, curMin, nextMin (или null), into, span, pct }.
+ */
+export function getLevel(xp = getXp()) {
+  let lvIdx = 0;
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (xp >= LEVELS[i].min) { lvIdx = i; break; }
+  }
+  const cur = LEVELS[lvIdx];
+  const next = LEVELS[lvIdx + 1] || null;
+  const into = xp - cur.min;
+  const span = next ? next.min - cur.min : 1;
+  return {
+    level: lvIdx + 1,
+    title: cur.title,
+    curMin: cur.min,
+    nextMin: next ? next.min : null,
+    into,
+    span,
+    pct: next ? Math.round((into / span) * 100) : 100,
+  };
+}
+
+/** Профиль игрока: имя и аватар (эмодзи). */
+export function getProfile() {
+  const p = load();
+  return { name: p.profileName || '', avatar: p.profileAvatar || '' };
+}
+export function setProfile({ name, avatar }) {
+  const p = load();
+  if (name !== undefined) p.profileName = String(name).slice(0, 32);
+  if (avatar !== undefined) p.profileAvatar = String(avatar).slice(0, 4);
+  save(p);
+  return getProfile();
+}
+
+/**
+ * Счётчик распевок/упражнений с оценкой 3★.
+ * Увеличивается в awardXp при stars===3.
+ */
+export function getPerfect3Count() { return load().perfect3Count || 0; }
+function _incPerfect3() {
+  const p = load();
+  p.perfect3Count = (p.perfect3Count || 0) + 1;
+  save(p);
+  return p.perfect3Count;
+}
+
+/**
+ * Флаг «полная сессия завершена хотя бы раз».
+ * Устанавливается снаружи через markFullSessionDone().
+ */
+export function getFullSessionDone() { return load().fullSessionDone === true; }
+export function markFullSessionDone() {
+  const p = load();
+  p.fullSessionDone = true;
+  save(p);
+}
+
+/**
+ * Начислить XP за действие.
+ * kind: 'exercise' | 'session' | 'breathing' | 'exam'
+ * stars (для exercise): 0..3
+ * Формула: упражнение = 10 + stars*15 (0★=10, 1★=25, 2★=40, 3★=55)
+ *          полная распевка = +60
+ *          дыхание = +20
+ *          экзамен = +100
+ */
+export function awardXp({ stars = 0, kind = 'exercise' } = {}) {
+  let n = 0;
+  if (kind === 'exercise') {
+    n = 10 + stars * 15;
+    if (stars === 3) _incPerfect3();
+  } else if (kind === 'session') {
+    n = 60;
+  } else if (kind === 'breathing') {
+    n = 20;
+  } else if (kind === 'exam') {
+    n = 100;
+  }
+  const prev = getXp();
+  const next = addXp(n);
+  return { added: n, total: next, prevTotal: prev };
+}
+
+// ================== Ачивки ==================
+
+export const ACHIEVEMENTS = [
+  {
+    id: 'first_step',
+    title: 'Первый шаг',
+    desc: 'Завершить первую распевку или упражнение',
+    icon: '🎵',
+    check: (st) => (st.totalSessions || 0) >= 1,
+  },
+  {
+    id: 'clean_voice',
+    title: 'Чистый голос',
+    desc: 'Получить первые 3 звезды',
+    icon: '⭐',
+    check: (st) => (st.perfect3Count || 0) >= 1,
+  },
+  {
+    id: 'perfectionist',
+    title: 'Перфекционист',
+    desc: 'Получить 3 звезды 10 раз',
+    icon: '💎',
+    check: (st) => (st.perfect3Count || 0) >= 10,
+  },
+  {
+    id: 'week_power',
+    title: 'Неделя силы',
+    desc: 'Стрик 7 дней подряд',
+    icon: '🔥',
+    check: (st) => (st.streak || 0) >= 7,
+  },
+  {
+    id: 'month_discipline',
+    title: 'Месяц дисциплины',
+    desc: 'Стрик 30 дней подряд',
+    icon: '📅',
+    check: (st) => (st.streak || 0) >= 30,
+  },
+  {
+    id: 'unbreakable',
+    title: 'Несгибаемый',
+    desc: 'Стрик 100 дней подряд',
+    icon: '🏆',
+    check: (st) => (st.streak || 0) >= 100,
+  },
+  {
+    id: 'breath_master',
+    title: 'Дыхание мастера',
+    desc: 'Ровный выдох ≥ 20 секунд',
+    icon: '🫁',
+    check: (st) => (st.breathBest || 0) >= 20,
+  },
+  {
+    id: 'wide_range',
+    title: 'Шире на октаву',
+    desc: 'Диапазон голоса 24+ полутона',
+    icon: '🎼',
+    check: (st) => (st.rangeSemitones || 0) >= 24,
+  },
+  {
+    id: 'student',
+    title: 'Ученик',
+    desc: 'Сдать первый экзамен блока',
+    icon: '🎓',
+    check: (st) => (st.examsPassed || 0) >= 1,
+  },
+  {
+    id: 'graduate',
+    title: 'Выпускник',
+    desc: 'Пройти все 10 блоков программы',
+    icon: '👑',
+    check: (st) => (st.examsPassed || 0) >= 10,
+  },
+  {
+    id: 'marathon',
+    title: 'Марафонец',
+    desc: 'Завершить 50 сессий/упражнений',
+    icon: '🏅',
+    check: (st) => (st.totalSessions || 0) >= 50,
+  },
+  {
+    id: 'timbre_found',
+    title: 'Тембр найден',
+    desc: 'Определить тип голоса',
+    icon: '🎤',
+    check: (st) => !!st.voiceSet,
+  },
+  {
+    id: 'full_session',
+    title: 'Полная распевка',
+    desc: 'Пройти полную распевку (все упражнения)',
+    icon: '✅',
+    check: (st) => !!st.fullSessionDone,
+  },
+];
+
+/** Разблокированные ачивки (массив id). */
+export function getUnlockedAchievements() { return load().unlockedAchievements || []; }
+
+/**
+ * Проверить все ачивки по снимку прогресса.
+ * Возвращает массив НОВЫХ разблокированных объектов.
+ * st = { streak, totalSessions, examsPassed (число), rangeSemitones, breathBest,
+ *         perfect3Count, voiceSet (bool), fullSessionDone (bool) }
+ */
+export function checkAchievements(st) {
+  const p = load();
+  const unlocked = new Set(p.unlockedAchievements || []);
+  const newOnes = [];
+  for (const ach of ACHIEVEMENTS) {
+    if (!unlocked.has(ach.id) && ach.check(st)) {
+      unlocked.add(ach.id);
+      newOnes.push(ach);
+    }
+  }
+  if (newOnes.length > 0) {
+    p.unlockedAchievements = [...unlocked];
+    save(p);
+  }
+  return newOnes;
+}
+
+/** Снимок прогресса для checkAchievements (удобный хелпер). */
+export function progressSnapshot() {
+  const p = load();
+  const range = p.range;
+  const rangeSemitones = range && Number.isFinite(range.low) && Number.isFinite(range.high)
+    ? range.high - range.low : 0;
+  return {
+    streak: p.streak || 0,
+    totalSessions: p.total || 0,
+    examsPassed: (p.examsPassed || []).length,
+    rangeSemitones,
+    breathBest: p.breathBest || 0,
+    perfect3Count: p.perfect3Count || 0,
+    voiceSet: !!(p.voice && p.voice.key),
+    fullSessionDone: !!p.fullSessionDone,
+  };
+}
+
 /** Разблокировать все блоки программы (пометить экзамены сданными). */
 export function devUnlockAllBlocks(blockIds) {
   const p = load();

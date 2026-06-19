@@ -3,6 +3,7 @@
 //   paced  — ведомое дыхание с дышащим кругом (box breathing, дыхание животом)
 //   exhale — замер длительности ровного выдоха на «с-с-с» по громкости (RMS)
 import * as progress from '../state/progress.js';
+import { showToast } from '../ui/celebrate.js';
 import { bellyDiagram } from '../ui/belly-diagram.js';
 import { exerciseHero } from '../ui/illustrations.js';
 
@@ -129,11 +130,24 @@ export function renderBreathing(app, mic, key, { onExit, onNext, nextLabel, onDo
     function finishPaced() {
       stop();
       if (onDone) onDone();
+      // XP за дыхательное упражнение
+      const prevLvl = progress.getLevel().level;
+      const xpRes = progress.awardXp({ kind: 'breathing' });
+      const newLvl = progress.getLevel().level;
+      progress.checkAchievements(progress.progressSnapshot()).forEach((a) =>
+        showToast(`Награда: ${a.title}`, { icon: a.icon, type: 'achievement' }));
+      if (newLvl > prevLvl) showToast(`Новый уровень: ${progress.getLevel().title}`, { icon: '🏆', type: 'level' });
+      const lvInfo = progress.getLevel();
       app.innerHTML = `
         <div class="screen summary">
           <div class="stars">🫁</div>
           <div class="verdict">Готово!</div>
           <p class="hint">${ex.cycles} циклов дыхания пройдено. Голос готов к распевке.</p>
+          <div class="xp-summary-row">
+            <span class="xp-gained">+${xpRes.added} XP</span>
+            <span class="xp-level-label">${lvInfo.title} · ур. ${lvInfo.level}</span>
+            <div class="xp-bar-wrap"><div class="xp-bar-fill" style="width:${lvInfo.pct}%"></div></div>
+          </div>
           ${finishButtons()}
         </div>`;
       wireFinish(runPaced);
@@ -186,11 +200,24 @@ export function renderBreathing(app, mic, key, { onExit, onNext, nextLabel, onDo
       const best = progress.recordBreathBest(seconds);
       const goal = [...ex.goals].reverse().find((g) => seconds >= g.sec);
       const verdict = goal ? goal.label[0].toUpperCase() + goal.label.slice(1) + '!' : 'Попробуй ещё';
+      // XP за дыхательное упражнение
+      const prevLvl = progress.getLevel().level;
+      const xpRes = progress.awardXp({ kind: 'breathing' });
+      const newLvl = progress.getLevel().level;
+      progress.checkAchievements(progress.progressSnapshot()).forEach((a) =>
+        showToast(`Награда: ${a.title}`, { icon: a.icon, type: 'achievement' }));
+      if (newLvl > prevLvl) showToast(`Новый уровень: ${progress.getLevel().title}`, { icon: '🏆', type: 'level' });
+      const lvInfo = progress.getLevel();
       app.innerHTML = `
         <div class="screen summary">
           <div class="big-pct">${seconds.toFixed(1)}<span>сек</span></div>
           <div class="verdict">${verdict}</div>
           <p class="hint">ровный выдох на «с-с-с» · твой рекорд: <b>${best.toFixed(1)} сек</b></p>
+          <div class="xp-summary-row">
+            <span class="xp-gained">+${xpRes.added} XP</span>
+            <span class="xp-level-label">${lvInfo.title} · ур. ${lvInfo.level}</span>
+            <div class="xp-bar-wrap"><div class="xp-bar-fill" style="width:${lvInfo.pct}%"></div></div>
+          </div>
           ${finishButtons()}
         </div>`;
       wireFinish(runExhale);

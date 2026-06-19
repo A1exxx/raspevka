@@ -1064,3 +1064,253 @@ h1, .splash-title, .hero-title, .voice-result, .ear-target, .big-pct {
 .guide-head { display: flex; align-items: center; gap: 10px; font-size: 16px; margin-bottom: 6px; }
 .guide-ic { font-size: 20px; }
 .guide-card .how { margin: 0; color: var(--text-dim); }
+
+/* ============ XP / Геймификация ============ */
+
+/* XP-строка на экране итога (game + session + breathing) */
+.xp-summary-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(14,141,127,.18);
+  border-radius: var(--r-sm);
+  padding: 12px 16px;
+}
+.xp-gained {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent-2);
+  letter-spacing: -.01em;
+}
+.xp-level-label {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+.xp-bar-hint {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* XP progress bar (используется в итоге и профиле) */
+.xp-bar-wrap {
+  height: 8px;
+  background: var(--bg-soft);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+.xp-bar-wrap--lg { height: 12px; }
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--green));
+  border-radius: 999px;
+  transition: width .5s var(--ease);
+  min-width: 4px;
+}
+
+/* Профиль-чип в шапке меню */
+.profile-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(14,141,127,.22);
+  border-radius: 999px;
+  padding: 4px 10px 4px 6px;
+  cursor: pointer;
+  transition: background .15s ease;
+  font: inherit;
+  color: var(--text);
+  min-width: 0;
+}
+.profile-chip:hover { background: rgba(14,141,127,.18); }
+.profile-chip-avatar { font-size: 18px; line-height: 1; }
+.profile-chip-level {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-2);
+  white-space: nowrap;
+}
+.profile-chip-bar {
+  width: 36px;
+  height: 5px;
+  background: var(--bg-soft);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(14,141,127,.2);
+}
+.profile-chip-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  min-width: 2px;
+}
+
+/* ============ Экран профиля ============ */
+.profile-screen { gap: 18px; }
+
+.prof-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+}
+.prof-avatar-btn {
+  font-size: 64px;
+  line-height: 1;
+  background: var(--accent-soft);
+  border: 2px solid rgba(14,141,127,.22);
+  border-radius: 50%;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .15s var(--ease), box-shadow .15s ease;
+  box-shadow: var(--shadow-sm);
+}
+.prof-avatar-btn:hover { transform: scale(1.07); box-shadow: var(--shadow-accent); }
+.prof-avatar-hint { font-size: 12px; color: var(--text-dim); }
+.prof-name-wrap { width: 100%; max-width: 280px; }
+.prof-name-input {
+  width: 100%;
+  text-align: center;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--line);
+  border-radius: 0;
+  padding: 6px 4px;
+  outline: none;
+  transition: border-color .15s ease;
+}
+.prof-name-input:focus { border-color: var(--accent); }
+.prof-name-input::placeholder { color: var(--text-dim); font-weight: 400; }
+
+.prof-level-card { display: flex; flex-direction: column; gap: 8px; }
+.prof-level-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.prof-level-num {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent-2);
+  letter-spacing: -.01em;
+}
+.prof-level-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.prof-xp-total {
+  font-size: 14px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+.prof-level-hint { font-size: 13px; color: var(--text-dim); }
+
+.prof-stats-card { display: flex; flex-direction: column; gap: 14px; }
+.prof-stats-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.prof-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+.prof-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+}
+.prof-stat-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+  word-break: break-all;
+}
+.prof-stat-lbl {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.3;
+}
+
+.prof-ach-card { display: flex; flex-direction: column; gap: 14px; }
+
+/* Сетка ачивок */
+.ach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+}
+.ach-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  border-radius: var(--r-sm);
+  text-align: center;
+  position: relative;
+  cursor: default;
+}
+.ach-unlocked {
+  background: var(--accent-soft);
+  border: 1px solid rgba(14,141,127,.22);
+}
+.ach-locked {
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  opacity: .6;
+}
+.ach-icon { font-size: 26px; line-height: 1; }
+.ach-name { font-size: 11px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.ach-desc { font-size: 10px; color: var(--text-dim); line-height: 1.3; }
+
+/* ============ Тост уровня/награды ============ */
+.xp-toast {
+  position: fixed;
+  bottom: 96px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--text);
+  color: #fff;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 8px 28px -8px rgba(0,0,0,.35);
+  white-space: nowrap;
+  max-width: calc(100vw - 40px);
+  transition: opacity .3s ease, transform .3s var(--ease);
+}
+.xp-toast--level { background: var(--accent-2); }
+.xp-toast--achievement { background: var(--gold); color: var(--text); }
+.xp-toast--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.xp-toast-icon { font-size: 18px; }
+.xp-toast-text { overflow: hidden; text-overflow: ellipsis; }

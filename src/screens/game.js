@@ -9,7 +9,7 @@ import * as progress from '../state/progress.js';
 import { logEvent } from '../state/analytics.js';
 import { MODES, modeUnlocked } from '../theory/modes.js';
 import { contourGlyph, exerciseHero, artFor } from '../ui/illustrations.js';
-import { celebrate, haptic } from '../ui/celebrate.js';
+import { celebrate, haptic, showToast } from '../ui/celebrate.js';
 
 // Открыт ли блок «продвинутых» настроек (тембр/грув/наушники) — сохраняем между перерисовками.
 let moreSettingsOpen = false;
@@ -350,6 +350,17 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     // Одиночная распевка ≥50% — засчитываем день (стрик/дневная цель).
     // Полная распевка и экзамены идут через onComplete и записываются своим флоу.
     if (avgPct >= 0.5) progress.recordSession({ pct: avgPct, stars: agg.stars });
+    // Начисляем XP и проверяем ачивки
+    const prevLvl = progress.getLevel().level;
+    const xpResult = progress.awardXp({ stars: agg.stars, kind: 'exercise' });
+    agg._xpAdded = xpResult.added;
+    const newLvl = progress.getLevel().level;
+    const newAchs = progress.checkAchievements(progress.progressSnapshot());
+    if (newLvl > prevLvl) {
+      celebrate(2);
+      showToast(`Новый уровень: ${progress.getLevel().title}`, { icon: '🏆', type: 'level' });
+    }
+    newAchs.forEach((a) => showToast(`Награда: ${a.title}`, { icon: a.icon, type: 'achievement' }));
     // Энергия/жизни (по ТЗ, смягчено): <40% → разбор и предложение заново со списанием
     // энергии (без авто-рестарта — выбор за тобой); ≥50% → пополнение. Энергия восстанавливается со временем.
     if (avgPct < 0.4) {
@@ -368,12 +379,21 @@ export function renderGame(app, mic, tracker, exercise, opts = {}) {
     const pct = Math.round(agg.pct * 100);
     const verdict = agg.stars >= 3 ? 'Отлично!' : agg.stars === 2 ? 'Хорошо!' : agg.stars === 1 ? 'Неплохо' : 'Ещё разок';
     const tip = diagnose(agg, exercise);
+    const lvInfo = progress.getLevel();
+    const xpRow = agg._xpAdded != null ? `
+      <div class="xp-summary-row">
+        <span class="xp-gained">+${agg._xpAdded} XP</span>
+        <span class="xp-level-label">${lvInfo.title} · ур. ${lvInfo.level}</span>
+        <div class="xp-bar-wrap"><div class="xp-bar-fill" style="width:${lvInfo.pct}%"></div></div>
+        ${lvInfo.nextMin ? `<span class="xp-bar-hint">до след. уровня ${lvInfo.nextMin - lvInfo.curMin - lvInfo.into} XP</span>` : '<span class="xp-bar-hint">Максимальный уровень!</span>'}
+      </div>` : '';
     app.innerHTML = `
       <div class="screen summary">
         <div class="stars">${stars}</div>
         <div class="verdict">${verdict}</div>
         <div class="big-pct">${pct}<span>%</span></div>
         <p class="hint">средняя точность${agg.repsDone > 1 ? ` за ${agg.repsDone} повтор${agg.repsDone < 5 ? 'а' : 'ов'}` : ''}</p>
+        ${xpRow}
         ${energyRow(progress.getEnergy(), progress.getMaxEnergy())}
         ${statsRow(agg)}
         <div class="card tip-card"><p class="how"><b>Разбор.</b> ${tip}</p></div>

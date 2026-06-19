@@ -22,6 +22,7 @@ import { renderBackingSong } from './screens/backing-song.js';
 import { renderLeadForm } from './screens/lead-form.js';
 import { BLOCKS, EX_MAKERS } from './theory/curriculum.js';
 import { renderSettings } from './screens/settings.js';
+import { renderProfile } from './screens/profile.js';
 import { renderCalibrate } from './screens/calibrate.js';
 import { renderDevPanel } from './screens/dev-panel.js';
 import { renderPaywall } from './screens/paywall.js';
@@ -29,6 +30,7 @@ import { renderGuide } from './screens/guide.js';
 import { setOutputVolume } from './audio/reference-tone.js';
 import { getMode } from './theory/modes.js';
 import { contourGlyph } from './ui/illustrations.js';
+import { showToast } from './ui/celebrate.js';
 import * as progress from './state/progress.js';
 import * as clock from './state/clock.js';
 import { initMetrika } from './state/analytics-config.js';
@@ -353,11 +355,18 @@ function renderMenu() {
   const modeName = getMode(progress.getModeKey()).name;
   const energy = progress.getEnergy();
   const maxE = progress.getMaxEnergy();
+  const profInfo = progress.getLevel();
+  const profAvatar = progress.getProfile().avatar || '🎤';
   app.innerHTML = `
     <div class="screen home">
       <header class="home-head">
         <h1>Распевка</h1>
         <div class="home-chips">
+          <button class="profile-chip" data-profile aria-label="Профиль игрока">
+            <span class="profile-chip-avatar">${profAvatar}</span>
+            <span class="profile-chip-level">Ур.${profInfo.level}</span>
+            <div class="profile-chip-bar"><div class="profile-chip-fill" style="width:${profInfo.pct}%"></div></div>
+          </button>
           <div class="energy-chip" title="Энергия — копится за точные распевки"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>${energy}/${maxE}</div>
           ${streak > 0 ? `<div class="streak-chip" title="Стрик: ${streak} ${dayWord(streak)} подряд">${flameSvg()} ${streak}</div>` : ''}
           ${progress.getFreezes() > 0 ? `<div class="energy-chip" title="Заморозка стрика — страхует 1 пропущенный день">❄ ${progress.getFreezes()}</div>` : ''}
@@ -476,6 +485,8 @@ function renderMenu() {
   });
   const guideBtn = app.querySelector('[data-guide]');
   if (guideBtn) guideBtn.addEventListener('click', renderGuideScreen);
+  const profileBtn = app.querySelector('[data-profile]');
+  if (profileBtn) profileBtn.addEventListener('click', renderProfileScreen);
   // Тест-режим: чип 🧪 (когда включён) или 7 быстрых тапов по заголовку.
   const devBtn = app.querySelector('[data-dev]');
   if (devBtn) devBtn.addEventListener('click', renderDevScreen);
@@ -489,6 +500,11 @@ function renderMenu() {
       if (taps >= 7) { taps = 0; progress.setDevMode(true); renderDevScreen(); }
     });
   }
+}
+
+function renderProfileScreen() {
+  stopRaf();
+  renderProfile(app, { onExit: renderMenu });
 }
 
 function renderDevScreen() {
@@ -653,8 +669,16 @@ function renderExamResult(block, agg) {
   stopRaf();
   const pct = Math.round(agg.pct * 100);
   const passed = agg.pct >= block.exam.pass;
-  if (passed) progress.markExamPassed(block.id);
-  else if (progress.getEnergy() > 0) progress.addEnergy(-1);
+  if (passed) {
+    progress.markExamPassed(block.id);
+    // XP за экзамен
+    const prevLvl = progress.getLevel().level;
+    const xpRes = progress.awardXp({ kind: 'exam' });
+    const newLvl = progress.getLevel().level;
+    progress.checkAchievements(progress.progressSnapshot()).forEach((a) =>
+      showToast(`Награда: ${a.title}`, { icon: a.icon, type: 'achievement' }));
+    if (newLvl > prevLvl) showToast(`Новый уровень: ${progress.getLevel().title}`, { icon: '🏆', type: 'level' });
+  } else if (progress.getEnergy() > 0) progress.addEnergy(-1);
   const idx = BLOCKS.indexOf(block);
   const nextUnlocked = passed && idx + 1 < BLOCKS.length;
   const col = passed ? 'var(--green)' : 'var(--coral)';

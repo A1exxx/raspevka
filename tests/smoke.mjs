@@ -296,6 +296,58 @@ P.devResetTrial();
 C.resetOffset();
 eq('тёмная сцена по умолчанию ВЫКЛ', P.getDarkStage(), false);
 
+// === XP / Уровни / Ачивки (геймификация) ===
+globalThis.localStorage.clear();
+// getLevel по порогам
+eq('getLevel(0) → ур.1 Новичок', P.getLevel(0).level, 1);
+eq('getLevel(0).title', P.getLevel(0).title, 'Новичок');
+eq('getLevel(100) → ур.2 Ученик', P.getLevel(100).level, 2);
+eq('getLevel(100).title', P.getLevel(100).title, 'Ученик');
+eq('getLevel(99) → ещё ур.1', P.getLevel(99).level, 1);
+eq('getLevel(10000) → Легенда', P.getLevel(10000).title, 'Легенда');
+eq('getLevel(10000).level = 12', P.getLevel(10000).level, 12);
+eq('getLevel(10000).nextMin = null', P.getLevel(10000).nextMin, null);
+eq('getLevel(250).title = Любитель', P.getLevel(250).title, 'Любитель');
+
+// addXp накапливает
+P.addXp(50); P.addXp(60);
+eq('addXp накапливает: 50+60=110', P.getXp(), 110);
+eq('addXp → уровень 2', P.getLevel().level, 2);
+
+// awardXp за 3★ = 55 XP
+globalThis.localStorage.clear();
+const xpRes = P.awardXp({ stars: 3, kind: 'exercise' });
+eq('awardXp 3★ = 55', xpRes.added, 55);
+eq('awardXp 1★ = 25', P.awardXp({ stars: 1, kind: 'exercise' }).added, 25);
+eq('awardXp session = 60', P.awardXp({ kind: 'session' }).added, 60);
+eq('awardXp breathing = 20', P.awardXp({ kind: 'breathing' }).added, 20);
+eq('awardXp exam = 100', P.awardXp({ kind: 'exam' }).added, 100);
+eq('awardXp 0★ = 10', P.awardXp({ stars: 0, kind: 'exercise' }).added, 10);
+
+// perfect3Count
+globalThis.localStorage.clear();
+P.awardXp({ stars: 3, kind: 'exercise' });
+P.awardXp({ stars: 3, kind: 'exercise' });
+P.awardXp({ stars: 2, kind: 'exercise' }); // не считается
+eq('perfect3Count = 2 после двух 3★', P.getPerfect3Count(), 2);
+
+// checkAchievements — «Первый шаг» после первой сессии
+globalThis.localStorage.clear();
+P.recordSession({ pct: 0.9, stars: 3 });
+const st0 = P.progressSnapshot();
+const newAchs0 = P.checkAchievements(st0);
+checks.push([newAchs0.some((a) => a.id === 'first_step'), 'checkAchievements: Первый шаг разблокирован', '']);
+// Не дублируется при повторной проверке
+const newAchs1 = P.checkAchievements(st0);
+eq('checkAchievements не дублирует', newAchs1.length, 0);
+
+// «Тембр найден» — при выставленном голосе
+globalThis.localStorage.clear();
+P.setVoice('tenor', 48, 72);
+const stVoice = P.progressSnapshot();
+const achsVoice = P.checkAchievements(stVoice);
+checks.push([achsVoice.some((a) => a.id === 'timbre_found'), 'checkAchievements: Тембр найден', '']);
+
 let pass = 0;
 for (const [ok, name, info] of checks) {
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}  ${ok ? '' : '<< ' + info}`);

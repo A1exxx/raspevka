@@ -6,7 +6,7 @@ import { renderRhythm, RHYTHM } from './rhythm.js';
 import { hum3, lipTrill, transposePlan } from '../theory/exercises.js';
 import { getVoiceType } from '../theory/voice-types.js';
 import * as progress from '../state/progress.js';
-import { celebrate, haptic } from '../ui/celebrate.js';
+import { celebrate, haptic, showToast } from '../ui/celebrate.js';
 import { logEvent } from '../state/analytics.js';
 
 export function renderSession(app, mic, tracker, { onExit }) {
@@ -67,9 +67,18 @@ export function renderSession(app, mic, tracker, { onExit }) {
     const stars = avgPct >= 0.85 ? 3 : avgPct >= 0.6 ? 2 : avgPct >= 0.35 ? 1 : 0;
     const { streak, freezeSpent } = progress.recordSession({ pct: avgPct, stars });
     logEvent('session_done', { pct: Math.round(avgPct * 100), stars }); // полная распевка пройдена
+    // XP + ачивки за полную распевку
+    progress.markFullSessionDone();
+    const prevLvl = progress.getLevel().level;
+    const xpResult = progress.awardXp({ kind: 'session' });
+    const newLvl = progress.getLevel().level;
+    const newAchs = progress.checkAchievements(progress.progressSnapshot());
     celebrate(2); haptic(30); // полная распевка завершена — всегда праздник
+    if (newLvl > prevLvl) showToast(`Новый уровень: ${progress.getLevel().title}`, { icon: '🏆', type: 'level' });
+    newAchs.forEach((a) => showToast(`Награда: ${a.title}`, { icon: a.icon, type: 'achievement' }));
     const starStr = '★'.repeat(stars) + '☆'.repeat(3 - stars);
     const pct = Math.round(avgPct * 100);
+    const lvInfo = progress.getLevel();
     app.innerHTML = `
       <div class="screen summary">
         <div class="stars">${starStr}</div>
@@ -77,6 +86,12 @@ export function renderSession(app, mic, tracker, { onExit }) {
         <div class="big-pct">${pct}<span>%</span></div>
         <p class="hint">средняя точность по ${scored.length} ${scored.length === 1 ? 'распевке' : 'распевкам'} с нотами</p>
         <div class="streak-badge">🔥 Стрик: ${streak} ${streak === 1 ? 'день' : 'дн.'}${freezeSpent ? ' · ❄ заморозка спасла стрик' : ''}</div>
+        <div class="xp-summary-row">
+          <span class="xp-gained">+${xpResult.added} XP</span>
+          <span class="xp-level-label">${lvInfo.title} · ур. ${lvInfo.level}</span>
+          <div class="xp-bar-wrap"><div class="xp-bar-fill" style="width:${lvInfo.pct}%"></div></div>
+          ${lvInfo.nextMin ? `<span class="xp-bar-hint">до след. уровня ${lvInfo.nextMin - lvInfo.curMin - lvInfo.into} XP</span>` : '<span class="xp-bar-hint">Максимальный уровень!</span>'}
+        </div>
         <button class="btn btn-primary" id="menu" style="width:100%">В меню</button>
       </div>
     `;

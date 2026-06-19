@@ -36,3 +36,23 @@ import { getHaptic } from '../state/progress.js';
 export function haptic(pattern = 12) {
   try { if (getHaptic() && navigator.vibrate) navigator.vibrate(pattern); } catch (e) { /* ok */ }
 }
+
+/**
+ * Неблокирующий тост-баннер (появляется поверх, исчезает через ~3.5с).
+ * type: 'level' | 'achievement' | 'xp'
+ */
+export function showToast(text, { icon = '🎉', type = 'xp' } = {}) {
+  const el = document.createElement('div');
+  el.className = `xp-toast xp-toast--${type}`;
+  el.setAttribute('aria-live', 'polite');
+  el.innerHTML = `<span class="xp-toast-icon">${icon}</span><span class="xp-toast-text">${text}</span>`;
+  document.body.appendChild(el);
+  // Анимация появления через requestAnimationFrame (иначе transition не сработает)
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => { el.classList.add('xp-toast--visible'); });
+  });
+  setTimeout(() => {
+    el.classList.remove('xp-toast--visible');
+    setTimeout(() => { try { el.remove(); } catch (e) { /* ok */ } }, 500);
+  }, 3200);
+}
