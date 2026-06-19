@@ -168,6 +168,14 @@
   .gloss{columns:2;column-gap:26px;font-size:13.5px;margin-top:6px}
   .gloss div{break-inside:avoid;padding:7px 0;border-bottom:1px dashed var(--line);color:var(--dim)}
   .gloss b{color:var(--ink)}
+  /* info tooltips */
+  .info{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;
+    border:1.3px solid currentColor;font-size:10px;font-weight:800;font-style:italic;line-height:1;opacity:.5;
+    cursor:help;margin-left:5px;vertical-align:middle;user-select:none;font-family:Georgia,'Times New Roman',serif}
+  .info:hover{opacity:1}
+  .tip{position:absolute;z-index:60;max-width:320px;background:#0f2027;color:#eaf6f3;border-radius:12px;
+    padding:13px 15px;font-size:13px;line-height:1.5;box-shadow:0 10px 34px rgba(0,0,0,.3);pointer-events:none}
+  .tip b{display:block;color:#5fe3cd;font-size:13.5px;margin-bottom:5px}
   @media (max-width:980px){ .assum,.advgrid{grid-template-columns:repeat(2,1fr)} .kpis{grid-template-columns:repeat(2,1fr)} .two{grid-template-columns:1fr} .liveband{grid-template-columns:1fr} .roi{grid-template-columns:1fr 1fr} }
   @media (max-width:560px){ .roi{grid-template-columns:1fr 1fr} .gloss{columns:1} }
   @media (max-width:560px){ header h1{font-size:27px} .assum,.advgrid,.kpis{grid-template-columns:1fr} h2{font-size:20px} .torn .trow{grid-template-columns:120px 1fr 78px} }
@@ -230,15 +238,15 @@
         <div class="gh">🎓 Школа музыки</div>
         <div class="fld"><label>Средний чек (₽ / ученик / мес)</label><div class="inrow"><input type="number" id="cheque" value="12000" step="500"></div></div>
         <div class="fld warn"><label title="Рынок онлайн-школ 40–50%">Доля педагога от выручки</label><div class="inrow"><input type="number" id="teacherPct" value="30" step="5"><span class="unit">%</span></div></div>
-        <div class="fld"><label title="Сколько учеников уходит за месяц. Вокал-хобби: 10–15%">Отток учеников / мес</label><div class="inrow"><input type="number" id="churnSchool" value="12" step="1"><span class="unit">%</span></div></div>
+        <div class="fld"><label>Отток учеников / мес <span class="info" data-k="churn">i</span></label><div class="inrow"><input type="number" id="churnSchool" value="12" step="1"><span class="unit">%</span></div></div>
         <div class="fld"><label>Учеников на 1 педагога</label><div class="inrow"><input type="number" id="perTeacher" value="18" step="1"></div></div>
       </div>
       <div class="agroup">
         <div class="gh">📱 Приложение</div>
-        <div class="fld"><label>ARPU (₽ / подписчик / мес)</label><div class="inrow"><input type="number" id="arpu" value="420" step="10"></div></div>
-        <div class="fld"><label title="Подписочные приложения: ~8–9% в месяц">Отток подписчиков / мес</label><div class="inrow"><input type="number" id="churnApp" value="8" step="1"><span class="unit">%</span></div></div>
+        <div class="fld"><label>ARPU (₽ / подписчик / мес) <span class="info" data-k="arpu">i</span></label><div class="inrow"><input type="number" id="arpu" value="420" step="10"></div></div>
+        <div class="fld"><label>Отток подписчиков / мес <span class="info" data-k="churn">i</span></label><div class="inrow"><input type="number" id="churnApp" value="8" step="1"><span class="unit">%</span></div></div>
         <div class="fld"><label>Инфраструктура / сервер (₽ / мес)</label><div class="inrow"><input type="number" id="server" value="10000" step="1000"></div></div>
-        <div class="fld"><label title="CAC — стоимость привлечения одного платящего. Кейсы школ 1800–5000 ₽">CAC — привлечение (₽ / клиент)</label><div class="inrow"><input type="number" id="cac" value="3000" step="500"></div></div>
+        <div class="fld"><label>CAC — привлечение (₽ / клиент) <span class="info" data-k="cac">i</span></label><div class="inrow"><input type="number" id="cac" value="3000" step="500"></div></div>
       </div>
       <div class="agroup">
         <div class="gh">💸 Расходы / мес</div>
@@ -465,6 +473,30 @@ const SCN = { bear:{newMul:0.6,churnMul:1.4}, base:{newMul:1,churnMul:1}, bull:{
 function num(id){ const v=parseFloat(document.getElementById(id).value); return isNaN(v)?0:v; }
 function P(){ const p={}; IDS.forEach(id=>p[id]=num(id)); return p; }
 
+/* ---------- объяснения метрик (всплывают при наведении/тапе) ---------- */
+const META={
+ mrr:{t:'Выручка · MRR / ARR',d:'MRR (Monthly Recurring Revenue) — сколько денег бизнес получает за месяц со всех клиентов: школа + приложение. ARR — то же за год (MRR×12). Главный показатель размера и роста: инвестор смотрит на него первым.'},
+ net:{t:'Чистая прибыль',d:'Сколько остаётся в месяц после ВСЕХ расходов: педагоги, маркетинг, команда, сервисы, эквайринг, возвраты и налог. Именно из неё распределяется доля инвестора. Минус — работа в убыток, он покрывается вложениями.'},
+ margin:{t:'Операционная маржа',d:'Какая доля выручки превращается в чистую прибыль (прибыль ÷ выручка). Показывает эффективность бизнеса. Ориентир здорового бизнеса — выше 15%.'},
+ gross:{t:'Валовая маржа',d:'Доля выручки после ПЕРЕМЕННЫХ расходов (педагог, эквайринг, возвраты), до постоянных (маркетинг, команда). Сколько с каждого рубля идёт на покрытие постоянных расходов и прибыль. Маркетплейс: 40–55%, приложение: 70–85%.'},
+ breakeven:{t:'Точка безубыточности',d:'Сколько учеников надо набрать, чтобы выручка покрыла все постоянные расходы и компания вышла в ноль. Считается: постоянные расходы ÷ маржа покрытия одного ученика. Чем меньше — тем безопаснее бизнес.'},
+ ltv:{t:'LTV — ценность клиента',d:'Lifetime Value — сколько денег принесёт один клиент за всё время, пока он с нами. Считается: маржа с клиента в месяц × срок жизни (1 ÷ отток). Чем выше отток — тем короче жизнь и ниже LTV.'},
+ ltvapp:{t:'LTV подписчика приложения',d:'Сколько принесёт один подписчик за всё время подписки: ARPU × срок жизни (1 ÷ отток приложения). У приложения почти нет переменных затрат, поэтому LTV идёт почти целиком в прибыль.'},
+ cac:{t:'CAC — стоимость привлечения',d:'Customer Acquisition Cost — сколько в среднем тратится на рекламу и продажи, чтобы получить одного ПЛАТЯЩЕГО клиента. Связан с CPL: CAC = CPL (цена лида) ÷ конверсия лида в клиента. Кейсы вокальных школ: 1 800–5 000 ₽.'},
+ cpl:{t:'CPL — цена лида',d:'Cost Per Lead — сколько стоит один лид (заявка/контакт) из рекламы. Из лидов лишь часть становится платящими: CAC = CPL ÷ конверсия. По кейсам школ лид стоит 190–520 ₽ (VK), 400–1000 ₽ (Яндекс).'},
+ ratio:{t:'LTV / CAC',d:'Во сколько раз клиент приносит больше денег, чем стоило его привлечь. Ключевой показатель здоровья для инвестора. Норма — от 3:1: ниже 3 реклама съедает прибыль, выше 3 — масштабировать выгодно.'},
+ cacpay:{t:'Окупаемость CAC',d:'За сколько месяцев деньги, потраченные на привлечение клиента (CAC), возвращаются из его ежемесячной маржи. Цель — меньше 12 месяцев: чем быстрее, тем меньше нужно оборотных средств на рост.'},
+ churn:{t:'Отток · churn',d:'Сколько процентов клиентов перестают платить за месяц. Напрямую определяет срок жизни клиента и LTV. Ориентиры: вокал-хобби 10–15%/мес (школа), ~8–9% (приложение).'},
+ arpu:{t:'ARPU',d:'Average Revenue Per User — средняя выручка с одного подписчика в месяц с учётом того, что часть платит помесячно, часть за год со скидкой. У нас ≈ 420 ₽ (подписка 690 ₽/мес или 3 990 ₽/год).'},
+ investor:{t:'Доля инвестора',d:'Сколько из месячной чистой прибыли получает инвестор. По сделке — 40% до полного возврата вложений, затем 20% бессрочно. Начисляется только с положительной прибыли.'},
+ roi:{t:'Доходность · ROI',d:'Return On Investment — на сколько процентов вырастут вложенные деньги за горизонт прогноза: всего получено ÷ вложено − 1. ×N — во столько раз вернётся больше вложенного.'},
+ payback:{t:'Окупаемость вложений',d:'За сколько месяцев накопленные выплаты инвестору покроют всю сумму вложений. После этой точки инвестор в плюсе и дальше получает 20% прибыли бессрочно.'},
+ runway:{t:'Запас прочности · runway',d:'Хватает ли вложений на период, пока компания работает в минус (разгон). Сколько денег из вложений израсходуется до выхода в плюс и какая подушка останется на непредвиденное.'},
+ contrib:{t:'Маржа покрытия',d:'Сколько остаётся от чека одного ученика после переменных расходов (педагог, эквайринг, возвраты). Эти деньги покрывают постоянные расходы и формируют прибыль — основа расчёта безубыточности.'},
+ teachers:{t:'Педагоги',d:'Сколько преподавателей нужно для текущего числа учеников (ученики ÷ нагрузка ~18). Оплата педагога — процент от проведённых уроков, поэтому расход растёт строго вместе с выручкой.'}
+};
+function info(k){ return '<span class="info" data-k="'+k+'">i</span>'; }
+
 /* форматирование */
 function ru(n){ return Math.round(n).toLocaleString('ru-RU'); }
 function cv(rub){ return CUR==='thb'?rub*num('rate'):rub; }
@@ -517,14 +549,14 @@ function renderKPIs(){
   const p=P(), s=snapshot(), r=calc(p,s.stu,s.sub,p.mktSteady), m=metrics(p,s.sub);
   const neg=r.net<0;
   document.getElementById('kpis').innerHTML = `
-    <div class="kpi"><div class="k">Выручка / мес (MRR)</div><div class="v">${ru(r.rev)} ₽</div><div class="v2">ARR ${ru(r.arr/1e6*10)/10} млн · ≈ ${ru(r.rev*p.rate)} ฿</div></div>
-    <div class="kpi ${neg?'neg':'profit'}"><div class="k">Чистая прибыль / мес</div><div class="v">${ru(r.net)} ₽</div><div class="v2">маржа ${r.margin.toFixed(0)}% · ≈ ${ru(r.net*p.rate)} ฿</div></div>
-    <div class="kpi hero"><div class="k">Инвестору (${p.invShare}%) / мес</div><div class="v">${ru(r.investor)} ₽</div><div class="v2">≈ ${ru(r.investor*p.rate)} ฿</div></div>
-    <div class="kpi"><div class="k">Точка безубыточности</div><div class="v">${m.beStud} <span style="font-size:14px">уч.</span></div><div class="v2">${m.appNet>=m.fixed?'уже покрыто приложением':'учеников чтобы выйти в ноль'}</div></div>
-    <div class="kpi"><div class="k">Валовая маржа</div><div class="v">${r.grossMargin.toFixed(0)}%</div><div class="v2">до постоянных расходов</div></div>
-    <div class="kpi"><div class="k">LTV / CAC (школа)</div><div class="v">${m.ratio.toFixed(1)}:1</div><div class="v2">${m.ratio>=3?'✓ норма ≥3:1':'ниже нормы 3:1'}</div></div>
-    <div class="kpi"><div class="k">Окупаемость CAC</div><div class="v">${m.cacPayback.toFixed(1)} <span style="font-size:14px">мес</span></div><div class="v2">${m.cacPayback<=12?'✓ быстро':'долго'}</div></div>
-    <div class="kpi"><div class="k">Нужно педагогов</div><div class="v">${r.teachers}</div><div class="v2">${s.stu} уч. · ${ru(s.sub)} подписч.</div></div>`;
+    <div class="kpi"><div class="k">Выручка / мес (MRR)${info('mrr')}</div><div class="v">${ru(r.rev)} ₽</div><div class="v2">ARR ${ru(r.arr/1e6*10)/10} млн · ≈ ${ru(r.rev*p.rate)} ฿</div></div>
+    <div class="kpi ${neg?'neg':'profit'}"><div class="k">Чистая прибыль / мес${info('net')}</div><div class="v">${ru(r.net)} ₽</div><div class="v2">маржа ${r.margin.toFixed(0)}% · ≈ ${ru(r.net*p.rate)} ฿</div></div>
+    <div class="kpi hero"><div class="k">Инвестору (${p.invShare}%) / мес${info('investor')}</div><div class="v">${ru(r.investor)} ₽</div><div class="v2">≈ ${ru(r.investor*p.rate)} ฿</div></div>
+    <div class="kpi"><div class="k">Точка безубыточности${info('breakeven')}</div><div class="v">${m.beStud} <span style="font-size:14px">уч.</span></div><div class="v2">${m.appNet>=m.fixed?'уже покрыто приложением':'учеников чтобы выйти в ноль'}</div></div>
+    <div class="kpi"><div class="k">Валовая маржа${info('gross')}</div><div class="v">${r.grossMargin.toFixed(0)}%</div><div class="v2">до постоянных расходов</div></div>
+    <div class="kpi"><div class="k">LTV / CAC (школа)${info('ratio')}</div><div class="v">${m.ratio.toFixed(1)}:1</div><div class="v2">${m.ratio>=3?'✓ норма ≥3:1':'ниже нормы 3:1'}</div></div>
+    <div class="kpi"><div class="k">Окупаемость CAC${info('cacpay')}</div><div class="v">${m.cacPayback.toFixed(1)} <span style="font-size:14px">мес</span></div><div class="v2">${m.cacPayback<=12?'✓ быстро':'долго'}</div></div>
+    <div class="kpi"><div class="k">Нужно педагогов${info('teachers')}</div><div class="v">${r.teachers}</div><div class="v2">${s.stu} уч. · ${ru(s.sub)} подписч.</div></div>`;
 }
 
 /* ---------- вердикт словами ---------- */
@@ -550,17 +582,17 @@ function renderUnit(){
     <div class="row"><span class="lab">− Педагог (${p.teacherPct}%)</span><span class="am minus">−${fmt(t)}</span></div>
     <div class="row"><span class="lab">− Эквайринг (${p.acq}%)</span><span class="am minus">−${fmt(a)}</span></div>
     <div class="row"><span class="lab">− Резерв возвратов (${p.refund}%)</span><span class="am minus">−${fmt(rf)}</span></div>
-    <div class="row tot"><span class="lab">= Маржа покрытия / мес</span><span class="am">${fmt(m.contribStud)}</span></div>
-    <div class="row"><span class="lab">Срок жизни (при оттоке ${p.churnSchool}%)</span><span class="am">${m.ltS.toFixed(0)} мес</span></div>`;
+    <div class="row tot"><span class="lab">= Маржа покрытия / мес${info('contrib')}</span><span class="am">${fmt(m.contribStud)}</span></div>
+    <div class="row"><span class="lab">Срок жизни (при оттоке ${p.churnSchool}%)${info('churn')}</span><span class="am">${m.ltS.toFixed(0)} мес</span></div>`;
   const rOk = m.ratio>=3;
   document.getElementById('metrics').innerHTML = `
     <div class="fh">📊 Ключевые метрики</div>
-    <div class="metr"><span class="lab">LTV ученика школы</span><b>${fmt(m.ltvSchool)}</b></div>
-    <div class="metr"><span class="lab">CAC (привлечение)</span><b>${fmt(p.cac)}</b></div>
-    <div class="metr"><span class="lab">LTV / CAC</span><b>${m.ratio.toFixed(1)}:1 <span class="badge2 ${rOk?'ok':'bad'}">${rOk?'норма':'низко'}</span></b></div>
-    <div class="metr"><span class="lab">Окупаемость CAC</span><b>${m.cacPayback.toFixed(1)} мес</b></div>
-    <div class="metr"><span class="lab">LTV подписчика приложения</span><b>${fmt(m.ltvApp)}</b></div>
-    <div class="metr"><span class="lab">Точка безубыточности</span><b>${m.beStud} учеников</b></div>`;
+    <div class="metr"><span class="lab">LTV ученика школы${info('ltv')}</span><b>${fmt(m.ltvSchool)}</b></div>
+    <div class="metr"><span class="lab">CAC (привлечение)${info('cac')}</span><b>${fmt(p.cac)}</b></div>
+    <div class="metr"><span class="lab">LTV / CAC${info('ratio')}</span><b>${m.ratio.toFixed(1)}:1 <span class="badge2 ${rOk?'ok':'bad'}">${rOk?'норма':'низко'}</span></b></div>
+    <div class="metr"><span class="lab">Окупаемость CAC${info('cacpay')}</span><b>${m.cacPayback.toFixed(1)} мес</b></div>
+    <div class="metr"><span class="lab">LTV подписчика приложения${info('ltvapp')}</span><b>${fmt(m.ltvApp)}</b></div>
+    <div class="metr"><span class="lab">Точка безубыточности${info('breakeven')}</span><b>${m.beStud} учеников</b></div>`;
 }
 
 /* ---------- торнадо-чувствительность ---------- */
@@ -664,7 +696,7 @@ function renderT4(){
 }
 
 /* ---------- светофор здоровья ---------- */
-function light(cls,label,val){ return `<div class="light ${cls}"><div class="lt">${label}</div><div class="lv">${val}</div></div>`; }
+function light(cls,label,val,key){ return `<div class="light ${cls}"><div class="lt">${label}${key?info(key):''}</div><div class="lv">${val}</div></div>`; }
 function renderHealth(){
   const p=P(), s=snapshot(), r=calc(p,s.stu,s.sub,p.mktSteady), m=metrics(p,s.sub);
   const {payback,peakBurn}=ramp(p);
@@ -674,11 +706,11 @@ function renderHealth(){
   const pbCls    = !payback?'r':(payback<=18?'g':(payback<=24?'y':'r'));
   const runCls   = peakBurn<=p.inv*0.8?'g':(peakBurn<=p.inv?'y':'r');
   document.getElementById('health').innerHTML =
-    light(ratioCls,'LTV / CAC', m.ratio.toFixed(1)+':1') +
-    light(marginCls,'Операц. маржа', r.margin.toFixed(0)+'%') +
-    light(cacCls,'Окупаемость CAC', m.cacPayback.toFixed(1)+' мес') +
-    light(pbCls,'Возврат вложений', payback?payback+' мес':'>'+p.horizon+' мес') +
-    light(runCls,'Запас вложений', peakBurn<=p.inv?'хватает':'впритык');
+    light(ratioCls,'LTV / CAC', m.ratio.toFixed(1)+':1','ratio') +
+    light(marginCls,'Операц. маржа', r.margin.toFixed(0)+'%','margin') +
+    light(cacCls,'Окупаемость CAC', m.cacPayback.toFixed(1)+' мес','cacpay') +
+    light(pbCls,'Возврат вложений', payback?payback+' мес':'>'+p.horizon+' мес','payback') +
+    light(runCls,'Запас вложений', peakBurn<=p.inv?'хватает':'впритык','runway');
 }
 
 /* ---------- проверка реализма прогноза ---------- */
@@ -699,8 +731,8 @@ function renderROI(){
   document.getElementById('roiCards').innerHTML =
     `<div class="roicard"><div class="rk">Инвестор вложит</div><div class="rv">${ru(p.inv)} ₽</div><div class="rs">≈ ${ru(p.inv*p.rate)} ฿</div></div>
      <div class="roicard"><div class="rk">Получит за ${rows.length} мес</div><div class="rv">${ru(totalReturn)} ₽</div><div class="rs">≈ ${ru(totalReturn*p.rate)} ฿</div></div>
-     <div class="roicard dark"><div class="rk">Доходность на вложения</div><div class="rv"><span class="ac">${roiPct>=0?'+':''}${ru(roiPct)}%</span></div><div class="rs">×${mult.toFixed(1)} от вложенного за ${yrs} г.</div></div>
-     <div class="roicard"><div class="rk">Возврат вложений</div><div class="rv">${payback?payback+' мес':'>'+rows.length+' мес'}</div><div class="rs">далее ${p.invShareAfter}% прибыли бессрочно</div></div>`;
+     <div class="roicard dark"><div class="rk">Доходность на вложения${info('roi')}</div><div class="rv"><span class="ac">${roiPct>=0?'+':''}${ru(roiPct)}%</span></div><div class="rs">×${mult.toFixed(1)} от вложенного за ${yrs} г.</div></div>
+     <div class="roicard"><div class="rk">Возврат вложений${info('payback')}</div><div class="rv">${payback?payback+' мес':'>'+rows.length+' мес'}</div><div class="rs">далее ${p.invShareAfter}% прибыли бессрочно</div></div>`;
   const enough = peakBurn<=p.inv, cushion=p.inv-peakBurn;
   const n=document.getElementById('runwayNote'); n.className='note '+(enough?'teal':'');
   n.innerHTML = `<div class="t">${enough?'✅ Вложений хватает на разгон':'⚠️ Вложений впритык — нужен запас'}</div>`+
@@ -740,6 +772,23 @@ document.querySelectorAll('#curseg button').forEach(b=>b.addEventListener('click
 const scenseg=document.getElementById('scenseg');
 scenseg.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{scenseg.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active');SCEN=b.dataset.s;scenseg.className='seg '+(SCEN==='base'?'':SCEN);renderAll();}));
 document.getElementById('subVal').textContent=ru(DEF.subs);
+
+/* ---------- всплывающие объяснения ---------- */
+(function(){
+  const tip=document.createElement('div'); tip.className='tip'; tip.style.display='none'; document.body.appendChild(tip);
+  let pinned=null;
+  function show(el){ const m=META[el.dataset.k]; if(!m) return; tip.innerHTML='<b>'+m.t+'</b>'+m.d; tip.style.display='block';
+    const r=el.getBoundingClientRect(); const tw=Math.min(320,window.innerWidth-24); tip.style.maxWidth=tw+'px';
+    let left=r.left+window.scrollX; if(left+tw>window.scrollX+window.innerWidth-12) left=window.scrollX+window.innerWidth-tw-12;
+    tip.style.left=Math.max(12,left)+'px'; tip.style.top=(r.bottom+window.scrollY+8)+'px'; }
+  function hide(){ tip.style.display='none'; }
+  document.addEventListener('mouseover',e=>{ const el=e.target.closest('.info'); if(el&&!pinned) show(el); });
+  document.addEventListener('mouseout',e=>{ const el=e.target.closest('.info'); if(el&&!pinned) hide(); });
+  document.addEventListener('click',e=>{ const el=e.target.closest('.info'); if(el){ e.preventDefault(); e.stopPropagation();
+      if(pinned===el.dataset.k){ pinned=null; hide(); } else { pinned=el.dataset.k; show(el); } } else { pinned=null; hide(); } });
+  window.addEventListener('scroll',()=>{ if(!pinned) hide(); });
+})();
+
 renderAll();
 </script>
 </body>
